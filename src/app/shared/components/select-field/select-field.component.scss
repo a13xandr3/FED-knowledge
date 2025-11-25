@@ -1,0 +1,113 @@
+::ng-deep  .selectField { 
+    width: 100%; 
+    .mat-mdc-form-field-type-mat-select {
+        height: 3rem !important;  
+    }
+    .mat-form-field-appearance-fill {
+        height: 3rem !important;
+    }
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none !important;
+    } 
+    .mat-mdc-form-field-bottom-align {
+        display: none !important;
+    }
+    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+        background: rgba(0, 0, 0, 0.02) !important;
+        border-top: 1px solid !important;
+        border-left: 1px solid !important;
+        border-right: 1px solid !important;
+        border-radius: 5px !important;
+    }
+    .mdc-list-item {
+        font-size: 0.8rem !important;
+    }
+    .mdc-list-item__text {
+        font-size: 0.8rem !important;
+    }
+    .mdc-floating-label {
+        font-size: 0.8rem !important;
+    }
+    .mdc-text-field__input {
+        font-size: 0.8rem !important;
+        padding: 0.5rem !important;
+        height: 1.1rem !important;
+    }
+    .mdc-text-field-helper-text--persistent {
+        font-size: 0.8rem;
+    }
+    .mdc-text-field-helper-text--validation-msg {
+        font-size: 0.8rem;
+    }
+    .mdc-text-field--filled .mdc-line-ripple::after {
+        border-bottom: 0px;
+        border-bottom-color: transparent;
+    }
+    .mdc-text-field-helper-text {
+        font-size: 0.8rem;
+    }    
+    .mdc-line-ripple {
+        height: 0px !important;
+    }
+    .mdc-text-field--filled .mdc-line-ripple::after {
+        border-bottom: 0px;
+        border-bottom-color: transparent;
+    }
+    .mdc-line-ripple::before, .mdc-line-ripple::after {
+        position: relative;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        border-bottom-style: solid;
+        content: "";
+    }
+    .mat-mdc-select {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        font-family: var(--mdc-typography-body1-font-family, var(--mdc-typography-font-family));
+        font-size: var(--mdc-typography-body1-font-size, 0.8rem);
+        line-height: var(--mdc-typography-body1-line-height, 0.6rem);
+        font-weight: var(--mdc-typography-body1-font-weight, 400);
+        letter-spacing: var(--mdc-typography-body1-letter-spacing, 0.03125em);
+        -webkit-text-decoration: var(--mdc-typography-body1-text-decoration, inherit);
+        text-decoration: var(--mdc-typography-body1-text-decoration, inherit);
+        text-transform: var(--mdc-typography-body1-text-transform, none);
+    }
+    .mat-mdc-select-value {
+        width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        height: 1rem !important;
+    }
+    .mat-mdc-form-field-subscript-wrapper {
+        width: 100%;
+        position: relative;
+        display: none;
+    }
+    .mat-mdc-form-field-subscript-wrapper, .mat-mdc-form-field-bottom-align::before {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        font-family: var(--mdc-typography-caption-font-family, var(--mdc-typography-font-family));
+        font-size: var(--mdc-typography-caption-font-size, 0px);
+        line-height: var(--mdc-typography-caption-line-height, 0px);
+        font-weight: var(--mdc-typography-caption-font-weight, 0);
+        letter-spacing: var(--mdc-typography-caption-letter-spacing, 0.0333333333em);
+        -webkit-text-decoration: var(--mdc-typography-caption-text-decoration, inherit);
+        text-decoration: var(--mdc-typography-caption-text-decoration, inherit);
+        text-transform: var(--mdc-typography-caption-text-transform, none);
+    }
+    .mat-mdc-form-field-focus-overlay {
+        background-color: transparent;
+    }
+    .mat-mdc-text-field-wrapper, .mdc-text-field .mdc-text-field--filled {
+        width: 100%;
+        border-top: 1px solid !important;
+        border-left: 1px solid !important;
+        border-right: 1px solid !important;
+        border-bottom: 1px solid !important;
+        border-radius: 5px !important;
+        height: 2.5rem !important;
+    }
+
+}

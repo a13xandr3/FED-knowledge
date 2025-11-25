@@ -1,0 +1,154 @@
+/* Layout em 3 áreas: header / body / footer */
+.sf-dialog {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0;
+  width: 100%;
+  height: 90vh; /* ocupa bem o espaço do MatDialog */
+  max-height: 90vh;
+  position: relative;
+  background: var(--sf-bg, #0f0f12);
+  color: #e9eaee;
+  //border-radius: 12px;
+  overflow: hidden;
+}
+/* Header elegante */
+.sf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sf-title {
+  min-width: 0;
+}
+.file-name {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.chip {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+/* Botão fechar minimalista */
+.icon-btn.close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 20px;
+  line-height: 20px;
+  cursor: pointer;
+}
+.icon-btn.close:hover { background: rgba(255,255,255,0.12); }
+/* Body com 10px de margem interna */
+.sf-body {
+  padding: 10px;
+  overflow: auto; /* evita scroll duplo do dialog */
+}
+/* Área de mídia ocupa tudo, mantendo proporção */
+.sf-media-wrap, .sf-text-wrap, .sf-empty {
+  display: flex;
+  width: 100%;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: auto;
+}
+.sf-media {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #0b0b0d;
+}
+/* Texto pré-formatado com scroll suave */
+.sf-text {
+  margin: 0;
+  padding: 12px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  white-space: pre-wrap;
+  line-height: 1.35;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  background: #0b0b0d;
+}
+/* Footer com ações alinhadas à direita */
+.sf-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.spacer { flex: 1; }
+.btn {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover { border-color: rgba(255,255,255,0.28); }
+.btn.ghost {
+  background: transparent;
+  border-color: rgba(255,255,255,0.14);
+}
+/* Overlay de loading */
+.sf-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 12px;
+  background: rgba(7,7,10,0.65);
+  z-index: 2;
+  text-align: center;
+}
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255,255,255,0.16);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Estado visual quando loading */
+.sf-dialog.loading .sf-body,
+.sf-dialog.loading .sf-footer { filter: blur(1px); pointer-events: none; }
+.sf-media-wrap.sf-scroll {
+  overflow: auto;
+}
+.sheet-view, .docx-view {
+  padding: 12px;
+  background: #0b0b0d;
+}
+.sheet-view table {
+  border-collapse: collapse;
+}
+.sheet-view td, .sheet-view th {
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 6px 8px;
+  white-space: nowrap;
+}

@@ -1,0 +1,51 @@
+::ng-deep quill-editor {
+    width: 100% !important;
+    border: 1px solid #999 !important;
+    border-radius: 10px !important;
+}
+::ng-deep .ql-snow .ql-tooltip {
+    background: rgba(0, 0, 0, 0.02) !important;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px #ddd;
+    color: #444;
+    padding: 5px 12px;
+    white-space: nowrap;
+    left: 0 !important;
+}
+::ng-deep .ql-toolbar.ql-snow {
+    border: 1px solid #999 !important;
+    box-sizing: border-box !important;
+    //font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    padding: 8px !important;
+    border-radius: 10px !important;
+    background: rgba(0, 0, 0, 0.02) !important;
+}
+::ng-deep .ql-editor {
+    box-sizing: border-box;
+    line-height: 1.42;
+    height: 31vh !important;
+    outline: none;
+    overflow-y: auto;
+    padding: 12px 15px;
+    tab-size: 4;
+    text-align: left;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: rgba(0, 0, 0, 0.02) !important;
+    iframe {
+        width: 100%;
+        height: -webkit-fill-available;
+    }
+}
+::ng-deep .ql-container.ql-snow {
+    border: 0px !important;
+}
+::ng-deep .ql-toolbar.ql-snow {
+    border-top: 0px !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
+    border-bottom: 1px solid #999 !important;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    padding: 8px;
+}

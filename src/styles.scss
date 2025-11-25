@@ -1,0 +1,106 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+// @use '@angular/material' as mat;
+// Plus imports for other components in your app.
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+// @include mat.core();
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+// $fed-knowledge-primary: mat.define-palette(mat.$indigo-palette);
+// $fed-knowledge-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+// The warn palette is optional (defaults to red).
+// $fed-knowledge-warn: mat.define-palette(mat.$red-palette);
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+//$fed-knowledge-theme: mat.define-light-theme((
+//  color: (
+//    primary: $fed-knowledge-primary,
+//    accent: $fed-knowledge-accent,
+//    warn: $fed-knowledge-warn,
+//  )
+//));
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+//@include mat.all-component-themes($fed-knowledge-theme);
+/* You can add global styles to this file, and also import other style files */
+//html, body { height: 100%; }
+//body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+@import '~quill/dist/quill.core.css';
+@import '~quill/dist/quill.bubble.css';
+@import '~quill/dist/quill.snow.css';
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";  /* required */
+//@import "~bootstrap/dist/css/bootstrap.css";  /* optional for better look */
+@font-face {
+  font-family: "Alumni";
+  src: url('/public/fonts/Alumni_Sans_Pinstripe/AlumniSansPinstripe-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url('/public/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Raleway";
+  src: url('/public/fonts/Raleway/Raleway-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+*,
+*::before,
+*::after {box-sizing: border-box;margin: 0;padding: 0;}
+html,
+body {height: 100%;line-height: 1.5;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;scroll-behavior: smooth;}
+body {background-color: #fff;color: #000;}
+img,
+picture,
+video,
+canvas,
+svg {display: block;max-width: 100%;}
+input,
+button,
+textarea,
+select {font: inherit;color: inherit;border: none;outline: none;background: none;}
+button {cursor: pointer;background-color: transparent;}
+a {text-decoration: none;color: inherit;}
+ul,ol {list-style: none;}
+table {border-collapse: collapse;width: 100%;}
+html, body { height: 100%; }
+body {margin: 0;}
+[quill-editor-toolbar] .ql-font span[data-label="Alumni"]::before {font-family: "Alumni";}
+.ql-font-Alumni {font-family: "Alumni";}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Alumni]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Alumni]::before {content: 'Alumni';}
+/**/
+[quill-editor-toolbar] .ql-font span[data-label="Poppins"]::before {font-family: "Poppins";}
+.ql-font-Poppins {font-family: "Poppins";}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Poppins]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Poppins]::before {content: 'Poppins';}
+/**/
+[quill-editor-toolbar] .ql-font span[data-label="Raleway"]::before {font-family: "Raleway";}
+.ql-font-Raleway {font-family: "Raleway";}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Raleway]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Raleway]::before {content: 'Raleway';}
+/* Tamanhos do dropdown de font-size */
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="8px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="8px"]::before {content: "8px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="10px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="10px"]::before {content: "10px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before {content: "12px";}
+/* Repita para todos os tamanhos da whitelist */
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {content: "14px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before {content: "16px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {content: "18px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="20px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before {content: "20px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="36px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="36px"]::before {content: "36px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="72px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="72px"]::before {content: "72px";}

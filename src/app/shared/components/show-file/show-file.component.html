@@ -1,0 +1,78 @@
+<div class="sf-dialog" [class.loading]="loading">
+  <!-- Header -->
+  <header class="sf-header">
+    <div class="sf-title">
+      <h3 class="file-name" [title]="originalFile.name || ''">
+        {{ originalFile.name || 'Pré-visualização' }}
+      </h3>
+      <div class="meta">
+        <span class="chip">ID: {{ itemId || '—' }}</span>
+        <!--span class="chip">MIME: {{ (originalFile?.type || 'desconhecido') }}</span-->
+        <span class="chip" *ngIf="originalFile">Tamanho: {{ prettySize }}</span>
+      </div>
+    </div>
+    <button class="icon-btn close" (click)="close()" aria-label="Fechar">×</button>
+  </header>
+  <!-- Loader -->
+  <div class="sf-loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+    <div>Carregando…</div>
+  </div>
+  <!-- Body -->
+  <section class="sf-body" *ngIf="!loading && originalFile">
+    <ng-container [ngSwitch]="renderKind">
+      <!-- IMAGEM -->
+      <figure *ngSwitchCase="'image'" class="sf-media-wrap">
+        <img
+          loading="lazy"
+          title="x"
+          class="sf-media"
+          [src]="objectUrl"
+          [alt]="originalFile.name || 'preview'">
+      </figure>
+      <!-- TEXTO -->
+      <div *ngSwitchCase="'text'" class="sf-text-wrap">
+        <pre class="sf-text">{{ previewText }}</pre>
+      </div>
+      <!-- PDF -->
+      <div *ngSwitchCase="'pdf'" class="sf-media-wrap" style="height: 68.84vh;">
+        <!-- Primeiro tenta <object>, fallback para <iframe> -->
+        <object
+          class="sf-media"
+          type="application/pdf"
+          [data]="safeObjectUrl">
+          <iframe
+            title="x"
+            class="sf-media"
+            [src]="safeObjectUrl"
+            frameborder="0"
+            >
+          </iframe>
+        </object>
+      </div>
+      <!-- XLSX -->
+      <div *ngSwitchCase="'xlsx'" class="sf-media-wrap sf-scroll">
+        <div class="sheet-view" [innerHTML]="xlsxHtml"></div>
+      </div>
+      <!-- DOCX -->
+      <div *ngSwitchCase="'docx'" class="sf-media-wrap sf-scroll">
+        <!-- se docx-preview renderizar: usa o host -->
+        <div *ngIf="!docxHtml; else docxHtmlTpl" #docxHost class="docx-view"></div>
+        <!-- fallback mammoth -->
+        <ng-template #docxHtmlTpl>
+          <div class="docx-view" [innerHTML]="docxHtml"></div>
+        </ng-template>
+      </div>
+      <!-- OUTROS -->
+      <div *ngSwitchDefault class="sf-empty">
+        <p>Pré-visualização indisponível para este tipo. Use o botão “Baixar”.</p>
+      </div>
+    </ng-container>
+  </section>
+  <!-- Footer -->
+  <footer class="sf-footer" *ngIf="!loading">
+    <div class="spacer"></div>
+    <button class="btn" (click)="download()" [disabled]="!originalFile">Download</button>
+    <button class="btn ghost" (click)="close()">Fechar</button>
+  </footer>
+</div>

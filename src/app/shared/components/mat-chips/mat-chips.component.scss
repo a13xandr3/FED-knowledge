@@ -1,0 +1,44 @@
+/* O scroll precisa estar no próprio contêiner MDC dos chips */
+::ng-deep .main-chips .chipbox .mdc-evolution-chip-set {
+  /* borda/caixa do “controle” dos chips */
+  //border: 1px solid rgba(0,0,0,0.24);
+  //border-radius: 10px;
+  //background: rgba(0,0,0,0.02);
+  padding: 6px 8px;
+  height: 3rem;
+  overflow: auto;
+}
+/* define altura e ativa a barra de rolagem vertical */
+::ng-deep .main-chips .mdc-evolution-chip-set__chips {
+  max-height: 96px;          /* limite vertical para forçar overflow */
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;   /* evita “pulo” de layout */
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,.40) transparent;
+}
+/* Chrome/Edge/Safari – largura da barra vertical (em px) e estilo */
+::ng-deep .main-chips .mdc-evolution-chip-set__chips::-webkit-scrollbar {
+  width: 5px;     /* largura da barra de rolagem vertical */
+  height: 5px;    /* espessura da barra horizontal (se aparecer) */
+  background-color: aqua;
+}
+::ng-deep .main-chips .mdc-evolution-chip-set__chips::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.35);
+  border-radius: 8px;
+}
+::ng-deep .main-chips .mdc-evolution-chip-set__chips::-webkit-scrollbar-track {
+  background: red;
+}
+/* limpa interferências visuais do form-field (sem remover o label) */
+::ng-deep .main-chips .mat-mdc-text-field-wrapper.mdc-text-field--filled {
+  background: transparent;
+  box-shadow: none;
+  border: 1px solid;
+  margin: 0 0 1rem 0;
+}
+::ng-deep .main-chips .mat-mdc-form-field-subscript-wrapper,
+::ng-deep .main-chips .mat-mdc-form-field-bottom-align {
+  display: none;
+}

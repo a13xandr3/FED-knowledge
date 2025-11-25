@@ -1,0 +1,13 @@
+<app-input-file
+  [accept]="'*/*'"
+  [allowMultiple]="allowMultiple"
+  [includeBase64]="true"
+  [hashMode]="'binary'"          
+  (processed)="processed.emit($event)"
+  (error)="error.emit($event)"
+  (cleared)="cleared.emit()"
+  [maxBytes]="5000 * 1024 * 1024"
+  [previews]="previews"
+  (removedAt)="removedAt.emit($event)"
+  >
+</app-input-file>

@@ -1,0 +1,18 @@
+<div class="selectField">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ placeholder }}</mat-label>
+      <mat-select
+        [formControl]="selected"
+        [errorStateMatcher]="matcher"
+        (selectionChange)="onSelectionChange($event)"
+        >
+        <mat-option
+          *ngFor="let opt of options"
+          [value]="opt.value"
+          [disabled]="opt.disabled"
+        >
+        {{ opt.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+</div>

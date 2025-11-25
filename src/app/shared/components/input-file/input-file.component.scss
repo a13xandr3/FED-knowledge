@@ -1,0 +1,175 @@
+/* Aumenta saturação/contraste/brilho e aplica sharpen via SVG */
+@mixin vivid-sharp($saturate: 1.35, $contrast: 1.15, $brightness: 1.04) {
+  filter:
+    contrast($contrast)
+    saturate($saturate)
+    brightness($brightness)
+    url('#svg-sharpen'); // referência ao filtro SVG abaixo
+  will-change: filter;
+}
+/* Versões prontas para uso */
+.img-vivid-sharp {
+  @include vivid-sharp(); // intensidade padrão
+}
+.img-vivid-sharp--strong {
+  @include vivid-sharp(1.60, 1.25, 1.06); // versão mais intensa
+}
+/* Ajustes opcionais de renderização (tire se não gostar do efeito) */
+.img-vivid-sharp,
+.img-vivid-sharp--strong {
+  image-rendering: -webkit-optimize-contrast;
+  backface-visibility: hidden;
+  transform: translateZ(0); // aceleração GPU em alguns navegadores
+}
+.dropzone {
+  border: 2px dashed #999;
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  transition: border-color .2s ease, background-color .2s ease;
+  background: rgba(0,0,0,.02);
+}
+.dropzone.active {
+  border-color: #3f51b5;
+  background: rgba(63,81,181,.06);
+}
+.dz-instructions {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+.dz-instructions span { opacity: .7; }
+.dz-instructions input[type="file"] { display: none; }
+.btn {
+  padding: .5rem .9rem;
+  border-radius: .5rem;
+  border: 1px solid #444;
+  cursor: pointer;
+  background: #fff;
+}
+.btn.secondary { background: #f5f5f5; }
+.meta { margin-top: .75rem; display: grid; gap: .25rem; }
+.preview code { word-break: break-all; }
+.actions { margin-top: .5rem; }
+.casca {
+  position: relative;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 42vh;
+  word-wrap: break-word;
+  overflow-y: auto;
+  margin: 5px 0 5px 0;
+  border: 2px dashed #999;
+  border-radius: 10px;
+  transition: border-color .2s ease, background-color .2s ease;
+  background: rgba(0,0,0,.02);
+  z-index: 0;
+  padding: 2px 5px 2px 5px; 
+}
+.block {
+  display: grid;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+  padding: .25rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+.thumb {
+  max-width: 150px; 
+  //height: auto;
+  height: 30vh; 
+  object-fit: contain; 
+  border: 1px solid #444;
+  border-radius: 8px;
+  position: relative;
+  z-index: 999;
+  opacity: 1;
+}
+.fnt {
+  font-size: 0.71rem !important;
+}
+/*
+ * Thumbnail de arquivos não‑imagem.
+ * Usa layout semelhante às thumbnails de imagem para manter consistência visual.
+ */
+.file-thumb {
+  /* Define largura e altura para corresponder à thumbnail de imagem */
+  width: 150px;
+  //height: 96px;
+  height: 30vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f9f9f9;
+  border: 1px solid #444;
+  border-radius: 8px;
+  position: relative;
+}
+/* Ajusta o tamanho do ícone dentro do thumbnail */
+.file-thumb i {
+  font-size: 3rem;
+  line-height: 1;
+}
+/* Label dentro do thumbnail de arquivo genérico. Fica posicionado abaixo do ícone,
+   centralizado horizontalmente. Usa fonte menor e cor secundária para harmonizar. */
+.file-thumb .file-label {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.65rem;
+  color: #555;
+  pointer-events: none; /* evita clique sobre o label afetar o botão */
+}
+.fa-file-txt {
+  background: transparent url('/assets/imgs/txt-ico.png') no-repeat center center;
+  background-size: cover;
+  width: 100%;
+  height: 24vh;
+}
+.fa-file-pdf {
+  background: transparent url('/assets/imgs/pdf-ico.png') no-repeat center center;
+  background-size: cover;
+  width: 100%;
+  height: 24vh;
+}
+.fa-file-word { 
+  background: transparent url('/assets/imgs/docx-ico.png') no-repeat center center;
+  background-size: cover;
+  width: 100%;
+  height: 24vh;
+}
+.fa-file-excel { 
+  background: transparent url('/assets/imgs/xls-ico.png') no-repeat center center;
+  background-size: cover;
+  width: 100%;
+  height: 24vh;
+}
+.fa-file-powerpoint { 
+  background: transparent url('/assets/imgs/txt-ico.png') no-repeat center center;
+  background-size: cover;
+  width: 100%;
+  height: 24vh;
+}
+.fa-file-image { 
+  //background-size: cover;
+  width: 100%;
+  height: 24vh;
+}
+.fa-file-alt { 
+  background-size: cover;
+  width: 100%;
+  height: 24vh;
+  background-color: #611111; 
+} 
+.fa-file-video {
+  background-size: cover;
+  width: 100%;
+  height: 24vh;
+  background-color: #b56526;  
+}

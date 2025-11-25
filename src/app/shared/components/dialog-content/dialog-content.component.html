@@ -1,0 +1,197 @@
+<div class="main">
+  <mat-dialog-content>
+    <div class="container-fluid w-100 body">
+        <form [formGroup]="fr" (ngSubmit)="salvar()" class="form-layout">
+          <div class="row">
+            <div class="col-12 linha">
+              <div mat-dialog-title class="dialog-title knowledge-base">
+                {{ data.status === 'inclusao' ? 'Inclusão' : 'Alteração' }}
+                {{ data.status !== 'inclusao' ? ' - ID: ' + this.fr.get('id')?.value : '' }}
+              </div>
+              <div *ngIf="tempoRestanteMs >= 0">
+                <p>Tempo restante: {{ tempoRestanteMs | duration }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <!-- Categoria e sub-Categoria -->
+            <div class="d-flex col-6 gap-1">
+              <!-- Categoria com autocomplete editável -->
+              <mat-form-field 
+                appearance="outline" 
+                [class]="this.fr.get('categoria')?.value == 'TI' || 
+                        this.fr.get('categoria')?.value == 'Ti' ? 'w-50' : 'w-100'" 
+                >
+                <mat-label>Categoria</mat-label>
+                <input
+                  type="text"
+                  matInput
+                  formControlName="categoria"
+                  cdkFocusInitial
+                  title="categoria"
+                >
+              </mat-form-field>
+              <mat-form-field 
+                appearance="outline"
+                *ngIf="this.fr.get('categoria')?.value == 'TI' 
+                      || this.fr.get('categoria')?.value == 'Ti' 
+                      || this.fr.get('categoria')?.value == 'ti'"
+                [class]="this.fr.get('categoria')?.value == 'TI' 
+                      || this.fr.get('categoria')?.value == 'Ti' 
+                      || this.fr.get('categoria')?.value == 'ti' ? 'w-50' : 'w-100'"
+                >
+                <mat-label>SubCategoria</mat-label>
+                <input
+                  type="text"
+                  matInput
+                  formControlName="subCategoria"
+                  title="Sub-Categoria"
+                >
+              </mat-form-field>
+            </div>
+            <!-- Nome -->
+            <div class="col-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Nome</mat-label>
+                <input matInput 
+                      formControlName="name" 
+                      title="nome">
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <app-mat-chips formControlName="tag" [(allChips)]="allTags" [label]="'Tag'"></app-mat-chips>
+            </div>
+          </div>
+          <!-- Uri e URL -->
+          <div class="row">
+            <div class="col-12">
+              <app-mat-chips formControlName="uri" [(allChips)]="allUris" [label]="'URI'" (click)="onChipClick($event)"></app-mat-chips>
+            </div>
+          </div>
+          <!--TimeSheet -- DATAS -->
+          <div class="row">
+            <div class="col-12"> {{ totalHorasDia }}</div>
+          </div>
+          <div
+            class="row" 
+            *ngIf="this.fr.get('categoria')?.value.toLowerCase() == 'timesheet' ">
+            <div class="col-2">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Data Entrada Manhã</mat-label>
+                <input 
+                  matInput 
+                  formControlName="dataEntradaManha"
+                  title="Data de Entrada Período Manhã"
+                  mask="d0/M0/0000 H0:m0:s0"
+                  placeholder="dd/mm/aaaa hh:mm:ss"
+                  [dropSpecialCharacters]="false"
+                  >
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Data Saída Manhã</mat-label>
+                <input 
+                  matInput 
+                  formControlName="dataSaidaManha"
+                  title="Data de Saída Período Manhã"
+                  mask="d0/M0/0000 H0:m0:s0"
+                  placeholder="dd/mm/aaaa hh:mm:ss"
+                  [dropSpecialCharacters]="false"
+                  >
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Data Entrada Tarde</mat-label>
+                <input 
+                  matInput 
+                  formControlName="dataEntradaTarde"
+                  title="Data de Entrada Período Tarde"
+                  mask="d0/M0/0000 H0:m0:s0"
+                  placeholder="dd/mm/aaaa hh:mm:ss"
+                  [dropSpecialCharacters]="false"
+                  >
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Data Saída Tarde</mat-label>
+                <input 
+                  matInput 
+                  formControlName="dataSaidaTarde"
+                  title="Data de Saída Período Tarde"
+                  mask="d0/M0/0000 H0:m0:s0"
+                  placeholder="dd/mm/aaaa hh:mm:ss"
+                  [dropSpecialCharacters]="false"
+                  >
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Data Entrada Noite</mat-label>
+                <input 
+                  matInput 
+                  formControlName="dataEntradaNoite"
+                  title="Data de Entrada Período Noite"
+                  mask="d0/M0/0000 H0:m0:s0"
+                  placeholder="dd/mm/aaaa hh:mm:ss"
+                  [dropSpecialCharacters]="false"
+                  >
+              </mat-form-field>
+            </div>
+            <div class="col-2">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Data Saída Noite</mat-label>
+                <input 
+                  matInput 
+                  formControlName="dataSaidaNoite"
+                  title="Data de Saída Período Noite"
+                  mask="d0/M0/0000 H0:m0:s0"
+                  placeholder="dd/mm/aaaa hh:mm:ss"
+                  [dropSpecialCharacters]="false"
+                  >
+              </mat-form-field>
+            </div>
+          </div>
+  
+          <!-- File -->
+          <div class="row">
+            <div class="col-12 w-100">
+              <app-uploader #uploader
+                (processed)="onProcessed($event)"
+                (error)="onError($event)"
+                (cleared)="onClearedFiles()"
+                (removedAt)="onPreviewRemoved($event)"
+                [allowMultiple]="true"
+                [previews]="previewsFromIds"
+                >
+              </app-uploader>
+            </div>
+          </div>
+  
+          <!-- Descricao -->
+          <div class="row">
+            <div class="col-12 w-100 mt-4" >
+                <app-quill formControlName="descricao"></app-quill>
+            </div>
+          </div>
+          <!-- Buttons -->
+          <div class="row">
+            <div class="col-12 d-flex justify-content-between">
+              <button 
+                mat-flat-button 
+                color="primary" 
+                type="submit" 
+                [disabled]="fr.invalid">
+                {{ data.status === 'inclusao' ? 'Incluir' : 'Alterar' }}
+              </button>
+              <button mat-button type="button" (click)="fechar()">Fechar</button>
+            </div>
+          </div>
+        </form>
+    </div>
+  </mat-dialog-content>
+</div>

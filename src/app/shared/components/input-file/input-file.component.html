@@ -1,0 +1,66 @@
+<div class="dropzone" 
+     [class.active]="dragActive"
+     (dragover)="onDragOver($event)" 
+     (dragenter)="onDragEnter($event)" 
+     (dragleave)="onDragLeave($event)" 
+     (drop)="onDrop($event)">
+
+  <div class="dz-instructions">
+    <strong>Arraste e solte</strong> um arquivo aqui
+    <span>ou</span>
+    <label class="btn">
+      Escolher arquivo
+      <input type="file"
+             [attr.multiple]="allowMultiple ? '' : null"
+             [accept]="accept"
+             (change)="onFileInputChange($event)" />
+    </label>
+  </div>
+</div>
+
+<mat-progress-bar *ngIf="isProcessing" mode="determinate" [value]="progress"></mat-progress-bar>
+
+<!-- Renderiza as pré-visualizações quando houver itens -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 d-flex casca" *ngIf="previews?.length">
+  <div class="block" *ngFor="let p of previews; let i = index; trackBy: trackById">
+    <!-- Seleciona automaticamente a visualização de imagem ou arquivo genérico -->
+    <ng-container *ngIf="isImage(p); else nonImageBlock">
+      <!-- Para imagens renderizamos a thumbnail usando o object URL -->
+      <img loading="lazy"  
+        class="thumb img-vivid-sharp"
+        title="thumb"
+        [src]="p.url"
+        [alt]="p.filename"
+        (click)="onPreviewClick(p)"
+        style="cursor: pointer;"
+      />
+    </ng-container>
+    <!-- Fallback para arquivos não‑imagem: exibimos um bloco com ícone e label "File". O ícone é escolhido
+         dinamicamente por `getIconClasses(p)`. O label garante que o usuário perceba que se trata de
+         um anexo genérico em vez de uma imagem. -->
+    <ng-template #nonImageBlock>
+
+      <div 
+        class="thumb file-thumb" 
+        [title]="p.filename"
+        (click)="onPreviewClick(p)"
+        style="cursor: pointer;"
+        >
+        
+        <i class="fa" [ngClass]="getIconClasses(p)"></i>
+        
+        <span class="file-label">&nbsp;</span>
+
+      </div>
+    </ng-template>
+    <!-- Nome do arquivo e botão de remoção -->
+    <div class="text-xs mt-1 truncate fnt" [title]="transformFileName(p.filename)">
+      {{ transformFileName(p.filename) }}
+    </div>
+    <button type="button" class="fnt" (click)="onRemove(p, i)">Remover</button>
+  </div>
+</div>
+
+<div class="actions" *ngIf="fileName">
+  <button type="button" class="btn secondary" (click)="clear()">Limpar</button>
+</div>

@@ -1,0 +1,135 @@
+// Paleta base — tons profissionais e suaves
+$bg-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
+$card-bg: rgba(255, 255, 255, 0.1);
+$border-glow: rgba(255, 255, 255, 0.25);
+$text-color: #eaeaea;
+$accent-color: #00bcd4;
+$shadow-color: rgba(0, 0, 0, 0.6);
+
+.login-wrapper {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: $bg-gradient;
+  overflow: hidden;
+  position: relative;
+  padding: 1rem;
+
+  .login-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 25% 25%, #4a148c55, transparent 60%),
+                radial-gradient(circle at 75% 75%, #00bcd455, transparent 60%);
+    filter: blur(80px);
+    z-index: 0;
+  }
+
+  .login-card {
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    background: $card-bg;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-radius: 1.5rem;
+    border: 1px solid $border-glow;
+    color: $text-color;
+    box-shadow: 0 8px 25px $shadow-color;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.8s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    mat-card-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-top: 1rem;
+
+      .login-logo {
+        background: url('/assets/imgs/logo.svg') no-repeat center/contain;
+        width: 64px;
+        height: 64px;
+        margin-bottom: 0.5rem;
+      }
+
+      mat-card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: $accent-color;
+      }
+
+      mat-card-subtitle {
+        font-size: 0.9rem;
+        color: lighten($text-color, 20%);
+      }
+    }
+
+    .login-form,
+    .login-form-2fa {
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      gap: 1rem;
+
+      .input-field {
+        width: 100%;
+      }
+
+      .login-btn {
+        width: 100%;
+        // font-weight: 600;
+        border-radius: 8px;
+        // text-transform: uppercase;
+        // background: $accent-color;
+        color: #fff;
+        box-shadow: 0 3px 10px rgba($accent-color, 0.4);
+
+        //&:hover {
+          // filter: brightness(1.1);
+        //}
+      }
+    }
+
+    .login-footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.8rem;
+      color: lighten($text-color, 30%);
+    }
+  }
+}
+
+// Mobile-first ajustes
+@media (max-width: 480px) {
+  .login-card {
+    padding: 0.5rem;
+    border-radius: 1rem;
+  }
+
+  .login-form {
+    padding: 1rem;
+  }
+
+  mat-card-title {
+    font-size: 1.2rem !important;
+  }
+}
+
+// Animação de entrada suave
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

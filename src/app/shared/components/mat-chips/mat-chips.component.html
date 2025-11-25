@@ -1,0 +1,33 @@
+<div class="main-chips">
+  <mat-form-field appearance="fill" class="w-100">
+    <mat-label>{{ label }}</mat-label>
+
+    <!-- caixa com borda + rolagem controlada -->
+    <div class="chipbox">
+      <mat-chip-grid #chipGrid aria-label="Lista de Tags">
+        <mat-chip-row *ngFor="let chip of chips" (removed)="removeTag(chip)">
+          {{ chip }}
+          <button type="button" matChipRemove>
+            <mat-icon>X</mat-icon>
+          </button>
+        </mat-chip-row>
+      </mat-chip-grid>
+    </div>
+
+    <input
+      placeholder="fill text"
+      [attr.placeholder]="label"
+      #chipInput
+      [formControl]="chipCtrl"
+      [matChipInputFor]="chipGrid"
+      [matAutocomplete]="auto"
+      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      (matChipInputTokenEnd)="addChip($event)" />
+
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="chipSelected($event)">
+      <mat-option *ngFor="let chip of filteredChips | async" [value]="chip">
+        {{ chip }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
