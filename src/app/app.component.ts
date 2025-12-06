@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { distinctUntilChanged, filter, map, Observable, startWith } from 'rxjs';
+import { distinctUntilChanged, filter, map, Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 
 @Component({
@@ -15,26 +15,33 @@ import { FooterComponent } from 'src/app/shared/components/footer/footer.compone
     RouterModule
   ]
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy  {
+  
+  private destroy$ = new Subject<void>();
+  
+  currentRoute = '';
 
   title = 'fed-knowledge';
   
-  // rotas onde o footer NÃO deve aparecer (escala fácil depois)
-  private hideFooterOn = new Set<string>(['/']);
+  constructor(
+    private router: Router
+  ) {}
 
-// boolean reativo, sem subscribe manual e sem destroy$
-  public showFooter$: Observable<boolean> = this.router.events.pipe(
-    filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-    map(e => this.shouldShow(e.urlAfterRedirects)),
-    startWith(this.shouldShow(this.router.url)),
-    distinctUntilChanged()
-  );
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-  constructor(private router: Router) {}
-
-  private shouldShow(url: string): boolean {
-    const path = url.split('?')[0].split('#')[0];  // normaliza
-    return !this.hideFooterOn.has(path);
+  ngOnInit(): void {
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event: any) => {
+        this.currentRoute = event.urlAfterRedirects;
+        //console.log('Rota atual:', this.currentRoute);
+      });
   }
 
 }

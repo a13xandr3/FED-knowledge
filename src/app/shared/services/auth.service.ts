@@ -43,13 +43,10 @@ export class AuthService {
    * Backend decide se o token ainda é válido ou retorna um novo.
    */
   revalidateToken(currentToken: string): Observable<LoginResponse> {
-    const body = { token: currentToken };
-    return this.http.post<LoginResponse>(`${this.api}/revalidate`, body)
+    return this.http.post<LoginResponse>(`${this.api}/api/auth/revalidate`, { token: currentToken })
       .pipe(
-        tap(response => {
-          if (response && response.token) {
-            this.tokenStorage.setToken(response.token);
-          }
+        tap(res => {
+          if (res?.token) this.tokenStorage.setToken(res.token);
         })
       );
   }

@@ -56,7 +56,7 @@
               class="actions">
               <img loading="lazy"  
                 src="assets/imgs/delete.svg" 
-                (click)="delete(link.id)"
+                (click)="deleteItem(link.id, link?.fileID?.fileRefs)"
                 class="delete"
                 alt="Delete">
               </span>

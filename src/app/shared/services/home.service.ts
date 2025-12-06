@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ILinkRequest } from 'src/app/shared/request/request';
 import { ILinksResponse } from 'src/app/shared/response/response';
+import { environment} from 'src/environments/environment';
 
 const token = localStorage.getItem('token');
 
@@ -12,7 +13,7 @@ const token = localStorage.getItem('token');
 export class HomeService {
   private urbase = 'http://localhost:8080';
   constructor(
-    private http: HttpClient,
+    private http: HttpClient
   ) { }
   carregaConteudo(urlTarget: string): Observable<any> {
     return this.http.get(`${this.urbase}/proxy?url=${urlTarget}`, { responseType: 'text' });
@@ -111,6 +112,16 @@ export class HomeService {
       })
     });
   }
+
+  deleteItem(payload: { linkId: number; fileIds: number[] }) {
+    return this.http.post<void>(
+      `${environment.bffUrl}/api/atividades/delete`,
+      payload,
+      { withCredentials: true }
+    );
+  }
+
+  /*
   deleteLink(id: number): Observable<ILinksResponse> {
     return this.http.delete<ILinksResponse>(`${this.urbase}/api/atividades/${id}`, {
       headers: new HttpHeaders({
@@ -118,6 +129,7 @@ export class HomeService {
       })
     });
   }
+  */
   calcularHoras(entrada: any, saida: any): number {
     const start = new Date(entrada).getTime();
     const end = new Date(saida).getTime();

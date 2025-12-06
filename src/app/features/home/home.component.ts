@@ -30,6 +30,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsComponent } from 'src/app/shared/components/mat-chips/mat-chips.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
+interface FileRef {
+  id: number;
+  filename: string;
+}
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -73,7 +77,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private linkStateService: LinkStateService,
     private homeService: HomeService,
     private snackService: SnackService,
-    //private loginService: LoginService
   ) {
   }
   ngOnInit(): void {
@@ -117,10 +120,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.linkStateService.triggerRefresh();
   }
   onChangeTag(value: any) {
-    //this.pageIndex = event!.pageIndex;
-    //this.pageSize = event!.pageSize;
-    //let tagValue = `${value}`;
-    //this.onItemSelecionado(tagValue);
     this.resetPaginador();
     this.onItemSelecionado(value);
   }
@@ -136,6 +135,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getLinks();
   }
   getLinks(): void {
+    debugger;
     this.homeService.getLinks(
                           this.pageIndex, 
                           this.pageSize, 
@@ -202,16 +202,21 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
-  delete(id: number): void {
-    this.homeService.deleteLink(id).subscribe({
+  deleteItem(
+    linkId: number,
+    fileRefs: { id: number }[] | number[] | { id: number } | number | null | undefined
+  ): void {
+    const fileIds: number[] = (Array.isArray(fileRefs) ? fileRefs : [fileRefs])
+      .filter((x): x is number | { id: number } => x != null)
+      .map(x => typeof x === 'number' ? x : x.id);
+    const payload = { linkId, fileIds };
+    this.homeService.deleteItem(payload).subscribe({
       next: () => {
-        this.mostrarMensagem('Card excluido com sucesso!', 'Fechar');
-        this.atualizarLista();
+        this.mostrarMensagem('Card e arquivo(s) excluídos com sucesso!', 'Fechar');
+        this.atualizarLista(); // reflete a lista após o 204
       },
       error: (err: HttpErrorResponse) => {
-        this.snackService.mostrarMensagem(
-          err.message, 'Fechar'
-        );
+        this.snackService.mostrarMensagem(err?.message ?? 'Falha ao excluir', 'Fechar');
       }
     });
   }
