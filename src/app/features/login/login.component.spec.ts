@@ -1,62 +1,131 @@
-/*
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LoginComponent } from './login.component';
+import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../services/auth.service';
-import { TwofaService } from '../services/twofa.service';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+
 import { of, throwError } from 'rxjs';
 
-describe('LoginComponent', () => {
+import { LoginComponent } from './login.component';
+import { AuthService, LoginPayload } from 'src/app/shared/services/auth.service';
+import { SnackService } from 'src/app/shared/services/snack.service';
+
+describe('LoginComponent (standalone + Jest)', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let authSpy: jasmine.SpyObj<AuthService>;
-  let twofaSpy: jasmine.SpyObj<TwofaService>;
+
+  const authServiceMock = {
+    login: jest.fn()
+  };
+
+  const routerMock = {
+    navigate: jest.fn()
+  };
+
+  const snackServiceMock = {
+    mostrarMensagem: jest.fn()
+  };
 
   beforeEach(async () => {
-    authSpy = jasmine.createSpyObj('AuthService', ['login']);
-    twofaSpy = jasmine.createSpyObj('TwofaService', ['verify']);
-
     await TestBed.configureTestingModule({
-      declarations: [LoginComponent],
-      imports: [ReactiveFormsModule],
-      providers: [
-        { provide: AuthService, useValue: authSpy },
-        { provide: TwofaService, useValue: twofaSpy },
+      imports: [
+        LoginComponent,
+        ReactiveFormsModule,
+        NoopAnimationsModule
       ],
+      providers: [
+        { provide: AuthService, useValue: authServiceMock },
+        { provide: Router, useValue: routerMock },
+        { provide: SnackService, useValue: snackServiceMock }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    jest.clearAllMocks();
   });
 
   it('deve criar o componente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('deve validar senha forte corretamente', () => {
-    const ctrl = component.loginForm.get('password');
-    ctrl?.setValue('Fr@me2025');
-    expect(ctrl?.valid).toBeTrue();
+  it('form deve iniciar inválido', () => {
+    expect(component.loginForm.valid).toBe(false);
+    expect(component.email?.value).toBe('');
+    expect(component.password?.value).toBe('');
+    expect(component.totp?.value).toBe('');
   });
 
-  it('deve falhar com senha fraca', () => {
-    const ctrl = component.loginForm.get('password');
-    ctrl?.setValue('12345');
-    expect(ctrl?.valid).toBeFalse();
+  it('getters devem retornar os controls corretos', () => {
+    expect(component.email).toBe(component.loginForm.get('email'));
+    expect(component.password).toBe(component.loginForm.get('password'));
+    expect(component.totp).toBe(component.loginForm.get('totp'));
   });
 
-  it('deve acionar 2FA após login bem-sucedido', () => {
-    authSpy.login.and.returnValue(of({}));
-    component.loginForm.setValue({ email: 'a@b.com', password: 'Fr@me2025' });
+  it('onSubmit com formulário inválido deve apenas marcar touched e não chamar AuthService', () => {
+    const markAllAsTouchedSpy = jest.spyOn(component.loginForm, 'markAllAsTouched');
     component.onSubmit();
-    expect(component.step2fa).toBeTrue();
+    expect(markAllAsTouchedSpy).toHaveBeenCalled();
+    expect(authServiceMock.login).not.toHaveBeenCalled();
+    expect(routerMock.navigate).not.toHaveBeenCalled();
   });
 
-  it('deve tratar erro de login', () => {
-    authSpy.login.and.returnValue(throwError(() => new Error('falha')));
+  it('onSubmit com formulário válido deve chamar AuthService.login e navegar para /home', () => {
+    // Arrange: preencher form com valores válidos
+    component.loginForm.setValue({
+      email: 'user@test.com',
+      password: '123456',
+      totp: '123456'
+    });
+
+    const payloadEsperado: LoginPayload = {
+      username: 'user@test.com',
+      password: '123456',
+      totp: '123456'
+    };
+
+    (authServiceMock.login as jest.Mock).mockReturnValue(of({}));
+
+    // Act
     component.onSubmit();
-    expect(authSpy.login).toHaveBeenCalled();
+
+    // Assert
+    expect(authServiceMock.login).toHaveBeenCalledTimes(1);
+    expect(authServiceMock.login).toHaveBeenCalledWith(payloadEsperado);
+
+    expect(routerMock.navigate).toHaveBeenCalledTimes(1);
+    expect(routerMock.navigate).toHaveBeenCalledWith(
+      ['/home'],
+      { queryParams: { titulo: 'Knowledge Base' } }
+    );
+
+    expect(snackServiceMock.mostrarMensagem).not.toHaveBeenCalled();
+  });
+
+  it('onSubmit deve exibir mensagem de erro quando AuthService.login lançar erro', () => {
+    component.loginForm.setValue({
+      email: 'user@test.com',
+      password: '123456',
+      totp: '123456'
+    });
+
+    const erro = new Error('401 Unauthorized');
+
+    (authServiceMock.login as jest.Mock).mockReturnValue(
+      throwError(() => erro)
+    );
+
+    component.onSubmit();
+
+    // mensagem amigável definida no componente
+    expect(snackServiceMock.mostrarMensagem).toHaveBeenCalledTimes(1);
+    expect(snackServiceMock.mostrarMensagem).toHaveBeenCalledWith(
+      'Login e/ou senha ou código incorretos',
+      'Fechar'
+    );
+
+    // não deve navegar em caso de erro
+    expect(routerMock.navigate).not.toHaveBeenCalled();
   });
 });
-*/

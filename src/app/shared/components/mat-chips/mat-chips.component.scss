@@ -1,9 +1,5 @@
 /* O scroll precisa estar no próprio contêiner MDC dos chips */
 ::ng-deep .main-chips .chipbox .mdc-evolution-chip-set {
-  /* borda/caixa do “controle” dos chips */
-  //border: 1px solid rgba(0,0,0,0.24);
-  //border-radius: 10px;
-  //background: rgba(0,0,0,0.02);
   padding: 6px 8px;
   height: 3rem;
   overflow: auto;

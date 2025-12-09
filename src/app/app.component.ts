@@ -24,7 +24,7 @@ export class AppComponent implements OnInit, OnDestroy  {
   title = 'fed-knowledge';
   
   constructor(
-    private router: Router
+    private readonly router: Router
   ) {}
 
   ngOnDestroy(): void {

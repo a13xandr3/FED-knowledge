@@ -14,42 +14,6 @@ import { ShowFileComponent } from 'src/app/shared/components/show-file/show-file
 
 import { PreviewItem, FilesPayload, ZlibLevel } from 'src/app/types/Files';
 import { IFileRef } from 'src/app/shared/interfaces/interface.file-ref';
-
-//** Gerenciar arquivos em array - inicio */
-/** Normaliza com fallback seguro. */
-export function normalizeFilesPayload(p?: Partial<FilesPayload> | null): FilesPayload {
-  const list = Array.isArray(p?.fileRefs) ? p!.fileRefs : [];
-  return { fileRefs: list
-    .filter(r => Number.isFinite(r?.id) && typeof r?.filename === 'string')
-    .map(r => ({ id: Number(r.id), filename: String(r.filename) }))
-  };
-}
-/** Inclusão/atualização (upsert) de um FileRef. Dedupe por id. */
-export function addFileRef(payload: FilesPayload, ref: IFileRef): FilesPayload {
-  const src = normalizeFilesPayload(payload).fileRefs;
-  const id = Number(ref.id);
-  // Mapa por id garante O(n) e última versão prevalece
-  const byId = new Map<number, IFileRef>(src.map(r => [r.id, r]));
-  byId.set(id, { id, filename: String(ref.filename) });
-  return { fileRefs: Array.from(byId.values()) };
-}
-/** Remoção por id (imutável). */
-export function removeFileRefById(payload: FilesPayload, removeId: number): FilesPayload{
-  const id = Number(removeId);
-  const src = normalizeFilesPayload(payload).fileRefs;
-  if (!Number.isFinite(id)) return { fileRefs: src };
-  const next = src.filter(r => r.id !== id);
-  return next === src ? { fileRefs: [...src] } : { fileRefs: next };
-}
-/** (Opcional) Descobre quais IDs foram removidos: útil para chamar o DELETE no service. */
-export function diffRemovedIds(prev: FilesPayload, next: FilesPayload): number[] {
-  const prevIds = new Set(normalizeFilesPayload(prev).fileRefs.map(r => r.id));
-  for (const id of normalizeFilesPayload(next).fileRefs.map(r => r.id)) {
-    prevIds.delete(id);
-  }
-  return Array.from(prevIds.values());
-}
-//** Gerenciar arquivos em array - final */
 @Component({
   selector: 'app-input-file',
   templateUrl: './input-file.component.html',
@@ -72,11 +36,7 @@ export class InputFileComponent implements OnInit, OnDestroy {
   /** Nível do pako (fallback). Ignorado quando houver CompressionStream. */
   @Input() gzipLevel: ZlibLevel = 6;
   @Input() allowMultiple = true;
-
-  //@Input() previews: Array<{ id: number; url: string; filename: string; mimeType?: string; sizeBytes: number }> = [];
-  
   @Input() previews: PreviewItem[] = [];
-
   @Output() removedAt = new EventEmitter<number>();
   @Output() processed = new EventEmitter<ProcessedFile>();
   @Output() error = new EventEmitter<unknown>();

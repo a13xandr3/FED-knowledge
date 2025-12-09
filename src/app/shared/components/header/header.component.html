@@ -4,7 +4,7 @@
       <!-- Coluna 1: Título + tempo do token -->
       <div class="col-12 col-md-5 d-flex align-items-center gap-2">
         <div class="knowledge-base mb-0">{{ titulo }}</div>
-        <span class="ms-3">
+        <span class="ms-3" style="font-size: 0.67rem;">
           Token expira em: <strong>{{ '' | tokenTimeLeft }}</strong>
         </span>
       </div>
@@ -13,18 +13,20 @@
       <div class="col-12 col-md-5">
         <div class="row g-2">
           <div class="col-12 col-lg-6 d-flex justify-content-center align-items-center">
+
             <app-select-field
               [options]="statusOptionsCat"
-              [placeholder]="'Choose one'"
+              [placeholder]="'Choose one cathegory'"
               [matcher]="matcher"
               [value]="initialValue"
               (valueChange)="onChangeCategory($event?.value)">
             </app-select-field>
+
           </div>
           <div class="col-12 col-lg-6 d-flex justify-content-center align-items-center">
             <app-select-field
               [options]="statusOptionsTag"
-              [placeholder]="'Choose one'"
+              [placeholder]="'Choose one Tag'"
               [matcher]="matcher"
               [value]="initialValue"
               (valueChange)="onChangeTag($event?.value)">
@@ -50,45 +52,3 @@
     </div>
   </div>
 </header>
-
-<!--
-<header class="header-container d-flex w-100 py-2 px-3">
-  <div class="ng-container w-100">
-    <div class="row d-flex align-items-center justify-content-between">
-      <div class="col-4">
-        <div class="knowledge-base">{{ titulo }}</div>
-      </div>
-      <p>Token expira em: {{ '' | tokenTimeLeft }}</p>
-      <div class="col-4 d-flex justify-content-center align-items-center">
-        <app-select-field
-          [options]="statusOptionsCat"
-          [placeholder]="'Choose one'"
-          [matcher]="matcher"
-          [value]="initialValue"
-          (valueChange)="onChangeCategory($event?.value)"
-          >
-        </app-select-field>
-      </div>
-      <div class="col-3 d-flex justify-content-center align-items-center">
-        <app-select-field
-          [options]="statusOptionsTag"
-          [placeholder]="'Choose one'"
-          [matcher]="matcher"
-          [value]="initialValue"
-          (valueChange)="onChangeTag($event?.value)"
-          >
-        </app-select-field>
-      </div>
-      <div class="col-1 d-flex justify-content-center align-items-center">
-        <button class="incluir-btn" (click)="abrirDialog($event)">Incluir</button>
-      </div>
-    </div>
-    <div class="row" *ngIf="this.selectedItemCategory.toLowerCase() === 'timesheet' ">
-      <div class="col-12">
-        <span>Total Horas: </span>
-        <span>{{ totalHoras | horaFormatada }}</span>
-      </div>
-    </div>
-  </div>
-</header>
--->

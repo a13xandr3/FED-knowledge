@@ -1,3 +1,19 @@
+::ng-deep * {
+    --mdc-typography-body1-font-family: "Poppins";
+    --mdc-typography-body2-font-family: "Poppins";
+    --mdc-typography-button-font-family: "Poppins";
+    --mdc-typography-caption-font-family: "Poppins";
+    --mdc-typography-headline1-font-family: "Poppins";
+    --mdc-typography-headline2-font-family: "Poppins";
+    --mdc-typography-headline3-font-family: "Poppins";
+    --mdc-typography-headline4-font-family: "Poppins";
+    --mdc-typography-headline5-font-family: "Poppins";
+    --mdc-typography-headline6-font-family: "Poppins";
+    --mdc-typography-overline-font-family: "Poppins";
+    --mdc-typography-subtitle1-font-family: "Poppins";
+    --mdc-typography-subtitle2-font-family: "Poppins";
+}
+
 .body {
     height: 82vh;
     max-height: 82vh;
@@ -49,6 +65,7 @@
 }
 .tags {
     cursor: pointer;
+    font-size: 0.6rem;
 }
 a {
     cursor: pointer;
@@ -60,7 +77,6 @@ a.disabled {
 .edit, .delete {
     cursor: pointer;
 }
-
 /* Largura da barra de rolagem */
 ::ng-deep .mdc-evolution-chip-set::-webkit-scrollbar {
   width: 5px; /* vertical */
@@ -78,4 +94,11 @@ a.disabled {
 /* Hover na thumb */
 ::ng-deep .mdc-evolution-chip-set::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary {
+    font: inherit;
+    letter-spacing: inherit;
+    white-space: inherit;
+    margin: 0.2rem;
+    padding: 0.01rem 0.5rem 0.01rem 0.5rem;
 }

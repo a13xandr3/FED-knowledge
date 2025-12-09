@@ -1,4 +1,3 @@
-import { LoginService } from 'src/app/shared/services/login.service';
 import { 
   AfterViewInit, 
   Component, 
@@ -23,17 +22,12 @@ import arquivo from 'src/assets/data/arquivo.json';
 
 import { DialogContentComponent } from 'src/app/shared/components/dialog-content/dialog-content.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatChipsComponent } from 'src/app/shared/components/mat-chips/mat-chips.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
-interface FileRef {
-  id: number;
-  filename: string;
-}
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -41,14 +35,15 @@ interface FileRef {
   standalone: true,
   imports: [
     CommonModule,
-    HeaderComponent,
+    RouterModule,
     MatChipsModule,
     MatFormFieldModule,
     MatTableModule,
     MatPaginatorModule,
     ReactiveFormsModule,
     MatDialogModule,
-  ],
+    HeaderComponent
+],
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   totalHoras: any;
@@ -71,8 +66,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private route: ActivatedRoute,
-    private dialog: MatDialog,
+    private readonly route: ActivatedRoute,
+    private readonly dialog: MatDialog,
     private comportamentoService: ComportamentoService,
     private linkStateService: LinkStateService,
     private homeService: HomeService,
@@ -135,7 +130,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getLinks();
   }
   getLinks(): void {
-    debugger;
     this.homeService.getLinks(
                           this.pageIndex, 
                           this.pageSize, 

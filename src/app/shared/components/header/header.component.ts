@@ -144,23 +144,26 @@ export class HeaderComponent implements OnInit {
   getTags(): void {
     this.homeService.getTags().subscribe({
       next: (response: any) => {
-        // Mantem seu item "todos" se precisar dele em outras lógicas
-        // 1) Extrai somente os objetos de tag válidos
+        const resp = response;
+        //console.log('responseTag', response);
+        /*
         const tagObjs = response
-        .map((item: any) => item?.tag)
-        .filter(isTagObject);
-        // 2) Achata todos os arrays de tags e filtra valores não-strings/vazios
+          .map((item: any) => item?.tag)
+          .filter(isTagObject);
         const allTags = tagObjs
-        .flatMap((obj: any) => obj.tags as unknown[])
-        .filter((t: any): t is string => typeof t === 'string' && t.trim().length > 0);
-        // 3) Remove duplicatas e ordena
+          .flatMap((obj: any) => obj.tags as unknown[])
+          .filter((t: any): t is string => typeof t === 'string' && t.trim().length > 0);
         this.tg = [...new Set(allTags)] as string[];        
         this.tg.sort((a: any, b: any) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
         this.tg.unshift('todos');
-        this.statusOptionsTag = (this.tg ?? []).map(cat => ({
+        */
+       
+        resp.unshift('todos');
+        this.statusOptionsTag = (resp ?? []).map((cat: any) => ({
           value: cat,
           label: cat
         }));
+
       },
       error: (err: HttpErrorResponse) => {
         this.snackService.mostrarMensagem(
@@ -173,10 +176,13 @@ export class HeaderComponent implements OnInit {
     this.homeService.getCategorias().subscribe({
       next: (response: any) => {
         const resp = response;
-        this.links = [...new Set(resp?.map((r: ICategoria) => r.categoria))] as string[];        
-        this.links.sort((a: any, b: any) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-        this.links.unshift('todos');
-        this.statusOptionsCat = (this.links ?? []).map(cat => ({
+        //console.log('resp -> ', resp);
+        //this.links = [...new Set(resp?.map((r: ICategoria) => r.categoria))] as string[];        
+        //this.links.sort((a: any, b: any) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+        //this.links.unshift('todos');
+        //console.log('categorias-> ', this.links);
+        resp.unshift('todos');
+        this.statusOptionsCat = resp.map((cat: any) => ({
           value: cat,
           label: cat
         }));

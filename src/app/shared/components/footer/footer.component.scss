@@ -1,23 +1,35 @@
-.footer-container {
+::ng-deep * {
+    --mdc-typography-body1-font-family: "Poppins";
+    --mdc-typography-body2-font-family: "Poppins";
+    --mdc-typography-button-font-family: "Poppins";
+    --mdc-typography-caption-font-family: "Poppins";
+    --mdc-typography-headline1-font-family: "Poppins";
+    --mdc-typography-headline2-font-family: "Poppins";
+    --mdc-typography-headline3-font-family: "Poppins";
+    --mdc-typography-headline4-font-family: "Poppins";
+    --mdc-typography-headline5-font-family: "Poppins";
+    --mdc-typography-headline6-font-family: "Poppins";
+    --mdc-typography-overline-font-family: "Poppins";
+    --mdc-typography-subtitle1-font-family: "Poppins";
+    --mdc-typography-subtitle2-font-family: "Poppins";
+    font-size: 0.8rem;
+  }
+  .footer-container {
     background-color: #222;
     color: #fff;
-    padding: 1rem;
     text-align: center;
     height: 10vh;
   }
-  
   .footer-content {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
-  
   .footer-content nav a {
     margin: 0 10px;
     color: #ccc;
     text-decoration: none;
   }
-  
   .footer-content nav a:hover {
     color: #fff;
     text-decoration: underline;
