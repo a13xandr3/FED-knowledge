@@ -1,4 +1,5 @@
 import { Component, Inject, OnDestroy, OnInit, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   restoreFilesFromSnapshot,
@@ -7,6 +8,7 @@ import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-brows
 import { CommonModule } from '@angular/common';
 import { RenderKind } from 'src/app/types/Files';
 import { ShowFileData } from '../../interfaces/interface.file-ref';
+import { FileApiService } from 'src/app/shared/services/file-api.service';
 @Component({
   selector: 'app-show-file',
   templateUrl: './show-file.component.html',
@@ -21,7 +23,7 @@ export class ShowFileComponent implements OnInit, OnDestroy {
   xlsxHtml: SafeHtml | null = null;
   docxHtml: SafeHtml | null = null;
   loading = true;
-  originalFile!: File;
+  originalFile?: File | null = null;
   objectUrl = '';
   safeObjectUrl: SafeResourceUrl | null = null;
   previewText = '';
@@ -37,6 +39,7 @@ export class ShowFileComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ShowFileData | null,
     public dialogRef: MatDialogRef<ShowFileComponent>,
+    private filesApiService: FileApiService,
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef
   ) {}
@@ -53,11 +56,30 @@ export class ShowFileComponent implements OnInit, OnDestroy {
         return;
       }
       // Restaura arquivo original
-      const { originalFile } = await restoreFilesFromSnapshot(snap, true);
-      this.originalFile = originalFile;
+      // Se o snapshot incluir base64 (base64Gzip ou base64Payload) usamos o util
+      const hasBase64 = !!((snap as any)?.base64Gzip || (snap as any)?.base64Payload);
+      if (hasBase64) {
+        const { originalFile } = await restoreFilesFromSnapshot(snap, true);
+        this.originalFile = originalFile;
+      } else if (this.itemId) {
+        // Se o snapshot não trouxer base64, tentamos baixar o blob do servidor
+        try {
+          const idNum = Number(this.itemId);
+          const blob = await firstValueFrom(this.filesApiService.download(idNum));
+          const filename = snap?.filename || `file-${idNum}`;
+          const mime = snap?.mimeType || blob.type || 'application/octet-stream';
+          this.originalFile = new File([blob], filename, { type: mime });
+        } catch (err) {
+          console.warn('[ShowFile] falha ao baixar blob do servidor, fallback:', err);
+          throw err;
+        }
+      } else {
+        throw new Error('Snapshot sem dados base64');
+      }
       // Decide renderização
+      const originalFile = this.originalFile!;
       const mt = (originalFile.type || '').toLowerCase();
-      const name = this.originalFile.name.toLowerCase();
+      const name = (originalFile.name || '').toLowerCase();
       if (mt.startsWith('image/')) {
         this.renderKind = 'image';
         this.objectUrl = URL.createObjectURL(originalFile);

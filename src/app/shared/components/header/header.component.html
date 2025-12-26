@@ -55,7 +55,7 @@
         </div>
     </div>
     <!-- Linha extra (timesheet) -->
-    <div class="row mt-2" *ngIf="this.selectedItemCategory?.toLowerCase() === 'timesheet'">
+    <div class="row mt-2" *ngIf="selectedItemCategory.toLowerCase() === 'timesheet'">
       <div class="col-12 small">
         <span class="text-muted">Total Horas:</span>
         <strong class="ms-1">{{ totalHoras | horaFormatada }}</strong>

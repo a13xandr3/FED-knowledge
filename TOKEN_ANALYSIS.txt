@@ -1,0 +1,168 @@
+ANÁLISE DETALHADA — FLUXO DE TOKEN (FED-KNOWLEDGE)
+
+Resumo Executivo
+----------------
+Este relatório descreve como o projeto lida com autenticação via JWT no cliente: solicitação (login), 
+armazenamento, uso em requisições, revalidação/renovação e leitura do payload (exp). Também documenta 
+inconsistências encontradas e recomendações.
+
+Arquivos principais consultados
+- src/main.ts
+- src/app/shared/services/auth.service.ts
+- src/app/shared/services/token-storage.service.ts
+- src/app/shared/services/token.interceptor.service.ts
+- src/app/shared/services/home.service.ts
+- src/app/shared/services/file-api.service.ts
+- src/app/shared/pipes/token-time-left.pipe.ts
+- src/app/shared/pipes/token-expiring-soon.pipe.ts
+
+(Links rápidos):
+- TokenStorage: [src/app/shared/services/token-storage.service.ts](src/app/shared/services/token-storage.service.ts#L1)
+- Interceptor: [src/app/shared/services/token.interceptor.service.ts](src/app/shared/services/token.interceptor.service.ts#L1)
+- AuthService: [src/app/shared/services/auth.service.ts](src/app/shared/services/auth.service.ts#L1)
+- HomeService: [src/app/shared/services/home.service.ts](src/app/shared/services/home.service.ts#L1)
+- FileApiService: [src/app/shared/services/file-api.service.ts](src/app/shared/services/file-api.service.ts#L1)
+
+1) Solicitação do token (Login)
+-------------------------------
+Onde: `AuthService.login(payload)` em [auth.service.ts](src/app/shared/services/auth.service.ts#L1).
+
+Fluxo observado:
+- Cliente (ex.: `LoginComponent`) constrói `LoginPayload` com `username`, `password` e `totp`.
+- Chama `auth.login(payload)` que executa um `POST` para `${api}/login` (api base: `http://localhost:8080/api/auth`).
+- A assinatura do método `login` retorna `Observable<LoginResponse>` onde `LoginResponse` tem `{ status: string; token: string }`.
+- No `pipe(tap(...))`, se `response.token` existe, o serviço faz `this.tokenStorage.setToken(response.token)`.
+- `TokenStorageService.setToken` salva o token no `localStorage` com a chave `kb_token`.
+
+Observações:
+- O token é gerado no backend; o frontend não cria nem assina tokens.
+- O token é salvo no cliente (localStorage) via `TokenStorageService`.
+
+2) Armazenamento do token no cliente
+-----------------------------------
+Onde: `TokenStorageService` em [token-storage.service.ts](src/app/shared/services/token-storage.service.ts#L1).
+
+Comportamento:
+- `private readonly TOKEN_KEY = 'kb_token'` — chave usada para `setItem/getItem/removeItem`.
+- Métodos expostos:
+  - `setToken(token: string)` — salva em `localStorage.setItem('kb_token', token)`.
+  - `getToken(): string | null` — recupera o token.
+  - `clear()` — remove a chave.
+  - `getExpirationDate()` — decodifica o payload JWT (`atob` do segundo segmento) e cria `Date` a partir do `exp` (segundos desde epoch).
+  - `isTokenExpired()` — true se exp <= now ou exp ausente.
+  - `willExpireIn(seconds: number)` — true se exp ausente ou exp - now <= segundos.
+
+Observações de segurança:
+- O token é armazenado em `localStorage`, que é persistente e vulnerável a XSS. Não há uso de `HttpOnly` cookies para proteger contra XSS.
+- A decodificação do payload não valida assinatura; apenas lê `exp`.
+
+3) Uso do token nas requisições (Authorization header)
+-----------------------------------------------------
+Existem duas formas observadas no código para incluir token nas requisições:
+
+(a) Interceptor global
+- Implementado como `tokenInterceptor` (função `HttpInterceptorFn`) em [token.interceptor.service.ts](src/app/shared/services/token.interceptor.service.ts#L1).
+- Registrado em `src/main.ts` via `provideHttpClient(withInterceptors([tokenInterceptor]))`.
+
+Lógica do interceptor:
+- Injeta `TokenStorageService` e `AuthService` via `inject()`.
+- Evita interceptar requisições cujo `req.url` contenha `/api/auth` para não criar loop (endpoints de login/revalidate).
+- Recupera `currentToken = tokenStorage.getToken()` (usa `kb_token`).
+  - Se não há token, passa a requisição sem alteração.
+- Verifica `aboutToExpire = tokenStorage.willExpireIn(60)` (expira em ≤ 60s).
+- Se `!aboutToExpire || isRefreshing`:
+  - Clona a requisição adicionando `Authorization: Bearer ${currentToken}` e prossegue.
+- Se `aboutToExpire && !isRefreshing`:
+  - Seta `isRefreshing = true` e chama `authService.revalidateToken(currentToken)`.
+  - No `switchMap` sobre a resposta:
+    - Se `resp.token` existe, persiste via `tokenStorage.setToken(resp.token)`, clona a requisição com `Authorization: Bearer ${newToken}` e continua.
+    - Se não houver `resp.token`, limpa storage e navega para `/login`.
+  - Em caso de erro: limpa storage e navega para `/login`.
+- Função `handleAuthError` também limpa token/navega para login quando recebe `401/403`.
+
+Pontos importantes:
+- Interceptor cuida da renovação pró-ativa (pré-envio) se token expirar em ≤ 60s.
+- `isRefreshing` evita chamadas concorrentes de revalidação.
+- O backend deve suportar `${api}/revalidate` que recebe `{ token: currentToken }` e retorna `{ token: string }` com novo JWT, conforme `AuthService.revalidateToken`.
+
+(b) Inserção manual em serviços
+- Alguns serviços (ex.: `HomeService` e `FileApiService`) montam `Authorization` manualmente lendo `localStorage.getItem('token')` (note a chave diferente) e em alguns casos guardando esse valor em uma `const token = localStorage.getItem('token')` no topo do arquivo (executado em import time). Exemplos:
+  - `HomeService` declara `const token = localStorage.getItem('token');` no topo e então monta headers com `Authorization: Bearer ${token}` em vários métodos.
+  - `FileApiService.authHeaders()` faz `const t = localStorage.getItem('token')` dinamicamente quando invocado.
+
+Inconsistência crítica:
+- `TokenStorageService` usa a chave `kb_token` para armazenar o token.
+- `HomeService` e `FileApiService` usam a chave `token` para ler o token.
+- Consequências:
+  - Se o token foi salvo apenas via `TokenStorageService.setToken` (chave `kb_token`), os métodos que leem `localStorage.getItem('token')` NÃO obterão o token, levando a requisições sem Authorization ou com valor `null`.
+  - `HomeService` lê `token` uma vez durante a importação (const no topo) — mesmo que `localStorage` mude depois, esse `token` local não se atualiza, causando envio de um token desatualizado ou nenhum token.
+  - O interceptor usa `TokenStorageService.getToken()` (chave `kb_token`) e assim funciona de forma diferente dos serviços que constroem headers manualmente.
+
+Recomendação: padronizar o uso do `TokenStorageService` em todos os serviços e remover leituras diretas de `localStorage` e, especialmente, evitar `const token = localStorage.getItem('token')` em escopo de módulo.
+
+4) Renovação / Revalidação do token
+-----------------------------------
+Onde: fluxo centralizado no `tokenInterceptor` com apoio em `AuthService.revalidateToken`.
+
+Detalhamento do fluxo de renovação:
+- Antes de enviar uma requisição, o interceptor pergunta `willExpireIn(60)` — se o token expira em até 60 segundos, o cliente tentará revalidar/renovar.
+- A revalidação é um `POST` para `${api}/revalidate` com o corpo `{ token: currentToken }` (implementação em `AuthService.revalidateToken`).
+- Se a resposta contiver um `token` novo, ele é persistido (`tokenStorage.setToken`) e usado para a requisição atual.
+- Se a revalidação falhar (erro HTTP ou resposta sem token), o cliente chama `tokenStorage.clear()` e navega para `/login` (expulsando o usuário).
+- `isRefreshing` é gerenciado como variável global no arquivo do interceptor para evitar múltiplas revalidações simultâneas (bom para evitar flood de chamadas ao backend).
+
+Observações arquiteturais:
+- Não há uso explícito de um "refresh token" separado; o mecanismo é baseada em revalidar o token atual enviando-o ao endpoint de revalidação. Isso delega ao backend a política: aceitar o token e devolver um novo, ou rejeitar.
+- O cliente armazena apenas o JWT no `localStorage` (nenhum refresh token de longa duração observável no código).
+
+5) Leitura do payload (exp) e pipes relacionados
+-----------------------------------------------
+Arquivos: `token-time-left.pipe.ts` e `token-expiring-soon.pipe.ts`.
+
+Comportamento comum:
+- Ambos leem o token de `token` argumento ou `localStorage.getItem('kb_token')` (observe que usam `kb_token`).
+- Decodificam o segmento do meio do JWT (base64URL -> base64 -> atob -> JSON.parse) para extrair `payload.exp` como segundos desde epoch.
+- `TokenTimeLeftPipe` retorna string formatada `HH:MM:SS` ou `expirado`.
+- `TokenExpiringSoonPipe` retorna boolean true se o token expirar em até `thresholdSec` (default 60s).
+- Ambos usam `pure: false` e setInterval interno que chama `ChangeDetectorRef.markForCheck()` a cada segundo para atualizar a UI de contadores/avisos.
+
+Riscos/observações:
+- Decodificação sem validação de assinatura é adequada para exibir `exp` no cliente, mas não deve ser utilizada para validar confiança do token.
+- Uso de `localStorage.getItem('kb_token')` faz com que pipes dependam da mesma chave que `TokenStorageService` (consistência aqui está correta), mas alguns serviços usam `token` diferente — inconsistência global.
+
+6) Erros, edge-cases e problemas detectados
+-------------------------------------------
+- Chaves diferentes em `localStorage` (`kb_token` vs `token`) — risco funcional: alguns requests podem ser enviados sem Authorization.
+- `const token = localStorage.getItem('token')` no escopo de módulo de `HomeService` é avaliado apenas uma vez durante a importação; se o token mudar, `HomeService` continuará usando o valor antigo. Isso é um bug de implementação.
+- Alguns serviços montam headers manualmente; com o interceptor global isso é redundante. Melhor centralizar no interceptor.
+- Armazenar token em `localStorage` expõe o token a XSS; considerar `HttpOnly` cookies ou mitigação (CSP, sanitização rigorosa, Content Security Policy, etc.).
+- O comportamento de revalidação depende do endpoint `/api/auth/revalidate` no backend. Se o backend não der suporte à revalidação do token atual, o fluxo falhará.
+- `isRefreshing` é variável de arquivo (escopo module). Em cenários com múltiplas instâncias do client (workers?), isso pode não ser suficiente, mas é aceitável para browser single-tab padrão.
+
+7) Recomendações
+----------------
+1. Padronizar chave do token: usar apenas `TokenStorageService` com `kb_token` (ou migrar para `token`) e substituir todas as leituras diretas de `localStorage.getItem('token')` por `TokenStorageService.getToken()`.
+2. Remover `const token = localStorage.getItem('token')` em escopo de módulo; ler token dinamicamente no momento da requisição.
+3. Remover headers manuais dos serviços e contar com o `tokenInterceptor` global para injetar `Authorization` (centraliza lógica de refresh).
+4. Reavaliar armazenamento: considerar cookie `HttpOnly` (melhor segurança contra XSS) ou, se continuar com `localStorage`, fortalecer proteção XSS (CSP, escape outputs, etc.).
+5. Adicionar testes unitários para o interceptor e `TokenStorageService` — validar comportamento de revalidação, `willExpireIn` e reação a 401.
+6. Documentar contrato do endpoint `/api/auth/revalidate` (corpo esperado, código de status e formato da resposta).
+
+8) Trechos críticos (resumos de código)
+---------------------------------------
+- `AuthService.login` — POST `/api/auth/login` -> tap -> `tokenStorage.setToken(response.token)`
+- `TokenStorageService` — `getExpirationDate()` decodifica JWT com `atob` e lê `exp`.
+- `tokenInterceptor` — se token expira em ≤ 60s chama `authService.revalidateToken(currentToken)` e aplica novo token antes da requisição.
+- `HomeService`/`FileApiService` — usam `localStorage.getItem('token')` (chave diferente) e, em `HomeService`, definem `const token = localStorage.getItem('token')` no topo do arquivo.
+
+9) Conclusão
+------------
+O projeto implementa um fluxo de login/armazenamento/renovação de token JWT bem definido, com revalidação pró-ativa via interceptor e leitura de `exp` para UI. Entretanto, existem inconsistências operacionais (chaves diferentes em `localStorage`, leituras em escopo de módulo e headers manuais) que podem causar falhas na inclusão do `Authorization` header ou uso de tokens desatualizados. Recomenda-se padronizar o armazenamento e a injeção de Authorization via `TokenStorageService` + `tokenInterceptor`.
+
+Se desejar, posso:
+- Gerar patches automatizados para padronizar o uso do token (por exemplo, atualizar `HomeService` e `FileApiService` para usar `TokenStorageService`),
+- Escrever testes unitários para `tokenInterceptor` e `TokenStorageService`,
+- Documentar o contrato esperado com o backend para `revalidate`.
+
+---
+Análise gerada automaticamente; se quiser que inclua trechos de código completos dentro do relatório, aviso que o arquivo aumentará de tamanho e eu o atualizo com os trechos solicitados.
