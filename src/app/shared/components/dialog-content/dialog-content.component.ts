@@ -1,10 +1,16 @@
-import { CommonModule, DatePipe } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, Optional, ViewChild, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { CommonModule, DatePipe } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
+import { MatChipsModule } from '@angular/material/chips';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
 import { SafeResourceUrl } from '@angular/platform-browser';
+
 import { catchError, concatMap, forkJoin, map, Observable, of, Subscription, throwError } from 'rxjs';
+import { NgxMaskDirective } from 'ngx-mask';
+
 import { FileSavedResponse, ILinkRequest, ProcessedFile } from '../../request/request';
 import { HomeService } from 'src/app/shared/services/home.service';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
@@ -13,15 +19,14 @@ import { SnackService } from 'src/app/shared/services/snack.service';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
 import { FilesPayload, FileRef as FileRefCore, extractIds, idToFilename, diffRemovedIds, mergeExistingAndNew } from 'src/app/shared/components/input-file/file-selection.util';
 import { FileRef } from 'src/app/shared/interfaces/interface.files';
-import { DurationPipe } from '../../pipes/duration.pipe';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatChipsComponent } from 'src/app/shared/components/mat-chips/mat-chips.component';
 import { UploaderComponent } from 'src/app/shared/components/uploader/uploader.component';
-import { MatInputModule } from '@angular/material/input';
-import { NgxMaskDirective } from 'ngx-mask';
-import { PreviewItem } from 'src/app/types/Files';
+import { TokenTimeLeftPipe } from 'src/app/shared/pipes/token-time-left.pipe';
+import { TokenExpiringSoonPipe } from 'src/app/shared/pipes/token-expiring-soon.pipe';
+
 import { QuillComponent } from '../quill/quill.component';
+import { PreviewItem } from 'src/app/types/Files';
+
 @Component({
   selector: 'app-dialog-content',
   templateUrl: './dialog-content.component.html',
@@ -29,7 +34,6 @@ import { QuillComponent } from '../quill/quill.component';
   standalone: true,
   imports: [
     CommonModule,
-    DurationPipe,
     MatDialogModule,
     MatFormFieldModule,
     MatChipsModule,
@@ -39,7 +43,9 @@ import { QuillComponent } from '../quill/quill.component';
     ReactiveFormsModule,
     NgxMaskDirective,
     UploaderComponent,
-    QuillComponent
+    QuillComponent,
+    TokenTimeLeftPipe,
+    TokenExpiringSoonPipe
   ],
   providers: [
     DatePipe

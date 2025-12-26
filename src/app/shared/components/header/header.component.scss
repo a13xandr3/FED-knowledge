@@ -1,42 +1,83 @@
+:host {
+  display: block;
+}
+.token-timer--danger {
+  color: #dc3545; /* bootstrap danger */
+  font-weight: 600;
+}
+/* =========================
+   Header tokens (default)
+   ========================= */
+.header-container {
+  flex: 0 0 auto;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ccc;
+  min-height: clamp(56px, 9dvh, 88px);
+}
+/* =========================
+   XS only (mobile)
+   ========================= */
+@media (max-width: 575.98px) {
   .header-container {
-    background-color: #f5f5f5;
-    border-bottom: 1px solid #ccc;
-    height: 8vh;
+    --header-min-height: clamp(64px, 9dvh, 104px);
+    --select-font-size: 0.8rem;
+    --select-min-height: 34px;
+    --btn-font-size: 0.8rem;
+    --btn-padding-y: 0.175rem;
+    --btn-line-height: 1;
   }
-  .header-container h1 {
-    font-size: 2rem;
-    margin: 0;
-    color: #333;
-  }
-  .incluir-btn {
-    padding: 0.4rem 1rem;
-    font-size: 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
-  }
-  .incluir-btn:hover {
-    background-color: #0056b3;
-  }
-  .knowledge-base {
-    /* fallback (caso clamp não seja suportado) */
-    font-size: 2rem;
-    /* tipografia fluida: min 1.25rem, cresce com viewport, máx 2.75rem */
-    font-size: clamp(1.0rem, 1rem + 2vw, 2.25rem) !important;
-
-    font-weight: 700;
-    color: #212626 !important;
-
-    text-shadow:
-      0 0 1px #14302e,
-      2px 2px 3px #1C4A48,
-      -1px -1px 1px rgba(255, 255, 255, 0.4);
-
-    /* espaçamento entre letras também responsivo:
-      min 0.08rem, cresce um pouco, máx 0.5rem */
-    letter-spacing: clamp(0.08rem, 0.1rem + 0.8vw, 0.5rem);
-
-    line-height: clamp(1.2rem, 1.2rem + 1vw, 2.5rem)  ;
-  }
+}
+/* =========================
+   Title / Branding
+   ========================= */
+.header-container .knowledge-base {
+  margin: 0;
+  font-size: clamp(0.8rem, 0.5rem + 1vw, 2.25rem);
+  font-weight: 700;
+  color: #212626;
+  text-shadow: 0 0 1px #14302e, 2px 2px 3px #1c4a48, -1px -1px 1px rgba(255, 255, 255, 0.4);
+  letter-spacing: clamp(0.08rem, 0.1rem + 0.8vw, 0.5rem);
+  line-height: clamp(1.2rem, 1.2rem + 1vw, 2.5rem);
+}
+/* =========================
+   Select-field compact
+   (scoped + variable-driven)
+   ========================= */
+.header-container app-select-field.kb-select--compact {
+  display: block;
+  width: 100%;
+  font-size: var(--select-font-size, 0.9rem);
+}
+.header-container app-select-field.kb-select--compact ::ng-deep .mat-mdc-form-field {
+  width: 100%;
+  font-size: var(--select-font-size, 0.9rem);
+}
+.header-container app-select-field.kb-select--compact ::ng-deep .mat-mdc-text-field-wrapper {
+  min-height: var(--select-min-height, 38px);
+}
+.header-container app-select-field.kb-select--compact ::ng-deep .mat-mdc-form-field-infix {
+  padding: 6px 0;
+  min-height: var(--select-min-height, 38px);
+}
+.header-container app-select-field.kb-select--compact ::ng-deep .mat-mdc-select-trigger {
+  height: var(--select-min-height, 38px);
+  align-items: center;
+}
+/* =========================
+   Header button (scoped)
+   ========================= */
+.header-container .header-btn {
+  font-size: var(--btn-font-size, 0.9rem);
+  padding: var(--btn-padding-y, 0.25rem) var(--btn-padding-x, 0.75rem);
+  line-height: var(--btn-line-height, 1.1);
+}
+/* Primary only inside header (no global impact) */
+.header-container .header-btn.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #0d6efd;
+  --bs-btn-border-color: #0d6efd;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #0b5ed7;
+  --bs-btn-hover-border-color: #0a58ca;
+  --bs-btn-focus-shadow-rgb: 49, 132, 253;
+}

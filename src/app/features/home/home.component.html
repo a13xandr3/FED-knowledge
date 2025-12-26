@@ -1,73 +1,89 @@
-<app-header [titulo]="titulo" [totalHoras]="totalHoras" (itemSelecionadoEvent)="onItemSelecionado($event)"></app-header>
-<div class="user-list-container body">
-  <table mat-table [dataSource]="links" class="mat-elevation-z8">
-    <!--id-->
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef class="col-1"> ID </th>
-      <td mat-cell *matCellDef="let link"> {{ link.id }} </td>
-    </ng-container>
-    <!-- Category Column -->
-    <ng-container matColumnDef="categoria">
-      <th mat-header-cell *matHeaderCellDef class="col-1"> Categoria </th>
-      <td mat-cell *matCellDef="let link"> {{ link.categoria }} </td>
-    </ng-container>
-    <!-- Name Column -->
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef class="col-4"> Name </th>
-      <td mat-cell *matCellDef="let link"> {{ link.name }} </td>
-    </ng-container>
-    <!--Tag-->
-    <ng-container matColumnDef="tag" class="tag">
-      <th mat-header-cell *matHeaderCellDef class="col-4 tag"> Tag </th>
-      <td mat-cell *matCellDef="let link">
-        <mat-chip-listbox>
-          <mat-chip *ngFor="let t of getTags(link.tag)">
-            <span class="tags" (click)="onChangeTag(t + '_tag')">{{ t }}</span>
-          </mat-chip>
-        </mat-chip-listbox>
-      </td>
-    </ng-container>
-    <!--Actions-->
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef class="col-1 text-end">Actions</th>
-      <td mat-cell *matCellDef="let link" >
-        <div class="d-flex gap-3 justify-content-end">
-            <span>
-                <a 
-                  [attr.href]="injectUrl(link) || null"
-                  [class.disabled]="!injectUrl(link)"
-                  target="_blank" 
-                  rel="noopener noreferrer">
-                    <img loading="lazy"
-                      src="assets/imgs/search.svg"
-                      alt="Abre url externamente" >
-                </a>
-            </span>
-            <span 
-              class="actions">
-              <img loading="lazy"  
-                src="assets/imgs/edit.svg" 
-                (click)="abrirDialog(link, false)" 
-                alt="Edit" 
-                class="edit" >
-            </span>
-            <span 
-              class="actions">
-              <img loading="lazy"  
-                src="assets/imgs/delete.svg" 
-                (click)="deleteItem(link.id, link?.fileID?.fileRefs)"
-                class="delete"
-                alt="Delete">
-              </span>
+<div class="page-shell">
+  <app-header
+    [titulo]="titulo"
+    [totalHoras]="totalHoras"
+    (itemSelecionadoEvent)="onItemSelecionado($event)">
+  </app-header>
+  <div class="page-main">
+    <div class="container-fluid py-3">
+      <div class="row">
+        <div class="col-12">
+          <!-- Rolagem horizontal se necessário -->
+          <div class="table-responsive">
+            <table mat-table [dataSource]="links" class="mat-elevation-z8 w-100 table-fixed-layout">
+              <!-- ID (visível >= lg) -->
+              <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef class="d-none d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-md-1 col-lg-1 col-xl-1 col-xxl-1">ID</th>
+                <td mat-cell *matCellDef="let link" class="d-none d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-md-1 col-lg-1 col-xl-1 col-xxl-1">{{ link.id }}</td>
+              </ng-container>
+              <ng-container matColumnDef="categoria">
+                <th mat-header-cell *matHeaderCellDef class="d-none d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-md-1 col-lg-1 col-xl-1 col-xxl-1">Categoria</th>
+                <td mat-cell *matCellDef="let link" class="d-none d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-md-1 col-lg-1 col-xl-1 col-xxl-1">
+                  <div class="text-truncate">{{ link.categoria }}</div>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef class="d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-md-2 col-lg-2 col-xl-2 col-xxl-2">Name</th>
+                <td mat-cell *matCellDef="let link" class="d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-md-2 col-lg-2 col-xl-2 col-xxl-2 text-md-nowrap text-lg-nowrap text-xl-nowrap text-xxl-nowrap">
+                  <div class="xtext-truncate">{{ link.name }}</div>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="tag">
+                <th mat-header-cell *matHeaderCellDef class="d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-md-7 col-lg-7 col-xl-7 col-xxl-7">Tag</th>
+                <td mat-cell *matCellDef="let link" class="d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-md-7 col-lg-7 col-xl-7 col-xxl-7">
+                  <mat-chip-listbox class="responsive-chips w-100">
+                    <mat-chip *ngFor="let t of getTags(link.tag)">
+                      <span class="tags" (click)="onChangeTag(t + '_tag')">{{ t }}</span>
+                    </mat-chip>
+                  </mat-chip-listbox>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-1 col-md-1 col-lg-1 col-xl-1 col-xxl-1">Actions</th>
+                <td mat-cell *matCellDef="let link" class="d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell col-1 col-md-1 col-lg-1 col-xl-1 col-xxl-1">
+                  <div class="d-flex flex-wrap justify-content-end gap-0 gap-md-0 gap-lg-2 gap-xl-1 gap-xxl-1 ">
+                    <span>
+                      <a
+                        [attr.href]="injectUrl(link) || null"
+                        [class.disabled]="!injectUrl(link)"
+                        [attr.tabindex]="injectUrl(link) ? 0 : -1"
+                        [attr.aria-disabled]="!injectUrl(link)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Abrir URL em nova aba">
+                        <img loading="lazy" src="assets/imgs/search.svg" alt="Abrir" />
+                      </a>
+                    </span>
+                    <span>
+                      <img loading="lazy"
+                           src="assets/imgs/edit.svg"
+                           (click)="abrirDialog(link, false)"
+                           alt="Editar"
+                           class="edit" />
+                    </span>
+                    <span>
+                      <img loading="lazy"
+                           src="assets/imgs/delete.svg"
+                           (click)="deleteItem(link.id, link?.fileID?.fileRefs)"
+                           class="delete"
+                           alt="Excluir" />
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+          <div class="d-flex justify-content-md-center justify-content-lg-end mt-2">
+            <mat-paginator
+              [length]="totalLinks"
+              [pageSize]="pageSize"
+              (page)="onPageChange($event)">
+            </mat-paginator>
+          </div>
         </div>
-      </td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-  <mat-paginator
-    [length]="totalLinks"
-    [pageSize]="pageSize"
-    (page)="onPageChange($event)">
-  </mat-paginator>
+      </div>
+    </div>
+  </div>
 </div>

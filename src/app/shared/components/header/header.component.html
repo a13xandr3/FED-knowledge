@@ -1,53 +1,64 @@
 <header class="header-container w-100 py-2 px-3">
-  <div class="container-fluid">
-    <div class="row align-items-center g-2">
-      <!-- Coluna 1: Título + tempo do token -->
-      <div class="col-12 col-md-5 d-flex align-items-center gap-2">
-        <div class="knowledge-base mb-0">{{ titulo }}</div>
-        <span class="ms-3" style="font-size: 0.67rem;">
-          Token expira em: <strong>{{ '' | tokenTimeLeft }}</strong>
-        </span>
-      </div>
-
-      <!-- Coluna 2: Selects (empilha no mobile, 2 colunas no lg+) -->
-      <div class="col-12 col-md-5">
-        <div class="row g-2">
-          <div class="col-12 col-lg-6 d-flex justify-content-center align-items-center">
-
-            <app-select-field
-              [options]="statusOptionsCat"
-              [placeholder]="'Choose one cathegory'"
-              [matcher]="matcher"
-              [value]="initialValue"
-              (valueChange)="onChangeCategory($event?.value)">
-            </app-select-field>
-
+  <div class="">
+    <!-- Linha principal -->
+    <div class="row align-items-center gy-2 gx-2">
+      <!-- Bloco: Título + sessão -->
+       <div class="row">
+          <div class="col-8 col-md-8 col-lg-6 col-xl-6 col-xxl-6">
+            <div class="d-flex flex-column flex-md-row flex-lg-row flex-xl-row flex-xxl-row align-items-md-center gap-1 gap-md-2">
+              <div class="knowledge-base m-0 text-truncate">{{ titulo }}</div>
+            </div>
           </div>
-          <div class="col-12 col-lg-6 d-flex justify-content-center align-items-center">
-            <app-select-field
-              [options]="statusOptionsTag"
-              [placeholder]="'Choose one Tag'"
-              [matcher]="matcher"
-              [value]="initialValue"
-              (valueChange)="onChangeTag($event?.value)">
-            </app-select-field>
+          <div class="col-4 col-md-4 col-lg-6 col-xl-6 col-xxl-6">
+            <div class="d-none d-md-block d-lg-flex d-xl-flex d-xxl-flex small text-muted justify-content-md-end">
+              <span
+                class="token-timer"
+                [class.token-timer--danger]="'' | tokenExpiringSoon:60">
+                sessão expira em: <strong>{{ '' | tokenTimeLeft }}</strong>
+              </span>
+            </div>
+         </div>
+       </div>
+      <!-- Bloco: filtros (categoria/tag) -->
+        <div class="row g-2">
+          <!-- Categoria -->
+          <div class="col-4 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+            <select
+              class="form-select form-select-sm" aria-label="Choose one category" [formControl]="categoryCtrl" (change)="onChangeCategory(categoryCtrl.value?.value)">
+              <option [ngValue]="null" disabled>Choose one category</option>
+              <option *ngFor="let opt of statusOptionsCat" [ngValue]="opt">
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+          <!-- Tag -->
+          <div class="col-4 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+            <select
+              class="form-select form-select-sm" 
+              aria-label="Choose one tag" 
+              [formControl]="tagCtrl" 
+              (change)="onChangeTag(tagCtrl.value?.value)">
+              <option [ngValue]="null" disabled>Choose one tag</option>
+              <option *ngFor="let opt of statusOptionsTag" [ngValue]="opt">
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+          <div class="col-4 col-md-1 col-lg-4 col-xl-4 col-xxl-4 d-flex justify-content-md-end">
+            <button
+              type="button"
+              class="btn btn-primary btn-sm w-md-auto"
+              (click)="abrirDialog($event)">
+              Incluir
+            </button>
           </div>
         </div>
-      </div>
-
-      <!-- Coluna 3: Botão (alinhado à direita em md+) -->
-      <div class="col-12 col-md-2 d-flex justify-content-md-end">
-        <button type="button" class="btn btn-primary incluir-btn" (click)="abrirDialog($event)">
-          Incluir
-        </button>
-      </div>
     </div>
-
     <!-- Linha extra (timesheet) -->
     <div class="row mt-2" *ngIf="this.selectedItemCategory?.toLowerCase() === 'timesheet'">
-      <div class="col-12">
-        <span>Total Horas: </span>
-        <span>{{ totalHoras | horaFormatada }}</span>
+      <div class="col-12 small">
+        <span class="text-muted">Total Horas:</span>
+        <strong class="ms-1">{{ totalHoras | horaFormatada }}</strong>
       </div>
     </div>
   </div>

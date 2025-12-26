@@ -8,9 +8,11 @@
                 {{ data.status === 'inclusao' ? 'Inclusão' : 'Alteração' }}
                 {{ data.status !== 'inclusao' ? ' - ID: ' + this.fr.get('id')?.value : '' }}
               </div>
-              <div *ngIf="tempoRestanteMs >= 0">
-                <p>Tempo restante: {{ tempoRestanteMs | duration }}</p>
-              </div>
+              <span
+                class="token-timer"
+                [class.token-timer--danger]="'' | tokenExpiringSoon:60">
+                sessão expira em: <strong>{{ '' | tokenTimeLeft }}</strong>
+              </span>
             </div>
           </div>
           <div class="row">
@@ -20,7 +22,7 @@
               <mat-form-field 
                 appearance="outline" 
                 [class]="this.fr.get('categoria')?.value == 'TI' || 
-                        this.fr.get('categoria')?.value == 'Ti' ? 'w-50' : 'w-100'" 
+                         this.fr.get('categoria')?.value == 'Ti' ? 'w-50' : 'w-100'" 
                 >
                 <mat-label>Categoria</mat-label>
                 <input

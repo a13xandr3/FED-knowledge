@@ -1,104 +1,66 @@
-::ng-deep * {
-    --mdc-typography-body1-font-family: "Poppins";
-    --mdc-typography-body2-font-family: "Poppins";
-    --mdc-typography-button-font-family: "Poppins";
-    --mdc-typography-caption-font-family: "Poppins";
-    --mdc-typography-headline1-font-family: "Poppins";
-    --mdc-typography-headline2-font-family: "Poppins";
-    --mdc-typography-headline3-font-family: "Poppins";
-    --mdc-typography-headline4-font-family: "Poppins";
-    --mdc-typography-headline5-font-family: "Poppins";
-    --mdc-typography-headline6-font-family: "Poppins";
-    --mdc-typography-overline-font-family: "Poppins";
-    --mdc-typography-subtitle1-font-family: "Poppins";
-    --mdc-typography-subtitle2-font-family: "Poppins";
+:host {
+  display: block;
+  min-height: 91%;
+  height: 91%;
+  max-height: 100%;
+  
+  --row-h: 3rem;         /* altura padrão da linha */
+  --cell-vpad: 2px;      /* padding vertical total (top+bottom) */
 }
-
-.body {
-    height: 82vh;
-    max-height: 82vh;
+:host,
+:host * {
+  font-family: "Poppins";
+  font-size: 0.67rem;
 }
-.row {
-    border-bottom: 1px solid #c1bccd;
+:host ::ng-deep .mat-mdc-table .mdc-data-table__header-row {
+    height: 1.5rem !important;
 }
-::ng-deep  .mat-mdc-table tbody, 
-           .mat-mdc-table tfoot, 
-           .mat-mdc-table thead, 
-           .mat-mdc-cell, 
-           .mat-mdc-footer-cell, 
-           .mat-mdc-header-row, 
-           .mat-mdc-row, 
-           .mat-mdc-footer-row, 
-           .mat-mdc-table .mat-mdc-header-cell {
-    background: inherit;
-    height: 7vh;
-    max-height: 7vh;
+/* 1) Padroniza a altura das linhas */
+:host ::ng-deep tr.mat-mdc-row {
+  height: var(--row-h) !important;
+  overflow: auto;
 }
-::ng-deep .mat-mdc-table .mdc-data-table__row {
-    height: 1.5rem;
+/* 2) Evita que outras colunas aumentem a linha */
+:host ::ng-deep td.mat-mdc-cell {
+  vertical-align: middle;
+  padding-top: calc(var(--cell-vpad) / 2);
+  padding-bottom: calc(var(--cell-vpad) / 2);
+  overflow: auto;
 }
-::ng-deep td:nth-child(4) {
-    display: table-cell !important;
-    height: 7vh !important;
-    overflow-y: auto !important;
-    margin-top: 0 !important;
-    padding: 3px !important;
+/* 3) Scroll interno apenas na célula de tags */
+:host ::ng-deep .tag-cell {
+  min-height: calc(var(--row-h) - var(--cell-vpad));
+  max-height: calc(var(--row-h) - var(--cell-vpad));
+  height: calc(var(--row-h) - var(--cell-vpad));
+  overflow: auto;
 }
-::ng-deep .mat-mdc-chip-set .mdc-evolution-chip-set__chips {
-    min-width: 100%;
-    padding: 0.3rem 0 0 0 !important;
+/* Chips quebram em múltiplas linhas dentro do scroll */
+:host ::ng-deep mat-chip-listbox.responsive-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  align-content: flex-start;
+  height: 5dvh !important;
+  overflow: auto;
+}
+:host ::ng-deep .mat-mdc-standard-chip {
+  padding: .3rem .3rem !important;  
+}
+:host ::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary {
+    padding: 0 !important;
     margin: 0 !important;
 }
-::ng-deep .mdc-evolution-chip-set .mdc-evolution-chip {
-    margin-top: 1px !important;
-    margin-bottom: 1px !important;
+.page-shell {
+  max-height: 91dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
 }
-::ng-deep .mdc-evolution-chip, .mdc-evolution-chip__cell, .mdc-evolution-chip__action {
-    display: inline-flex;
-    align-items: center;
-    height: 20px !important;
+.page-main {
+  flex: 1 1 auto;  /* ocupa o espaço restante */
+  min-height: 0;   /* CRÍTICO: permite scroll interno sem “estourar” */
+  overflow: auto;  /* scroll fica apenas no conteúdo */
 }
-.mdc-evolution-chip-set {
-    display: flex;
-    height: 5vh !important;
-    overflow-y: auto !important;
-}
-.tags {
-    cursor: pointer;
-    font-size: 0.6rem;
-}
-a {
-    cursor: pointer;
-}
-a.disabled {
-    pointer-events: none;
-    opacity: 0.5;
-}
-.edit, .delete {
-    cursor: pointer;
-}
-/* Largura da barra de rolagem */
-::ng-deep .mdc-evolution-chip-set::-webkit-scrollbar {
-  width: 5px; /* vertical */
-  height: 5px; /* horizontal */
-}
-/* Parte de fundo da barra */
-::ng-deep .mdc-evolution-chip-set::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-/* Parte que se move (thumb) */
-::ng-deep .mdc-evolution-chip-set::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-/* Hover na thumb */
-::ng-deep .mdc-evolution-chip-set::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary {
-    font: inherit;
-    letter-spacing: inherit;
-    white-space: inherit;
-    margin: 0.2rem;
-    padding: 0.01rem 0.5rem 0.01rem 0.5rem;
+:host ::ng-deep .table-responsive {
+    height: 67dvh !important;
 }

@@ -1,36 +1,57 @@
-::ng-deep * {
-    --mdc-typography-body1-font-family: "Poppins";
-    --mdc-typography-body2-font-family: "Poppins";
-    --mdc-typography-button-font-family: "Poppins";
-    --mdc-typography-caption-font-family: "Poppins";
-    --mdc-typography-headline1-font-family: "Poppins";
-    --mdc-typography-headline2-font-family: "Poppins";
-    --mdc-typography-headline3-font-family: "Poppins";
-    --mdc-typography-headline4-font-family: "Poppins";
-    --mdc-typography-headline5-font-family: "Poppins";
-    --mdc-typography-headline6-font-family: "Poppins";
-    --mdc-typography-overline-font-family: "Poppins";
-    --mdc-typography-subtitle1-font-family: "Poppins";
-    --mdc-typography-subtitle2-font-family: "Poppins";
-    font-size: 0.8rem;
-  }
-  .footer-container {
-    background-color: #222;
-    color: #fff;
-    text-align: center;
-    height: 10vh;
-  }
-  .footer-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .footer-content nav a {
-    margin: 0 10px;
-    color: #ccc;
-    text-decoration: none;
-  }
-  .footer-content nav a:hover {
-    color: #fff;
-    text-decoration: underline;
-  }
+:host {
+  display: block;
+}
+body{
+  max-height: 9dvh;
+}
+.app-footer {
+  flex: 0 0 auto;
+  background: #222;
+  color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  min-height: clamp(56px, 9dvh, 88px);
+}
+/*
+.app-footer {
+  flex: 0 0 auto;
+  background: #222;
+  color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.75rem 1rem;
+  --footer-min-height: clamp(56px, 9dvh, 88px);
+  min-height: var(--footer-min-height);
+}
+*/
+.app-footer__inner {
+  /* Layout responsivo sem breakpoints desnecessários */
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.app-footer__copyright {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+.app-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  justify-content: center;
+}
+.app-footer__link {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+.app-footer__link:hover,
+.app-footer__link:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+}

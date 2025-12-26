@@ -1,76 +1,36 @@
-@import '~quill/dist/quill.core.css';
-@import '~quill/dist/quill.bubble.css';
-@import '~quill/dist/quill.snow.css';
-@import "~@angular/material/prebuilt-themes/indigo-pink.css";  /* required */
-//@import "~bootstrap/dist/css/bootstrap.css";  /* optional for better look */
-@font-face {
-  font-family: "Alumni";
-  src: url('/public/fonts/Alumni_Sans_Pinstripe/AlumniSansPinstripe-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
+html, body {
+  height: 100%;
+  margin: 0;
 }
-@font-face {
-  font-family: "Poppins";
-  src: url('/public/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Raleway";
-  src: url('/public/fonts/Raleway/Raleway-VariableFont_wght.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
-*,
-*::before,
-*::after {box-sizing: border-box;margin: 0;padding: 0;}
 
-html,
-body {height: 100%;line-height: 1.5;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;scroll-behavior: smooth;}
-body {background-color: #fff;color: #000;font-family: "Poppins";}
-img,
-picture,
-video,
-canvas,
-svg {display: block;max-width: 100%;}
-input,
-button,
-textarea,
-select {font: inherit;color: inherit;border: none;outline: none;background: none;}
-button {cursor: pointer;background-color: transparent;}
-a {text-decoration: none;color: inherit;}
-ul,ol {list-style: none;}
-table {border-collapse: collapse;width: 100%;}
-html, body { height: 100%; }
-body {margin: 0;}
-[quill-editor-toolbar] .ql-font span[data-label="Alumni"]::before {font-family: "Alumni";}
-.ql-font-Alumni {font-family: "Alumni";}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Alumni]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Alumni]::before {content: 'Alumni';}
-/**/
-[quill-editor-toolbar] .ql-font span[data-label="Poppins"]::before {font-family: "Poppins";}
-.ql-font-Poppins {font-family: "Poppins";}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Poppins]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Poppins]::before {content: 'Poppins';}
-/**/
-[quill-editor-toolbar] .ql-font span[data-label="Raleway"]::before {font-family: "Raleway";}
-.ql-font-Raleway {font-family: "Raleway";}
-.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Raleway]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Raleway]::before {content: 'Raleway';}
-/* Tamanhos do dropdown de font-size */
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="8px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="8px"]::before {content: "8px";}
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="10px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="10px"]::before {content: "10px";}
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before {content: "12px";}
-/* Repita para todos os tamanhos da whitelist */
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {content: "14px";}
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before {content: "16px";}
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {content: "18px";}
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="20px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before {content: "20px";}
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="36px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="36px"]::before {content: "36px";}
-.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="72px"]::before,
-.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="72px"]::before {content: "72px";}
+/* Mantém zoom do usuário e base em 16px (~1rem) */
+//html { font-size: 100%; }
+
+/* Corpo com tipografia fluida controlada (15px → 17px) */
+body {
+//  font-size: clamp(0.9375rem, 0.22vw + 0.9rem, 1.0625rem);
+//  line-height: 1.5;
+}
+h1 { font-size: clamp(1.75rem, 2.5vw + 1rem, 3rem);   line-height: 1.2; }
+h2 { font-size: clamp(1.5rem,  2.0vw + 0.9rem, 2.25rem); line-height: 1.25; }
+h3 { font-size: clamp(1.25rem, 1.5vw + 0.8rem, 1.75rem); line-height: 1.25; }
+h4 { font-size: clamp(1.125rem,1.1vw + 0.7rem, 1.5rem);  line-height: 1.3;  }
+h5 { font-size: clamp(1rem,    0.8vw + 0.65rem,1.25rem); line-height: 1.35; }
+h6 { font-size: clamp(0.95rem, 0.6vw + 0.6rem, 1.125rem);line-height: 1.35; }
+
+/* Base = XS (default) */
+
+/* SM+ */
+@media (min-width: 576px) { }
+
+/* MD+ */
+@media (min-width: 768px) { }
+
+/* LG+ */
+@media (min-width: 992px) { }
+
+/* XL+ */
+@media (min-width: 1200px) { }
+
+/* XXL+ */
+@media (min-width: 1400px) { }

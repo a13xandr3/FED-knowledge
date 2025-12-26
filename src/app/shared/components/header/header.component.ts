@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,9 +15,10 @@ import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { ICategoria } from 'src/app/shared/request/request';
 import { SelectOption } from 'src/app/shared/models/select-option.model';
 import { HoraFormatadaPipe } from 'src/app/shared/pipes/hora-formatada.pipe';
-import { SelectFieldComponent } from 'src/app/shared/components/select-field/select-field.component';
 import { ErrorStateMatcher } from '@angular/material/core';
+
 import { TokenTimeLeftPipe } from 'src/app/shared/pipes/token-time-left.pipe';
+import { TokenExpiringSoonPipe } from 'src/app/shared/pipes/token-expiring-soon.pipe';
 
 // Type guard para verificar se um objeto tem a estrutura esperada de tags
 function isTagObject(v: any): v is { tags: unknown } {
@@ -35,8 +36,8 @@ function isTagObject(v: any): v is { tags: unknown } {
     MatSelectModule,
     MatFormFieldModule,
     ReactiveFormsModule,
-    SelectFieldComponent,
     TokenTimeLeftPipe,
+    TokenExpiringSoonPipe
   ]
 })
 export class HeaderComponent implements OnInit {
@@ -56,7 +57,8 @@ export class HeaderComponent implements OnInit {
   
   // valor inicial opcional
   initialValue: string | null = '';
-
+  categoryCtrl = new FormControl<SelectOption | null>(null);
+  tagCtrl = new FormControl<SelectOption | null>(null);
   constructor(
     private homeService: HomeService,
     private linkStateService: LinkStateService,

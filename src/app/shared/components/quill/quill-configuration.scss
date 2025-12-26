@@ -1,0 +1,83 @@
+@font-face {
+  font-family: "Alumni";
+  src: url('../../../public/fonts/Alumni_Sans_Pinstripe/AlumniSansPinstripe-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Poppins";
+  src: url('../../../public/fonts/Poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Raleway";
+  src: url('../../../public/fonts/Raleway/Raleway-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+::ng-deep *,
+::ng-deep *::before,
+::ng-deep *::after {box-sizing: border-box;margin: 0;padding: 0;}
+::ng-deep * {
+    --mdc-typography-body1-font-family: "Poppins";
+    --mdc-typography-body2-font-family: "Poppins";
+    --mdc-typography-button-font-family: "Poppins";
+    --mdc-typography-caption-font-family: "Poppins";
+    --mdc-typography-headline1-font-family: "Poppins";
+    --mdc-typography-headline2-font-family: "Poppins";
+    --mdc-typography-headline3-font-family: "Poppins";
+    --mdc-typography-headline4-font-family: "Poppins";
+    --mdc-typography-headline5-font-family: "Poppins";
+    --mdc-typography-headline6-font-family: "Poppins";
+    --mdc-typography-overline-font-family: "Poppins";
+    --mdc-typography-subtitle1-font-family: "Poppins";
+    --mdc-typography-subtitle2-font-family: "Poppins";
+    font-size: 1rem;
+    background-color: lawngreen;
+}
+html,
+body {height: 100%;line-height: 1.5;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;scroll-behavior: smooth;}
+body {background-color: #000;color: #000;font-family: "Poppins";}
+img,
+picture,
+video,
+canvas,
+svg {display: block;max-width: 100%;}
+input,
+button,
+textarea,
+select {font: inherit;color: inherit;border: none;outline: none;background: none;}
+button {cursor: pointer;background-color: transparent;}
+a {text-decoration: none;color: inherit;}
+ul,ol {list-style: none;}
+table {border-collapse: collapse;width: 100%;}
+html, body { height: 100%; }
+body {margin: 0;}
+[quill-editor-toolbar] .ql-font span[data-label="Alumni"]::before {font-family: "Alumni";}
+.ql-font-Alumni {font-family: "Alumni";}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Alumni]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Alumni]::before {content: 'Alumni';}
+[quill-editor-toolbar] .ql-font span[data-label="Poppins"]::before {font-family: "Poppins";}
+.ql-font-Poppins {font-family: "Poppins";}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Poppins]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Poppins]::before {content: 'Poppins';}
+[quill-editor-toolbar] .ql-font span[data-label="Raleway"]::before {font-family: "Raleway";}
+.ql-font-Raleway {font-family: "Raleway";}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=Raleway]::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=Raleway]::before {content: 'Raleway';}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="8px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="8px"]::before {content: "8px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="10px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="10px"]::before {content: "10px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12px"]::before {content: "12px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {content: "14px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before {content: "16px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="18px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {content: "18px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="20px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="20px"]::before {content: "20px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="36px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="36px"]::before {content: "36px";}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="72px"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="72px"]::before {content: "72px";}
