@@ -53,7 +53,6 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "node_modules/quill/dist/quill.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           },
@@ -74,7 +73,8 @@
             "production": {
               "allowedCommonJsDependencies": [
                 "jszip",
-                "mammoth/mammoth.browser"
+                "mammoth/mammoth.browser",
+                "quill"
               ],
               "fileReplacements": [
                 {
@@ -108,7 +108,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "links:build"
+            "browserTarget": "fed-knowledge:build"
           },
           "configurations": {
             "production": {
@@ -149,7 +149,6 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "node_modules/quill/dist/quill.min.js",
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           }
