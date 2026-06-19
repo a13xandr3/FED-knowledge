@@ -436,6 +436,7 @@ export class InputFileComponent implements OnInit, OnDestroy {
   }
   onRemove(p: PreviewItem, index: number): void {
     if (!this.previews[index]) return;
+    this.removedRef.emit({ id: p.id, index, filename: p.filename });
     this.revokeObjectUrl(this.previews[index].url);
     this.previews.splice(index, 1);
     this.removedAt.emit(index); // pai atualiza o form/fileIDs

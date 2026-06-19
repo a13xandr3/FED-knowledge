@@ -3,10 +3,10 @@ import { environment as prodEnv } from './environment.prod';
 
 describe('Environment configurations', () => {
   it('development environment should have production set to false', () => {
-    expect(devEnv.production).toBeFalse();
+    expect(devEnv.production).toBeFalsy();
   });
 
   it('production environment should have production set to true', () => {
-    expect(prodEnv.production).toBeTrue();
+    expect(prodEnv.production).toBeTruthy();
   });
 });

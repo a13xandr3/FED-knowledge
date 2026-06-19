@@ -111,7 +111,9 @@ import { ungzip } from 'pako';
     if (validateHash) {
       const snapHash: string | undefined = snap.hashSha256Hex ?? snap.sha256Hex;
       if (snapHash) {
-        const h = await sha256Hex(toArrayBuffer(u8OriginalRaw));
+        const h = snap.hashMode === 'base64'
+          ? await sha256HexOfString(b64)
+          : await sha256Hex(toArrayBuffer(u8Raw));
         hashOk = h === snapHash;
       }
     }

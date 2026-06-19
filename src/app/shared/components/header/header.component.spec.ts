@@ -1,97 +1,90 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { of, Subject } from 'rxjs';
+
 import { HeaderComponent } from './header.component';
 import { HomeService } from 'src/app/shared/services/home.service';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { of, Subject } from 'rxjs';
+import { SnackService } from 'src/app/shared/services/snack.service';
 import { DialogContentComponent } from 'src/app/shared/components/dialog-content/dialog-content.component';
-import { ILinkRequest } from 'src/app/shared/request/request';
+import { FiltroSelecionado } from 'src/app/shared/components/app-filtro/app-filtro.component';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  let mockHomeService: jasmine.SpyObj<HomeService>;
-  let mockLinkStateService: jasmine.SpyObj<LinkStateService>;
-  let mockDialog: jasmine.SpyObj<MatDialog>;
-
-  let refreshSubject: Subject<void>;
+  let refreshSubject: Subject<boolean>;
+  let homeService: { getCategorias: jest.Mock; getTags: jest.Mock };
+  let linkStateService: { refreshLink$: Subject<boolean>; triggerRefresh: jest.Mock };
+  let dialog: { open: jest.Mock };
 
   beforeEach(async () => {
-    mockHomeService = jasmine.createSpyObj('HomeService', ['getLinks']);
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
-    mockLinkStateService = jasmine.createSpyObj('LinkStateService', ['triggerRefresh'], {
-      refresh$: new Subject<void>()
-    });
-    //refreshSubject = mockLinkStateService.refresh$ as Subject<void>;
+    refreshSubject = new Subject<boolean>();
+    homeService = {
+      getCategorias: jest.fn().mockReturnValue(of(['TI'])),
+      getTags: jest.fn().mockReturnValue(of(['angular'])),
+    };
+    linkStateService = {
+      refreshLink$: refreshSubject,
+      triggerRefresh: jest.fn(),
+    };
+    dialog = {
+      open: jest.fn(),
+    };
+
     await TestBed.configureTestingModule({
-      declarations: [HeaderComponent],
+      imports: [HeaderComponent, NoopAnimationsModule],
       providers: [
-        { provide: HomeService, useValue: mockHomeService },
-        { provide: MatDialog, useValue: mockDialog },
-        { provide: LinkStateService, useValue: mockLinkStateService }
-      ]
+        { provide: HomeService, useValue: homeService },
+        { provide: LinkStateService, useValue: linkStateService },
+        { provide: MatDialog, useValue: dialog },
+        { provide: SnackService, useValue: { mostrarMensagem: jest.fn() } },
+      ],
     }).compileComponents();
+
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
   });
+
   it('deve criar o componente', () => {
     expect(component).toBeTruthy();
   });
-  it('deve carregar categorias ao iniciar', () => {
-    const mockLinks: ILinkRequest = 
-      { id: 1, 
-        name: 'Link 1', 
-        uri: {}, 
-        categoria: 'A', 
-        descricao: 'desc',
-        tag: {},
-        subCategoria: '', 
-        oldCategoria: '',
-        dataEntradaManha: '',
-        dataSaidaManha: '',
-        dataEntradaTarde: '',
-        dataSaidaTarde: '',
-        dataEntradaNoite: '',
-        dataSaidaNoite: '',
-        horas: null
-        
-      };
-    //mockHomeService.getLinks.and.returnValue(of(mockLinks));
-    fixture.detectChanges(); // chama ngOnInit()
-    expect(mockHomeService.getLinks).toHaveBeenCalled();
-    //expect(component.items).toEqual(undefined);
-  });
-  it('deve emitir evento ao alterar seleção', () => {
-    spyOn(component.itemSelecionadoEvent, 'emit');
-    //component.onChange('Categoria A');
-    expect(component.itemSelecionadoEvent.emit).toHaveBeenCalledWith('Categoria A');
-  });
-  it('deve retornar categoria selecionada em publicaItem()', () => {
-    //component.selectedItem = 'Categoria B';
-    //expect(component.publicaItem()).toBe('Categoria B');
-  });
-  it('deve abrir o dialog e disparar triggerRefresh se categoria estiver no resultado', () => {
-    const dialogRefSpy = jasmine.createSpyObj<MatDialogRef<DialogContentComponent>>('MatDialogRef', ['afterClosed']);
-    mockDialog.open.and.returnValue(dialogRefSpy);
-    dialogRefSpy.afterClosed.and.returnValue(of({ categoria: 'Nova Categoria' }));
-    component.abrirDialog();
-    expect(mockDialog.open).toHaveBeenCalled();
-    expect(mockLinkStateService.triggerRefresh).toHaveBeenCalled();
+
+  it('deve carregar categorias e tags ao iniciar', () => {
+    fixture.detectChanges();
+
+    expect(homeService.getCategorias).toHaveBeenCalledTimes(1);
+    expect(homeService.getTags).toHaveBeenCalledTimes(1);
   });
 
-  xit('não deve chamar triggerRefresh se resultado do dialog não tiver categoria', () => {
-    const dialogRefSpy = jasmine.createSpyObj<MatDialogRef<DialogContentComponent>>('MatDialogRef', ['afterClosed']);
-    mockDialog.open.and.returnValue(dialogRefSpy);
-    dialogRefSpy.afterClosed.and.returnValue(of({}));
-    component.abrirDialog();
-    expect(mockDialog.open).toHaveBeenCalled();
-    expect(mockLinkStateService.triggerRefresh).not.toHaveBeenCalled();
+  it('deve emitir categoria e tag selecionadas', () => {
+    const emitSpy = jest.spyOn(component.itemSelecionadoEvent, 'emit');
+
+    component.onFiltroSelecionado({ tipo: 'categoria', valor: 'TI' } satisfies FiltroSelecionado);
+    component.onFiltroSelecionado({ tipo: 'tag', valor: 'angular' } satisfies FiltroSelecionado);
+
+    expect(emitSpy).toHaveBeenCalledWith('TI_categoria');
+    expect(emitSpy).toHaveBeenCalledWith('angular_tag');
   });
 
-  it('deve recarregar categorias quando refresh$ for emitido', () => {
-    mockHomeService.getLinks.and.returnValue(of());
-    fixture.detectChanges(); // chama ngOnInit()
-    //refreshSubject.next(); // simula evento de refresh
-    expect(mockHomeService.getLinks).toHaveBeenCalledTimes(2); // um no init e um no refresh$
+  it('deve abrir o dialog e disparar refresh quando houver categoria no resultado', () => {
+    const dialogRef = {
+      afterClosed: jest.fn().mockReturnValue(of({ categoria: 'Nova Categoria' })),
+    } as unknown as MatDialogRef<DialogContentComponent>;
+    dialog.open.mockReturnValue(dialogRef);
+    linkStateService.triggerRefresh.mockClear();
+
+    component.abrirDialog();
+
+    expect(dialog.open).toHaveBeenCalled();
+    expect(linkStateService.triggerRefresh).toHaveBeenCalled();
+  });
+
+  it('deve recarregar opções quando refreshLink$ emitir', () => {
+    fixture.detectChanges();
+    refreshSubject.next(true);
+
+    expect(homeService.getCategorias).toHaveBeenCalledTimes(2);
+    expect(homeService.getTags).toHaveBeenCalledTimes(2);
   });
 });

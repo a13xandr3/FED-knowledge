@@ -67,7 +67,6 @@ export class LoginComponent {
         });
       }),
       catchError(err => {
-        console.error('[Login] Erro na autenticação', err);
         this.snackService.mostrarMensagem('Login e/ou senha ou código incorretos', 'Fechar');
         return of(null);
       })

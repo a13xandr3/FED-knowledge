@@ -50,7 +50,6 @@ export class ShowFileComponent implements OnInit, OnDestroy {
       // 100% via data do diálogo
       const snap = this.data?.snapshot;
       if (!snap) {
-        console.warn('[ShowFile] Snapshot não informado no MAT_DIALOG_DATA.');
         this.renderKind = 'other';
         this.loading = false;
         return;

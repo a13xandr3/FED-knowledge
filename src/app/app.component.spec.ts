@@ -6,9 +6,7 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
-      ],
-      declarations: [
+        RouterTestingModule,
         AppComponent
       ],
     }).compileComponents();
@@ -26,10 +24,10 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('fed-knowledge');
   });
 
-  it('should render title', () => {
+  it('should render router outlet', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('fed-knowledge app is running!');
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

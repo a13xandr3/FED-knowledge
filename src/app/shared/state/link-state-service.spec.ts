@@ -7,7 +7,7 @@ describe('LinkStateService', () => {
       // The first emission comes from the BehaviorSubject's initial value (false).
       // We care about the next emission triggered by triggerRefresh().
       if (value) {
-        expect(value).toBeTrue();
+        expect(value).toBeTruthy();
         done();
       }
     });

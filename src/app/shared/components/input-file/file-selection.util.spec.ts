@@ -26,7 +26,7 @@ describe('file-selection.util', () => {
       expect(map.get(1)).toBe('foo.txt');
       expect(map.get(2)).toBe('bar.csv');
       // undefined id should not be inserted
-      expect(map.has(NaN)).toBeFalse();
+      expect(map.has(NaN)).toBeFalsy();
     });
   });
 
@@ -47,11 +47,11 @@ describe('file-selection.util', () => {
       // insert new id
       const inserted = upsertFileRef(list, { id: 3, filename: 'baz' });
       expect(inserted.length).toBe(3);
-      expect(inserted.some(r => r.id === 3 && r.filename === 'baz')).toBeTrue();
+      expect(inserted.some(r => r.id === 3 && r.filename === 'baz')).toBeTruthy();
       // update existing id
       const updated = upsertFileRef(inserted, { id: 2, filename: 'updated-bar' });
       expect(updated.length).toBe(3);
-      expect(updated.some(r => r.id === 2 && r.filename === 'updated-bar')).toBeTrue();
+      expect(updated.some(r => r.id === 2 && r.filename === 'updated-bar')).toBeTruthy();
     });
   });
 

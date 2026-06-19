@@ -130,6 +130,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getLinks();
   }
   getLinks(): void {
+    console.log(this.itemModificadoCategoria);
     this.homeService.getLinks(
                           this.pageIndex, 
                           this.pageSize, 
@@ -138,10 +139,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
                           this.itemModificadoTag
                         ).subscribe({
       next: (response: any) => {
-        console.log('response', response);
-        let lnk = response.atividades;
+        console.log(response);
+        const lnk = response.atividades ?? response.links ?? [];
         lnk.sort((a: any, b: any) => a.name?.localeCompare(b?.name));
-        if ( lnk[0].categoria.toLowerCase() === 'timesheet' ) {
+        if (lnk[0]?.categoria?.toLowerCase() === 'timesheet') {
           this.totalHoras = this.homeService.totalHorasTimeSheet(lnk);
           this.links = lnk;
           this.totalLinks = response.total;

@@ -10,6 +10,15 @@ function u8ToBase64(u8: Uint8Array): string {
   return btoa(binary);
 }
 
+function fileToText(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => resolve(String(reader.result));
+    reader.readAsText(file);
+  });
+}
+
 describe('file-utils', () => {
   it('base64ToUint8 should decode base64 into correct bytes', () => {
     const b64 = btoa('Hello');
@@ -55,12 +64,12 @@ describe('file-utils', () => {
       hashSha256Hex: hash
     };
     const { gzipFile, originalFile, hashOk } = await restoreFilesFromSnapshot(snap, true);
-    expect(hashOk).toBeTrue();
+    expect(hashOk).toBeTruthy();
     // Check filenames
     expect(gzipFile.name).toBe('test.txt.gz');
     expect(originalFile.name).toBe('test.txt');
     // Check content by reading original file's text
-    const restoredText = await originalFile.text();
+    const restoredText = await fileToText(originalFile);
     expect(restoredText).toBe(text);
   });
 });

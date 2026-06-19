@@ -40,7 +40,7 @@ export class FileApiService {
     return byExt ? { ok: true, finalMime: byExt } : { ok: false };  
   }
   private authHeaders(): HttpHeaders {
-    const t = localStorage.getItem('token');
+    const t = localStorage.getItem('kb_token') || localStorage.getItem('token');
     return t ? new HttpHeaders({ 'Authorization': `Bearer ${t}` }) : new HttpHeaders();
   }
   upload(form: FormData): Observable<FileSavedResponse[]> {
@@ -139,7 +139,9 @@ export class FileApiService {
   /** Envia 1 arquivo (compatível com FileController @PostMapping /api/files) */
   uploadOne(p: ProcessedFile): Observable<FileSavedResponse> {
     const fd = this.toFormData(p);
-    return this.http.post<FileSavedResponse>(`${this.url}${this.base}`, fd);
+    return this.http.post<FileSavedResponse>(`${this.url}${this.base}`, fd, {
+      headers: this.authHeaders()
+    });
   }
   
   /** Baixa o ARQUIVO ORIGINAL (já descompactado) */
@@ -179,79 +181,6 @@ export class FileApiService {
     })());
     await Promise.all(jobs);
     return items.filter((x): x is PreviewItem => !!x);
-  }
-  public async ___buildPreviewsFromFileIds(ids: any[]) {
-    const numericIds = (ids || [])
-      .map(x => (typeof x === 'object' && x !== null) ? (x.id ?? x.fileId ?? x.file_id ?? x.fileID) : x)
-      .map(Number)
-      .filter(Number.isFinite);
-    if (!numericIds.length) return [];
-    // Prealoca e preenche pela POSIÇÃO (ordem de entrada):
-    const items: Array<PreviewItem | undefined> = new Array(numericIds.length);
-    const jobs = numericIds.map((id, pos) => (async () => {
-      const snap: SnapshotResponse = await firstValueFrom(this.getSnapshot(id, false));
-      const blob: Blob = await firstValueFrom(this.download(id));
-      const filename = snap?.filename || `file-${id}`;
-      const mimeHdr  = snap?.mimeType || blob.type || '';
-      const { ok, finalMime } = this.isImageLike(mimeHdr, filename);
-      if (!ok) return; // mantém posição vazia se não for imagem
-      const file = new File([blob], filename, {
-        type: finalMime || mimeHdr || 'application/octet-stream',
-        lastModified: Date.now()
-      });
-      const url = this.fileToObjectUrl(file);
-      items[pos] = {
-        url,
-        filename: file.name,
-        mimeType: file.type,
-        sizeBytes: blob.size,
-        id: id,               // <<< preserva ID no preview
-      };
-    })());
-    await Promise.all(jobs);
-    // remove “buracos” (itens undefined por não serem imagens)
-    return items.filter((x): x is PreviewItem => !!x);
-  }
-
-  public async _buildPreviewsFromFileIds(ids: any[]) {
-    const numericIds = (ids || [])
-      .map(x => (typeof x === 'object' && x !== null) ? (x.id ?? x.fileId ?? x.file_id ?? x.fileID) : x)
-      .map(Number)
-      .filter(n => Number.isFinite(n));
-
-    if (!numericIds.length) return [];
-
-    // Prealoca e preenche pela POSIÇÃO (ordem de entrada):
-    const items: Array<PreviewItem | undefined> = new Array(numericIds.length);
-  //const items: Array<{ url: string; filename: string; mimeType?: string; sizeBytes: number }> = [];
-
-    const jobs = numericIds.map(async (id) => {
-      const snap: SnapshotResponse = await firstValueFrom(this.getSnapshot(id, false));
-      const blob: Blob = await firstValueFrom(this.download(id));
-
-      const filename = snap?.filename || `file-${id}`;
-      const mimeHdr = snap?.mimeType || blob.type || ''; // pode vir vazio ou application/octet-stream
-      const { ok, finalMime } = this.isImageLike(mimeHdr, filename);
-      if (!ok) return;
-
-      // Cria um File com MIME final (corrigido por extensão quando necessário)
-      const file = new File([blob], filename, {
-        type: finalMime || mimeHdr || 'application/octet-stream',
-        lastModified: Date.now()
-      });
-
-      const url = this.fileToObjectUrl(file);
-      items.push({
-        id,
-        url,
-        filename: file.name,
-        mimeType: file.type,
-        sizeBytes: blob.size
-      });
-    });
-
-    await Promise.all(jobs);
-    return items;
   }
 }
 /**

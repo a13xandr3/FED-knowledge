@@ -2,10 +2,10 @@ import { isBlank, normalizeText, trackById, toISODate, parseNumberSafe, handleHt
 
 describe('common utility functions', () => {
   it('should correctly identify blank values', () => {
-    expect(isBlank(undefined)).toBeTrue();
-    expect(isBlank(null)).toBeTrue();
-    expect(isBlank('   ')).toBeTrue();
-    expect(isBlank('test')).toBeFalse();
+    expect(isBlank(undefined)).toBeTruthy();
+    expect(isBlank(null)).toBeTruthy();
+    expect(isBlank('   ')).toBeTruthy();
+    expect(isBlank('test')).toBeFalsy();
   });
 
   it('should normalize text (remove diacritics and lowercase)', () => {
@@ -30,7 +30,7 @@ describe('common utility functions', () => {
   });
 
   it('should throw an Error with proper message in handleHttpError', () => {
-    expect(() => handleHttpError({ message: 'Failed' })).toThrowError('Failed');
-    expect(() => handleHttpError({ error: { message: 'Inner' } })).toThrowError('Inner');
+    expect(() => handleHttpError({ message: 'Failed' })).toThrow('Failed');
+    expect(() => handleHttpError({ error: { message: 'Inner' } })).toThrow('Inner');
   });
 });

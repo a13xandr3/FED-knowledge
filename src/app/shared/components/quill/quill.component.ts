@@ -11,6 +11,14 @@ import { QuillConfiguration } from './quill-configuration';
 import { QuillModule, type EditorChangeContent } from 'ngx-quill';
 import { CommonModule } from '@angular/common';
 
+const FontAttributor = Quill.import('attributors/class/font');
+FontAttributor.whitelist = ['Alumni', 'Poppins', 'Raleway'];
+Quill.register(FontAttributor, true);
+
+const SizeStyle = Quill.import('attributors/style/size');
+SizeStyle.whitelist = ['8px', '10px', '12px', '14px', '16px', '18px', '20px', '36px', '72px'];
+Quill.register(SizeStyle, true);
+
 @Component({
   selector: 'app-quill',
   templateUrl: './quill.component.html',

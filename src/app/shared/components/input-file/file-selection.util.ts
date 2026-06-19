@@ -13,7 +13,7 @@ export type PreviewItem = {
 export function extractIds(previews: PreviewItem[]): number[] {
   return previews
     .map(p => (Number.isFinite(p.id) ? Number(p.id) : NaN))
-    .filter(Number.isFinite) as number[];
+    .filter(id => Number.isFinite(id) && id > 0) as number[];
 }
 
 /** Mapa id -> filename a partir dos previews (usado p/ montar payload sem depender de índice). */

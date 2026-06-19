@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { SelectFieldComponent } from './select-field.component';
 
@@ -8,7 +9,7 @@ describe('SelectFieldComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SelectFieldComponent ]
+      imports: [ SelectFieldComponent, NoopAnimationsModule ]
     })
     .compileComponents();
 

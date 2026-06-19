@@ -26,7 +26,7 @@ export class TokenTimeLeftPipe implements PipeTransform, OnDestroy {
 
     const msLeft = expSec * 1000 - Date.now();
     if (msLeft <= 0) return 'expirado';
-    if (msLeft <= 20000) return '< 1s';
+    if (msLeft < 1000) return '< 1s';
 
     return this.formatHHMMSS(msLeft);
   }

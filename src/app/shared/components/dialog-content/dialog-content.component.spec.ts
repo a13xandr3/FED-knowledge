@@ -140,7 +140,7 @@ describe('DialogContentComponent (standalone + Jest)', () => {
   });
 
   it('ngOnInit deve carregar previews e preencher controle fileID', async () => {
-    await fixture.whenStable(); // aguarda promises do ngOnInit
+    await Promise.resolve(); // aguarda promises do ngOnInit sem esperar o timer do countdown
     fixture.detectChanges();
 
     expect(filesApiServiceMock.buildPreviewsFromFileIds).toHaveBeenCalledWith([10, 20]);
@@ -173,15 +173,15 @@ describe('DialogContentComponent (standalone + Jest)', () => {
     expect(component.allFiles.files.length).toBe(0);
   });
 
-  it('onPreviewRemoved deve remover id tanto do form quanto do initialIds', () => {
+  it('onPreviewRemovedRef deve remover id do form e preservar initialIds para diff de exclusão', () => {
     component.previewsFromIds = [{ id: 10, url: 'http://file-10', filename: 'file-10' } as any];
     component.fr.get('fileID')?.setValue([10]);
     (component as any).initialIds = [10];
 
-    component.onPreviewRemoved(0);
+    component.onPreviewRemovedRef({ id: 10, index: 0, filename: 'file-10' });
 
     expect(component.fr.get('fileID')?.value).toEqual([]);
-    expect((component as any).initialIds).toEqual([]);
+    expect((component as any).initialIds).toEqual([10]);
   });
 
   it('salvar com form inválido não deve chamar serviços', () => {

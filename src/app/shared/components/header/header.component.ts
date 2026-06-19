@@ -1,29 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 
-import { SnackService } from 'src/app/shared/services/snack.service';
 import { DialogContentComponent } from 'src/app/shared/components/dialog-content/dialog-content.component';
 
-import { HomeService } from 'src/app/shared/services/home.service';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
-import { ICategoria } from 'src/app/shared/request/request';
-import { SelectOption } from 'src/app/shared/models/select-option.model';
 import { HoraFormatadaPipe } from 'src/app/shared/pipes/hora-formatada.pipe';
 import { ErrorStateMatcher } from '@angular/material/core';
 
 import { TokenTimeLeftPipe } from 'src/app/shared/pipes/token-time-left.pipe';
 import { TokenExpiringSoonPipe } from 'src/app/shared/pipes/token-expiring-soon.pipe';
+import { AppFiltroComponent, FiltroSelecionado } from 'src/app/shared/components/app-filtro/app-filtro.component';
 
-// Type guard para verificar se um objeto tem a estrutura esperada de tags
-function isTagObject(v: any): v is { tags: unknown } {
-  return v && typeof v === 'object' && Array.isArray((v as any).tags);
-}
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -31,63 +20,41 @@ function isTagObject(v: any): v is { tags: unknown } {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    AppFiltroComponent,
     HoraFormatadaPipe,
-    MatSelectModule,
-    MatFormFieldModule,
-    ReactiveFormsModule,
     TokenTimeLeftPipe,
     TokenExpiringSoonPipe
   ]
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   @Input() matcher: ErrorStateMatcher = new ErrorStateMatcher();
   @Input() titulo!: string;
   @Input() totalHoras!: any;
 
   @Output() itemSelecionadoEvent = new EventEmitter<string>();
 
-  links: string[] = [];
-  tg: string[] = [];
-  statusOptionsCat: SelectOption<string>[] = [];
-  statusOptionsTag: SelectOption<string>[] = [];
-
   selectedItemCategory: string = '';
   selectedItemTag: string = '';
-  
-  // valor inicial opcional
-  initialValue: string | null = '';
-  categoryCtrl = new FormControl<SelectOption | null>(null);
-  tagCtrl = new FormControl<SelectOption | null>(null);
+
   constructor(
-    private homeService: HomeService,
     private linkStateService: LinkStateService,
-    private snackService: SnackService,
     private dialog: MatDialog) {
       this.linkStateService.triggerRefresh();
     }
-  ngOnInit(): void {
-    this.brDate();
-    this.getCategories();
-    this.getTags();
-    this.linkStateService.refreshLink$.subscribe(() => {
-      this.getCategories();
-      this.getTags();
-    });
+
+  onFiltroSelecionado(filtro: FiltroSelecionado): void {
+    console.log(filtro);
+    if (filtro.tipo === 'categoria') {
+      this.selectedItemCategory = filtro.valor;
+    }
+
+    if (filtro.tipo === 'tag') {
+      this.selectedItemTag = filtro.valor;
+    }
+
+    this.itemSelecionadoEvent.emit(`${filtro.valor}_${filtro.tipo}`);
   }
-  onChangeCategory(value: string) {
-    let categoriaValue = `${value}_categoria`;
-    this.selectedItemCategory = value;
-    this.itemSelecionadoEvent.emit(categoriaValue);
-  }
-  onChangeTag(value: string) {
-    let tagValue = `${value}_tag`;
-      this.selectedItemTag = value;
-      this.itemSelecionadoEvent.emit(tagValue);
-  }
-  onStatusChange(opt: SelectOption<string> | null): void {
-    //console.log('Selecionado:', opt); // aqui você recebe o item inteiro
-  }
+
   ISODate(dt: any): any {
     if ( dt === null || dt === '' ) return null;
     const [datePart, timePart] = dt.split(' ');
@@ -140,59 +107,6 @@ export class HeaderComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result?.categoria) {
         this.linkStateService.triggerRefresh();
-      }
-    });
-  }
-  getTags(): void {
-    this.homeService.getTags().subscribe({
-      next: (response: any) => {
-        const resp = response;
-        //console.log('responseTag', response);
-        /*
-        const tagObjs = response
-          .map((item: any) => item?.tag)
-          .filter(isTagObject);
-        const allTags = tagObjs
-          .flatMap((obj: any) => obj.tags as unknown[])
-          .filter((t: any): t is string => typeof t === 'string' && t.trim().length > 0);
-        this.tg = [...new Set(allTags)] as string[];        
-        this.tg.sort((a: any, b: any) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-        this.tg.unshift('todos');
-        */
-       
-        resp.unshift('todos');
-        this.statusOptionsTag = (resp ?? []).map((cat: any) => ({
-          value: cat,
-          label: cat
-        }));
-
-      },
-      error: (err: HttpErrorResponse) => {
-        this.snackService.mostrarMensagem(
-          err.message, 'Fechar'
-        );
-      }
-    });
-  }
-  getCategories(): void {
-    this.homeService.getCategorias().subscribe({
-      next: (response: any) => {
-        const resp = response;
-        //console.log('resp -> ', resp);
-        //this.links = [...new Set(resp?.map((r: ICategoria) => r.categoria))] as string[];        
-        //this.links.sort((a: any, b: any) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
-        //this.links.unshift('todos');
-        //console.log('categorias-> ', this.links);
-        resp.unshift('todos');
-        this.statusOptionsCat = resp.map((cat: any) => ({
-          value: cat,
-          label: cat
-        }));
-      },
-      error: (err: HttpErrorResponse) => {
-        this.snackService.mostrarMensagem(
-          err.message, 'Fechar'
-        );
       }
     });
   }

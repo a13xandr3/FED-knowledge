@@ -3,18 +3,22 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ILinkRequest } from 'src/app/shared/request/request';
 import { ILinksResponse } from 'src/app/shared/response/response';
-import { environment} from 'src/environments/environment';
-
-const token = localStorage.getItem('token');
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HomeService {
-  private urbase = 'http://localhost:8080';
+  private urbase = environment.bffUrl;
   constructor(
     private http: HttpClient
   ) { }
+
+  private authHeaders(): HttpHeaders {
+    const token = localStorage.getItem('kb_token') || localStorage.getItem('token');
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+  }
+
   carregaConteudo(urlTarget: string): Observable<any> {
     return this.http.get(`${this.urbase}/proxy?url=${urlTarget}`, { responseType: 'text' });
   }
@@ -27,25 +31,20 @@ export class HomeService {
     excessao.forEach((item: any) => {
       params = params.append('excessao', item);
     });
-    return this.http.get<{ links: ILinksResponse[]; total: number }>(`${this.urbase}/api/atividades`, { params, 
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}` 
-      })
-     } );
+    return this.http.get<{ links: ILinksResponse[]; total: number }>(`${this.urbase}/api/atividades`, {
+      params,
+      headers: this.authHeaders()
+    });
   }
   //** Monta lista de Dropdown */
   getCategorias(): Observable<ILinksResponse> {
     return this.http.get<ILinksResponse>(`${this.urbase}/api/atividades/categorias`, {
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}` 
-      })
+      headers: this.authHeaders()
     });
   }
   getTags(): Observable<ILinksResponse> {
     return this.http.get<ILinksResponse>(`${this.urbase}/api/atividades/tags`, {
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}` 
-      })
+      headers: this.authHeaders()
     });
   }
   //** ao selecionar o item no dropdown */
@@ -55,16 +54,12 @@ export class HomeService {
       .set('limit', pageSize.toString())
       .set('categoria', itemCategoria);
     return this.http.get<{ links: ILinksResponse[]; total: number }>(`${this.urbase}/api/atividades`, { params,
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}` 
-      })
+      headers: this.authHeaders()
      });
   }
   getLink(id: number): Observable<ILinksResponse> {
     return this.http.get<ILinkRequest>(`${this.urbase}/api/atividades/${id}`, {
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}` 
-      })
+      headers: this.authHeaders()
     });
   }
   postLink(request: ILinkRequest): Observable<ILinksResponse> {
@@ -84,9 +79,7 @@ export class HomeService {
       dataSaidaNoite: request.dataSaidaNoite
     }
     return this.http.post<ILinksResponse>(`${this.urbase}/api/atividades`, auxRequest, {
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}` 
-      })
+      headers: this.authHeaders()
     });
   }
   putLink(request: ILinkRequest): Observable<ILinksResponse> {
@@ -105,11 +98,8 @@ export class HomeService {
       dataEntradaNoite: request.dataEntradaNoite,
       dataSaidaNoite: request.dataSaidaNoite
     }
-    return this.http.put<ILinksResponse>(`${this.urbase}/api/atividades/${request.id}`, request, {
-      headers: new HttpHeaders({
-        'content-type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      })
+    return this.http.put<ILinksResponse>(`${this.urbase}/api/atividades/${request.id}`, auxRequest, {
+      headers: this.authHeaders().set('content-type', 'application/json')
     });
   }
 
@@ -121,15 +111,11 @@ export class HomeService {
     );
   }
 
-  /*
   deleteLink(id: number): Observable<ILinksResponse> {
     return this.http.delete<ILinksResponse>(`${this.urbase}/api/atividades/${id}`, {
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}` 
-      })
+      headers: this.authHeaders()
     });
   }
-  */
   calcularHoras(entrada: any, saida: any): number {
     const start = new Date(entrada).getTime();
     const end = new Date(saida).getTime();

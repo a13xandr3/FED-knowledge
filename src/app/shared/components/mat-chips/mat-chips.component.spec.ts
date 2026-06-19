@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatChipsComponent } from './mat-chips.component';
 
@@ -8,7 +9,7 @@ describe('MatChipsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MatChipsComponent ]
+      imports: [ MatChipsComponent, NoopAnimationsModule ]
     })
     .compileComponents();
 

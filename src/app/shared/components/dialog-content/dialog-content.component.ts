@@ -8,7 +8,7 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { MatInputModule } from '@angular/material/input';
 import { SafeResourceUrl } from '@angular/platform-browser';
 
-import { catchError, concatMap, forkJoin, map, Observable, of, Subscription, throwError } from 'rxjs';
+import { catchError, concatMap, forkJoin, map, Observable, of, Subscription, switchMap, throwError } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
 
 import { FileSavedResponse, ILinkRequest, ProcessedFile } from '../../request/request';
@@ -166,7 +166,6 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
     this.sub?.unsubscribe();
     this.sub = this.linkMapperService.countdown(ms).subscribe({
       next: remainingMs => this.tempoRestanteMs = remainingMs,
-      complete: () => console.log('Contagem finalizada!')
     });
   }
   onProcessed(p: ProcessedFile) {
@@ -182,12 +181,17 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
   }
   onPreviewRemoved(idx: number) {
     const removedId = this.previewsFromIds[idx]?.id;
+    this.removePreviewIdFromForm(removedId);
+  }
+  onPreviewRemovedRef(ref: { id?: number; index: number; filename: string }) {
+    this.removePreviewIdFromForm(ref.id);
+  }
+  private removePreviewIdFromForm(removedId: unknown) {
     if (!Number.isFinite(removedId)) return;
     const id = Number(removedId);
     const ctrl = this.fr.get('fileID');
     const curr: number[] = (ctrl?.value ?? []).filter((v: any) => v !== id);
     ctrl?.setValue(curr);
-    this.initialIds = this.initialIds.filter(v => v !== id);
   }
   private deleteMany(ids: number[]): Observable<any> {
     return ids.length ? forkJoin(ids.map(id => this.filesApiService.delete(id))) : of(null);
@@ -209,9 +213,8 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
     const currentIds = extractIds(this.previewsFromIds);
     // 2) Para UPDATE: calcule exatamente o que foi removido
     const toDelete = isInclusao ? [] : diffRemovedIds(this.initialIds, currentIds);
-    // 3) Execução: delete -> upload -> montar payload -> POST/PUT
-    this.deleteMany(toDelete).pipe(
-      concatMap(() => this.uploadQueue()),
+    // 3) Execução: upload -> salvar card -> apagar anexos removidos
+    this.uploadQueue().pipe(
       map((newRefs) => {
         const nameMap = idToFilename(this.previewsFromIds);
         const filesPayload = mergeExistingAndNew(currentIds, nameMap, newRefs);
@@ -223,9 +226,9 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
         );
       }),
       concatMap((req: ILinkRequest) => {
-        console.log(req);
         return isInclusao ? this.service.postLink(req) : this.service.putLink(req);
       }),
+      switchMap(() => this.deleteMany(toDelete)),
       catchError(err => {
         this.snackService.mostrarMensagem(err?.message ?? 'Falha ao salvar', 'Fechar');
         return throwError(() => err);
