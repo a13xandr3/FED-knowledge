@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { of, Subject } from 'rxjs';
 
 import { HeaderComponent } from './header.component';
@@ -33,8 +33,9 @@ describe('HeaderComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [HeaderComponent, NoopAnimationsModule],
+      imports: [HeaderComponent],
       providers: [
+        provideNoopAnimations(),
         { provide: HomeService, useValue: homeService },
         { provide: LinkStateService, useValue: linkStateService },
         { provide: MatDialog, useValue: dialog },

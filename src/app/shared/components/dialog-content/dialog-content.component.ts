@@ -186,8 +186,8 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
     this.removePreviewIdFromForm(ref.id);
   }
   private removePreviewIdFromForm(removedId: unknown) {
-    if (!Number.isFinite(removedId)) return;
     const id = Number(removedId);
+    if (!Number.isFinite(id)) return;
     const ctrl = this.fr.get('fileID');
     const curr: number[] = (ctrl?.value ?? []).filter((v: any) => v !== id);
     ctrl?.setValue(curr);

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { HomeService } from './home.service';
 import { ILinkRequest } from 'src/app/shared/request/request';
@@ -29,8 +30,11 @@ describe('HomeService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [HomeService],
+      providers: [
+        HomeService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
     service = TestBed.inject(HomeService);
     httpMock = TestBed.inject(HttpTestingController);

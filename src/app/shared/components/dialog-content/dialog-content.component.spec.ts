@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { of, throwError } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -95,10 +96,11 @@ describe('DialogContentComponent (standalone + Jest)', () => {
     await TestBed.configureTestingModule({
       imports: [
         DialogContentComponent, // standalone
-        NoopAnimationsModule,
-        HttpClientTestingModule,
       ],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideNoopAnimations(),
         { provide: HomeService, useValue: homeServiceMock },
         { provide: LinkStateService, useValue: linkStateServiceMock },
         { provide: LinkMapperService, useValue: linkMapperServiceMock },

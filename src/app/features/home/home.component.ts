@@ -74,7 +74,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {
   }
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {this.titulo = params['titulo']});
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => { this.titulo = params['titulo']; });
     this.resetPaginador();
     this.subscreverComportamentos();
     this.subscreverAtualizacoes();
@@ -189,12 +191,14 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         }])
       }
     });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.atualizarLista();
-        dialogRef.close();
-      }
-    });
+    dialogRef.afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          this.atualizarLista();
+          dialogRef.close();
+        }
+      });
   }
   deleteItem(
     linkId: number,

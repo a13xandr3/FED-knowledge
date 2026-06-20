@@ -9,7 +9,7 @@ import { HomeService } from 'src/app/shared/services/home.service';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { ComportamentoService } from 'src/app/shared/services/comportamento.service';
 import { SnackService } from 'src/app/shared/services/snack.service';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 // ---- Mocks de serviços ----
 
@@ -57,9 +57,9 @@ describe('HomeComponent (standalone + Jest)', () => {
     await TestBed.configureTestingModule({
       // standalone component: entra em imports, não em declarations
       imports: [
-        HomeComponent,
-        NoopAnimationsModule],
+        HomeComponent],
       providers: [
+        provideNoopAnimations(),
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: MatDialog, useValue: matDialogMock },
         { provide: ComportamentoService, useValue: comportamentoServiceMock },

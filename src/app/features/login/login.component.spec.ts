@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { of, throwError } from 'rxjs';
 
@@ -29,10 +29,10 @@ describe('LoginComponent (standalone + Jest)', () => {
     await TestBed.configureTestingModule({
       imports: [
         LoginComponent,
-        ReactiveFormsModule,
-        NoopAnimationsModule
+        ReactiveFormsModule
       ],
       providers: [
+        provideNoopAnimations(),
         { provide: AuthService, useValue: authServiceMock },
         { provide: Router, useValue: routerMock },
         { provide: SnackService, useValue: snackServiceMock }

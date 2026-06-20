@@ -30,6 +30,7 @@
               "jszip",
               "mammoth/mammoth.browser",
               "quill",
+              "quill-delta",
               "quill-mention"
             ],
             "inlineStyleLanguage": "scss",
@@ -74,7 +75,8 @@
               "allowedCommonJsDependencies": [
                 "jszip",
                 "mammoth/mammoth.browser",
-                "quill"
+                "quill",
+                "quill-delta"
               ],
               "fileReplacements": [
                 {
