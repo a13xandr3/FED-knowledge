@@ -11,7 +11,7 @@ module.exports = {
     '<rootDir>/src/test.ts',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$|@angular/common/locales/.*\\.js$|quill|parchment|quill-delta|lodash-es|eventemitter3)/)',
+    'node_modules/(?!(.*\\.mjs$|@angular/common/locales/.*\\.js$|quill|parchment|quill-delta|lodash-es|eventemitter3))',
   ],
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',

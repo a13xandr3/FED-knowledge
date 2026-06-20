@@ -10,14 +10,17 @@ import Quill from 'quill';
 import { QuillConfiguration } from './quill-configuration';
 import { QuillModule, type EditorChangeContent } from 'ngx-quill';
 
+type QuillAttributor = {
+  whitelist: string[];
+};
 
-const FontAttributor = Quill.import('attributors/class/font');
+const FontAttributor = Quill.import('attributors/class/font') as QuillAttributor;
 FontAttributor.whitelist = ['Alumni', 'Poppins', 'Raleway'];
-Quill.register(FontAttributor, true);
+Quill.register(FontAttributor as any, true);
 
-const SizeStyle = Quill.import('attributors/style/size');
+const SizeStyle = Quill.import('attributors/style/size') as QuillAttributor;
 SizeStyle.whitelist = ['8px', '10px', '12px', '14px', '16px', '18px', '20px', '36px', '72px'];
-Quill.register(SizeStyle, true);
+Quill.register(SizeStyle as any, true);
 
 @Component({
   selector: 'app-quill',
@@ -60,7 +63,7 @@ export class QuillComponent implements ControlValueAccessor, OnDestroy {
     const applyHtml  = () => {
       if (!this._value) return;
       try {
-        const delta = this.quill?.clipboard.convert(this._value) as any;
+        const delta = this.quill?.clipboard.convert({ html: this._value }) as any;
         this.quill?.setContents(delta, 'silent');
       } catch (err) {
       }
@@ -117,7 +120,7 @@ export class QuillComponent implements ControlValueAccessor, OnDestroy {
         //this.quill.setContents([{ insert: '\n' }], 'silent');
         this.quill.setText('', 'silent');
       } else {
-        const delta = this.quill.clipboard.convert(html);
+        const delta = this.quill.clipboard.convert({ html });
         this.quill.setContents(delta, 'silent');
       }
     } finally {
