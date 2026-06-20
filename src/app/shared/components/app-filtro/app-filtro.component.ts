@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -22,9 +22,8 @@ export interface FiltroSelecionado {
   styleUrls: ['./app-filtro.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule
-  ]
+]
 })
 export class AppFiltroComponent implements OnInit, OnDestroy {
   @Output() filtroSelecionado = new EventEmitter<FiltroSelecionado>();

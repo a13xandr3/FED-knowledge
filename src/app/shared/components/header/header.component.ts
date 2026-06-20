@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
@@ -19,12 +19,11 @@ import { AppFiltroComponent, FiltroSelecionado } from 'src/app/shared/components
   styleUrls: ['./header.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     AppFiltroComponent,
     HoraFormatadaPipe,
     TokenTimeLeftPipe,
     TokenExpiringSoonPipe
-  ]
+]
 })
 export class HeaderComponent {
   @Input() matcher: ErrorStateMatcher = new ErrorStateMatcher();

@@ -6,9 +6,11 @@
     [formControl]="categoryCtrl"
     (change)="onChangeCategory(categoryCtrl.value?.value)">
     <option [ngValue]="null" disabled>Choose one category</option>
-    <option *ngFor="let opt of statusOptionsCat" [ngValue]="opt">
-      {{ opt.label }}
-    </option>
+    @for (opt of statusOptionsCat; track opt) {
+      <option [ngValue]="opt">
+        {{ opt.label }}
+      </option>
+    }
   </select>
 </div>
 
@@ -20,8 +22,10 @@
     [formControl]="tagCtrl"
     (change)="onChangeTag(tagCtrl.value?.value)">
     <option [ngValue]="null" disabled>Choose one tag</option>
-    <option *ngFor="let opt of statusOptionsTag" [ngValue]="opt">
-      {{ opt.label }}
-    </option>
+    @for (opt of statusOptionsTag; track opt) {
+      <option [ngValue]="opt">
+        {{ opt.label }}
+      </option>
+    }
   </select>
 </div>

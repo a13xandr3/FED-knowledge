@@ -5,12 +5,14 @@
     <!-- caixa com borda + rolagem controlada -->
     <div class="chipbox">
       <mat-chip-grid #chipGrid aria-label="Lista de Tags">
-        <mat-chip-row *ngFor="let chip of chips" (removed)="removeTag(chip)">
-          {{ chip }}
-          <button type="button" matChipRemove>
-            <mat-icon>X</mat-icon>
-          </button>
-        </mat-chip-row>
+        @for (chip of chips; track chip) {
+          <mat-chip-row (removed)="removeTag(chip)">
+            {{ chip }}
+            <button type="button" matChipRemove>
+              <mat-icon>X</mat-icon>
+            </button>
+          </mat-chip-row>
+        }
       </mat-chip-grid>
     </div>
 
@@ -25,9 +27,11 @@
       (matChipInputTokenEnd)="addChip($event)" />
 
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="chipSelected($event)">
-      <mat-option *ngFor="let chip of filteredChips | async" [value]="chip">
-        {{ chip }}
-      </mat-option>
+      @for (chip of filteredChips | async; track chip) {
+        <mat-option [value]="chip">
+          {{ chip }}
+        </mat-option>
+      }
     </mat-autocomplete>
   </mat-form-field>
 </div>

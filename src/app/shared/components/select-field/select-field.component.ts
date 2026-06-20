@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
@@ -16,13 +16,12 @@ import { MatFormFieldAppearance } from 'src/app/types/appearance';
   styleUrls: ['./select-field.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     MatFormFieldModule,
     MatInputModule,
     MatOptionModule,
     MatSelectModule,
     ReactiveFormsModule
-  ],
+],
 })
 export class SelectFieldComponent implements OnChanges {
   @Input() options: ReadonlyArray<SelectOption<any>> = [];

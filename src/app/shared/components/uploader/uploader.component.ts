@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 
 import { InputFileComponent } from '../input-file/input-file.component';
@@ -12,9 +12,8 @@ import { PreviewItem } from 'src/app/types/Files';
   styleUrls: ['./uploader.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     InputFileComponent
-  ],
+],
 })
 export class UploaderComponent {
   @Input() allowMultiple = true;

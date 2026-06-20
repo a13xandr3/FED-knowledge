@@ -5,7 +5,7 @@ import {
   restoreFilesFromSnapshot,
   downloadFile} from '../input-file/file-utils';
 import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
-import { CommonModule } from '@angular/common';
+
 import { RenderKind } from 'src/app/types/Files';
 import { ShowFileData } from '../../interfaces/interface.file-ref';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
@@ -14,9 +14,7 @@ import { FileApiService } from 'src/app/shared/services/file-api.service';
   templateUrl: './show-file.component.html',
   styleUrls: ['./show-file.component.scss'],
   standalone: true,
-  imports: [
-    CommonModule
-  ],
+  imports: [],
 })
 export class ShowFileComponent implements OnInit, OnDestroy {
   @ViewChild('docxHost', { static: false }) docxHost?: ElementRef<HTMLDivElement>;

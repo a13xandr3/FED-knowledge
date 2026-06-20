@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { distinctUntilChanged, filter, map, Observable, startWith, Subject, takeUntil } from 'rxjs';
@@ -10,10 +10,9 @@ import { FooterComponent } from 'src/app/shared/components/footer/footer.compone
   styleUrls: ['./app.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     FooterComponent,
     RouterModule
-  ]
+]
 })
 export class AppComponent implements OnInit, OnDestroy  {
   

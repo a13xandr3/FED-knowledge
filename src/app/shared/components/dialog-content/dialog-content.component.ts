@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,7 +33,6 @@ import { PreviewItem } from 'src/app/types/Files';
   styleUrls: ['./dialog-content.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     MatDialogModule,
     MatFormFieldModule,
     MatChipsModule,
@@ -46,7 +45,7 @@ import { PreviewItem } from 'src/app/types/Files';
     QuillComponent,
     TokenTimeLeftPipe,
     TokenExpiringSoonPipe
-  ],
+],
   providers: [
     DatePipe
   ]

@@ -9,7 +9,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import Quill from 'quill';
 import { QuillConfiguration } from './quill-configuration';
 import { QuillModule, type EditorChangeContent } from 'ngx-quill';
-import { CommonModule } from '@angular/common';
+
 
 const FontAttributor = Quill.import('attributors/class/font');
 FontAttributor.whitelist = ['Alumni', 'Poppins', 'Raleway'];
@@ -25,9 +25,8 @@ Quill.register(SizeStyle, true);
   styleUrls: ['./quill.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     QuillModule
-  ],
+],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

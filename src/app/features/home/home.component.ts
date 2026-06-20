@@ -23,7 +23,7 @@ import arquivo from 'src/assets/data/arquivo.json';
 import { DialogContentComponent } from 'src/app/shared/components/dialog-content/dialog-content.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -34,7 +34,6 @@ import { MatChipsModule } from '@angular/material/chips';
   styleUrls: ['./home.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     MatChipsModule,
     MatFormFieldModule,
