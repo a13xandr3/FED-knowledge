@@ -23,20 +23,19 @@ SizeStyle.whitelist = ['8px', '10px', '12px', '14px', '16px', '18px', '20px', '3
 Quill.register(SizeStyle as any, true);
 
 @Component({
-  selector: 'app-quill',
-  templateUrl: './quill.component.html',
-  styleUrls: ['./quill.component.scss'],
-  standalone: true,
-  imports: [
-    QuillModule
-],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => QuillComponent),
-      multi: true
-    }
-  ]
+    selector: 'app-quill',
+    templateUrl: './quill.component.html',
+    styleUrls: ['./quill.component.scss'],
+    imports: [
+        QuillModule
+    ],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => QuillComponent),
+            multi: true
+        }
+    ]
 })
 export class QuillComponent implements ControlValueAccessor, OnDestroy {
   @Input() placeholder = '';

@@ -28,27 +28,26 @@ import { QuillComponent } from '../quill/quill.component';
 import { PreviewItem } from 'src/app/types/Files';
 
 @Component({
-  selector: 'app-dialog-content',
-  templateUrl: './dialog-content.component.html',
-  styleUrls: ['./dialog-content.component.scss'],
-  standalone: true,
-  imports: [
-    MatDialogModule,
-    MatFormFieldModule,
-    MatChipsModule,
-    MatChipsComponent,
-    FormsModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    NgxMaskDirective,
-    UploaderComponent,
-    QuillComponent,
-    TokenTimeLeftPipe,
-    TokenExpiringSoonPipe
-],
-  providers: [
-    DatePipe
-  ]
+    selector: 'app-dialog-content',
+    templateUrl: './dialog-content.component.html',
+    styleUrls: ['./dialog-content.component.scss'],
+    imports: [
+        MatDialogModule,
+        MatFormFieldModule,
+        MatChipsModule,
+        MatChipsComponent,
+        FormsModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        NgxMaskDirective,
+        UploaderComponent,
+        QuillComponent,
+        TokenTimeLeftPipe,
+        TokenExpiringSoonPipe
+    ],
+    providers: [
+        DatePipe
+    ]
 })
 export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('tagInput') tagInput!: ElementRef<HTMLInputElement>;
@@ -80,7 +79,7 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
     private filesApiService: FileApiService
     ){
     this.iniciarContagem(86400000); // 24 horas
-    if ( this.data?.categoria.toLowerCase() == 'timesheet' ) {
+    if ( this.data?.categoria?.toLowerCase() == 'timesheet' ) {
       this.totalHorasDia = data?.totalHorasDia;
     }
     this.fr = this.fb.group({
@@ -94,13 +93,16 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
       descricao: [data?.descricao || ''],
       oldCategoria: [data?.oldCategoria],
       status: [data?.status],
-      dataEntradaManha: [this.linkMapperService.toDateBr(data?.dataEntradaManha)],
-      dataSaidaManha: [this.linkMapperService.toDateBr(data?.dataSaidaManha)],
-      dataEntradaTarde: [this.linkMapperService.toDateBr(data?.dataEntradaTarde)],
-      dataSaidaTarde: [this.linkMapperService.toDateBr(data?.dataSaidaTarde)],
-      dataEntradaNoite: [this.linkMapperService.toDateBr(data?.dataEntradaNoite)],
-      dataSaidaNoite: [this.linkMapperService.toDateBr(data?.dataSaidaNoite)]
+      dataEntradaManha: [this.toDateBrOrEmpty(data?.dataEntradaManha)],
+      dataSaidaManha: [this.toDateBrOrEmpty(data?.dataSaidaManha)],
+      dataEntradaTarde: [this.toDateBrOrEmpty(data?.dataEntradaTarde)],
+      dataSaidaTarde: [this.toDateBrOrEmpty(data?.dataSaidaTarde)],
+      dataEntradaNoite: [this.toDateBrOrEmpty(data?.dataEntradaNoite)],
+      dataSaidaNoite: [this.toDateBrOrEmpty(data?.dataSaidaNoite)]
     });
+  }
+  private toDateBrOrEmpty(value: string | null | undefined): string {
+    return this.linkMapperService.toDateBr(value ?? null) ?? '';
   }
   ngOnInit(): void {
     const ids = (this.data?.fileID?.[0]?.fileRefs ?? [])

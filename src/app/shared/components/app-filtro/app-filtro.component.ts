@@ -17,13 +17,12 @@ export interface FiltroSelecionado {
 }
 
 @Component({
-  selector: 'app-filtro',
-  templateUrl: './app-filtro.component.html',
-  styleUrls: ['./app-filtro.component.scss'],
-  standalone: true,
-  imports: [
-    ReactiveFormsModule
-]
+    selector: 'app-filtro',
+    templateUrl: './app-filtro.component.html',
+    styleUrls: ['./app-filtro.component.scss'],
+    imports: [
+        ReactiveFormsModule
+    ]
 })
 export class AppFiltroComponent implements OnInit, OnDestroy {
   @Output() filtroSelecionado = new EventEmitter<FiltroSelecionado>();

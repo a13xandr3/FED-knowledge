@@ -14,16 +14,15 @@ import { TokenExpiringSoonPipe } from 'src/app/shared/pipes/token-expiring-soon.
 import { AppFiltroComponent, FiltroSelecionado } from 'src/app/shared/components/app-filtro/app-filtro.component';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
-  standalone: true,
-  imports: [
-    AppFiltroComponent,
-    HoraFormatadaPipe,
-    TokenTimeLeftPipe,
-    TokenExpiringSoonPipe
-]
+    selector: 'app-header',
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.scss'],
+    imports: [
+        AppFiltroComponent,
+        HoraFormatadaPipe,
+        TokenTimeLeftPipe,
+        TokenExpiringSoonPipe
+    ]
 })
 export class HeaderComponent {
   @Input() matcher: ErrorStateMatcher = new ErrorStateMatcher();
@@ -39,10 +38,9 @@ export class HeaderComponent {
     private linkStateService: LinkStateService,
     private dialog: MatDialog) {
       this.linkStateService.triggerRefresh();
-    }
+  }
 
   onFiltroSelecionado(filtro: FiltroSelecionado): void {
-    console.log(filtro);
     if (filtro.tipo === 'categoria') {
       this.selectedItemCategory = filtro.valor;
     }

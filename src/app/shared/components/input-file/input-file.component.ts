@@ -15,14 +15,13 @@ import { ShowFileComponent } from 'src/app/shared/components/show-file/show-file
 import { PreviewItem, FilesPayload, ZlibLevel } from 'src/app/types/Files';
 import { IFileRef } from 'src/app/shared/interfaces/interface.file-ref';
 @Component({
-  selector: 'app-input-file',
-  templateUrl: './input-file.component.html',
-  styleUrls: ['./input-file.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatProgressBarModule
-  ],
+    selector: 'app-input-file',
+    templateUrl: './input-file.component.html',
+    styleUrls: ['./input-file.component.scss'],
+    imports: [
+        CommonModule,
+        MatProgressBarModule
+    ]
 })
 export class InputFileComponent implements OnInit, OnDestroy {
   /** MIME(s) aceitos. Ex.: 'image/*' | 'application/pdf' */
@@ -413,7 +412,6 @@ export class InputFileComponent implements OnInit, OnDestroy {
           }
         }
         const result: FilesPayload = { fileRefs: kept };
-      console.log('Após remoção input-file:', result.fileRefs);
       return result;
   }
   public async addPreviewsFromFileIds(ids: number[], cleanBefore = false): Promise<void> {

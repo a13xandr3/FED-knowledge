@@ -29,20 +29,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
-  standalone: true,
-  imports: [
-    RouterModule,
-    MatChipsModule,
-    MatFormFieldModule,
-    MatTableModule,
-    MatPaginatorModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    HeaderComponent
-],
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    imports: [
+        RouterModule,
+        MatChipsModule,
+        MatFormFieldModule,
+        MatTableModule,
+        MatPaginatorModule,
+        ReactiveFormsModule,
+        MatDialogModule,
+        HeaderComponent
+    ]
 })
 export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   totalHoras: any;
@@ -131,16 +130,16 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getLinks();
   }
   getLinks(): void {
-    console.log(this.itemModificadoCategoria);
     this.homeService.getLinks(
                           this.pageIndex, 
                           this.pageSize, 
                           this.categoriaExcessao, 
                           this.itemModificadoCategoria, 
                           this.itemModificadoTag
-                        ).subscribe({
+                        )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
       next: (response: any) => {
-        console.log(response);
         const lnk = response.atividades ?? response.links ?? [];
         lnk.sort((a: any, b: any) => a.name?.localeCompare(b?.name));
         if (lnk[0]?.categoria?.toLowerCase() === 'timesheet') {

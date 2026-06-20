@@ -16,7 +16,7 @@ import { FilesPayload } from 'src/app/shared/components/input-file/file-selectio
 import { PreviewItem } from 'src/app/types/Files';
 
 // ngx-mask (standalone)
-import { provideNgxMask, NGX_MASK_CONFIG } from 'ngx-mask';
+import { provideNgxMask } from 'ngx-mask';
 
 // ---------- Mocks ----------
 const homeServiceMock = {
@@ -110,7 +110,6 @@ describe('DialogContentComponent (standalone + Jest)', () => {
         { provide: MAT_DIALOG_DATA, useValue: dialogDataMock },
         // ngx-mask config para a NgxMaskDirective usada pelo componente
         provideNgxMask({ validation: false }),
-        { provide: NGX_MASK_CONFIG, useValue: { validation: false } },
       ],
     }).compileComponents();
 

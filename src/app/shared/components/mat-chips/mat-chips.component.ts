@@ -22,26 +22,25 @@ import { MatIconModule } from '@angular/material/icon';
 import { map, Observable, startWith } from 'rxjs';
 
 @Component({
-  selector: 'app-mat-chips',
-  templateUrl: './mat-chips.component.html',
-  styleUrls: ['./mat-chips.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatAutocompleteModule,
-    MatChipsModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    ReactiveFormsModule,
-  ],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => MatChipsComponent),
-      multi: true
-    }
-  ]
+    selector: 'app-mat-chips',
+    templateUrl: './mat-chips.component.html',
+    styleUrls: ['./mat-chips.component.scss'],
+    imports: [
+        CommonModule,
+        MatAutocompleteModule,
+        MatChipsModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        ReactiveFormsModule,
+    ],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => MatChipsComponent),
+            multi: true
+        }
+    ]
 })
 export class MatChipsComponent implements ControlValueAccessor, OnInit, OnChanges {
   @Input() public label!: string;

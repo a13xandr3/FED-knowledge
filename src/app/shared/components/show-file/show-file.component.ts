@@ -10,11 +10,10 @@ import { RenderKind } from 'src/app/types/Files';
 import { ShowFileData } from '../../interfaces/interface.file-ref';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
 @Component({
-  selector: 'app-show-file',
-  templateUrl: './show-file.component.html',
-  styleUrls: ['./show-file.component.scss'],
-  standalone: true,
-  imports: [],
+    selector: 'app-show-file',
+    templateUrl: './show-file.component.html',
+    styleUrls: ['./show-file.component.scss'],
+    imports: []
 })
 export class ShowFileComponent implements OnInit, OnDestroy {
   @ViewChild('docxHost', { static: false }) docxHost?: ElementRef<HTMLDivElement>;

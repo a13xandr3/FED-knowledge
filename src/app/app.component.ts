@@ -1,18 +1,17 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { distinctUntilChanged, filter, map, Observable, startWith, Subject, takeUntil } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  standalone: true,
-  imports: [
-    FooterComponent,
-    RouterModule
-]
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    imports: [
+        FooterComponent,
+        RouterModule
+    ]
 })
 export class AppComponent implements OnInit, OnDestroy  {
   
@@ -34,12 +33,11 @@ export class AppComponent implements OnInit, OnDestroy  {
   ngOnInit(): void {
     this.router.events
       .pipe(
-        filter(event => event instanceof NavigationEnd),
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         takeUntil(this.destroy$)
       )
-      .subscribe((event: any) => {
+      .subscribe((event) => {
         this.currentRoute = event.urlAfterRedirects;
-        //console.log('Rota atual:', this.currentRoute);
       });
   }
 

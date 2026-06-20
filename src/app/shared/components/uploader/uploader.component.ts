@@ -7,13 +7,12 @@ import { ProcessedFile } from 'src/app/shared/request/request';
 import { PreviewItem } from 'src/app/types/Files';
 
 @Component({
-  selector: 'app-uploader',
-  templateUrl: './uploader.component.html',
-  styleUrls: ['./uploader.component.scss'],
-  standalone: true,
-  imports: [
-    InputFileComponent
-],
+    selector: 'app-uploader',
+    templateUrl: './uploader.component.html',
+    styleUrls: ['./uploader.component.scss'],
+    imports: [
+        InputFileComponent
+    ]
 })
 export class UploaderComponent {
   @Input() allowMultiple = true;
