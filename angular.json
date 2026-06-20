@@ -48,7 +48,7 @@
               "node_modules/quill/dist/quill.core.css",
               "node_modules/quill/dist/quill.snow.css",
               "src/app/shared/components/quill/quill-configuration.scss",
-              "node_modules/bootstrap/scss/bootstrap.scss",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "node_modules/font-awesome/css/font-awesome.min.css",
               "@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
@@ -66,7 +66,7 @@
               "aot": true,
               "sourceMap": {
                 "scripts": true,
-                "styles": true,
+                "styles": false,
                 "vendor": true
               },
               "namedChunks": true
