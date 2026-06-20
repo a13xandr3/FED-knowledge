@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform, inject } from '@angular/core';
 
 @Pipe({
   name: 'tokenTimeLeft',
@@ -7,9 +7,10 @@ import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core
   pure: false,
 })
 export class TokenTimeLeftPipe implements PipeTransform, OnDestroy {
-  private timerId: any;
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly timerId: ReturnType<typeof setInterval>;
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor() {
     // força atualização 1x por segundo (funciona com OnPush também)
     this.timerId = setInterval(() => this.cdr.markForCheck(), 1000);
   }

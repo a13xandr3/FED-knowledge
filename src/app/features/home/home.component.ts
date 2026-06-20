@@ -1,20 +1,12 @@
-import { 
-  AfterViewInit, 
-  Component, 
-  Input, 
-  OnDestroy, 
-  OnInit, 
-  ViewChild } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageEvent, MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-
-import { Subject, takeUntil } from 'rxjs';
+import { MatTableModule } from '@angular/material/table';
 
 import { IactionStatus } from 'src/app/shared/request/request';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { HomeService } from 'src/app/shared/services/home.service';
-import { Comportamento, ComportamentoService } from 'src/app/shared/services/comportamento.service';
 import { ILinksResponse } from 'src/app/shared/response/response';
 import { SnackService } from 'src/app/shared/services/snack.service';
 
@@ -25,103 +17,95 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { ReactiveFormsModule } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
+
+type LinksResponse = {
+  atividades?: ILinksResponse[];
+  links?: ILinksResponse[];
+  total: number;
+};
+
+type TagValue = { tags?: string[] } | Array<{ tags?: string[] }> | string[] | null | undefined;
+
 @Component({
-    selector: 'app-home',
-    templateUrl: './home.component.html',
-    styleUrls: ['./home.component.scss'],
-    imports: [
-        RouterModule,
-        MatChipsModule,
-        MatFormFieldModule,
-        MatTableModule,
-        MatPaginatorModule,
-        ReactiveFormsModule,
-        MatDialogModule,
-        HeaderComponent
-    ]
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss',
+  imports: [
+    RouterModule,
+    MatChipsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatDialogModule,
+    HeaderComponent
+  ]
 })
-export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
-  totalHoras: any;
-  categoriaExcessao = arquivo.categoriaExcessao;
-  @Input() titulo!: string;
-  itemModificadoCategoria: string = '';
-  itemModificadoTag: string = '';
+export class HomeComponent implements OnInit {
+  totalHoras?: number;
+  readonly categoriaExcessao = arquivo.categoriaExcessao;
+  titulo = '';
+  itemModificadoCategoria = '';
+  itemModificadoTag = '';
 
   links: ILinksResponse[] = [];
-  
-  dataSource = new MatTableDataSource(this.links);
-  comportamentos: Comportamento[] = [];
-  pagedItems: ILinksResponse[] = [];
-  displayedColumns: string[] = ['id','categoria', 'name', 'tag', 'actions'];
-  totalLinks!: number;
-  pageSize!: number;
-  pageIndex!: number;
+
+  readonly displayedColumns: string[] = ['id', 'categoria', 'name', 'tag', 'actions'];
+  totalLinks = 0;
+  pageSize = 10;
+  pageIndex = 0;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  private destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
+  private readonly linkStateService = inject(LinkStateService);
+  private readonly homeService = inject(HomeService);
+  private readonly snackService = inject(SnackService);
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly dialog: MatDialog,
-    private comportamentoService: ComportamentoService,
-    private linkStateService: LinkStateService,
-    private homeService: HomeService,
-    private snackService: SnackService,
-  ) {
-  }
   ngOnInit(): void {
     this.route.queryParams
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => { this.titulo = params['titulo']; });
     this.resetPaginador();
-    this.subscreverComportamentos();
     this.subscreverAtualizacoes();
   }
-  ngAfterViewInit(): void {
-  }
-  injectUrl(url: any): string {
+
+  injectUrl(url: { url?: string; uri?: { uris?: string[] } } | null | undefined): string {
     return url?.url || url?.uri?.uris?.[0] || '';
   }
-  onPageChange(event: PageEvent) {
+
+  onPageChange(event: PageEvent): void {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.getLinks();
   }
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-  private subscreverComportamentos(): void {
-    this.comportamentoService.comportamentos$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(lista => {
-        this.comportamentos = lista;
-      });
-  }
+
   private subscreverAtualizacoes(): void {
     this.linkStateService.refreshLink$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(refresh => {
-        if (refresh!) {
+        if (refresh) {
           this.getLinks();
         }
       });
   }
+
   private atualizarLista(): void {
     this.getLinks();
     this.linkStateService.triggerRefresh();
   }
-  onChangeTag(value: any) {
+
+  onChangeTag(value: string): void {
     this.resetPaginador();
     this.onItemSelecionado(value);
   }
+
   private parseItemSelecionado(value: string): { tipo: 'categoria' | 'tag', valor: string } {
     const [valor, tipo] = value.split('_');
     return { tipo: tipo as 'categoria' | 'tag', valor };
   }
+
   onItemSelecionado(itemSelecionado: string): void {
     const { tipo, valor } = this.parseItemSelecionado(itemSelecionado);
     this.itemModificadoCategoria = tipo === 'categoria' ? valor : '';
@@ -137,19 +121,17 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
                           this.itemModificadoCategoria, 
                           this.itemModificadoTag
                         )
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-      next: (response: any) => {
-        const lnk = response.atividades ?? response.links ?? [];
-        lnk.sort((a: any, b: any) => a.name?.localeCompare(b?.name));
-        if (lnk[0]?.categoria?.toLowerCase() === 'timesheet') {
-          this.totalHoras = this.homeService.totalHorasTimeSheet(lnk);
-          this.links = lnk;
-          this.totalLinks = response.total;
-        } else {
-          this.links = lnk;
-          this.totalLinks = response.total;
-        }
+      next: (response: LinksResponse) => {
+        const links = [...(response.atividades ?? response.links ?? [])]
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        this.totalHoras = links[0]?.categoria?.toLowerCase() === 'timesheet'
+          ? this.homeService.totalHorasTimeSheet(links)
+          : undefined;
+        this.links = links;
+        this.totalLinks = response.total;
       },
       error: (err: HttpErrorResponse) => {
         this.snackService.mostrarMensagem(
@@ -158,6 +140,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
+
   abrirDialog(obj: IactionStatus, showSite?: boolean): void {
     const dialogRef = this.dialog.open(DialogContentComponent, {
       autoFocus: true,
@@ -191,14 +174,15 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
     dialogRef.afterClosed()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((result) => {
         if (result) {
           this.atualizarLista();
           dialogRef.close();
-        }
-      });
+      }
+    });
   }
+
   deleteItem(
     linkId: number,
     fileRefs: { id: number }[] | number[] | { id: number } | number | null | undefined
@@ -207,30 +191,39 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
       .filter((x): x is number | { id: number } => x != null)
       .map(x => typeof x === 'number' ? x : x.id);
     const payload = { linkId, fileIds };
-    this.homeService.deleteItem(payload).subscribe({
-      next: () => {
-        this.mostrarMensagem('Card e arquivo(s) excluídos com sucesso!', 'Fechar');
-        this.atualizarLista(); // reflete a lista após o 204
-      },
-      error: (err: HttpErrorResponse) => {
-        this.snackService.mostrarMensagem(err?.message ?? 'Falha ao excluir', 'Fechar');
-      }
-    });
+    this.homeService.deleteItem(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.mostrarMensagem('Card e arquivo(s) excluídos com sucesso!', 'Fechar');
+          this.atualizarLista();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.snackService.mostrarMensagem(err?.message ?? 'Falha ao excluir', 'Fechar');
+        }
+      });
   }
-  mostrarMensagem(msg: string, action: any): void {
+
+  mostrarMensagem(msg: string, action: string): void {
     this.snackService.mostrarMensagem(msg, action);
   }
-  getTags(tag: any): string[] {
+
+  getTags(tag: TagValue): string[] {
     if (!tag) return [];
-    if (Array.isArray(tag?.tags)) return tag.tags;
     if (Array.isArray(tag)) {
-      return tag.flatMap((item: any) => Array.isArray(item?.tags) ? item.tags : []);
+      if (tag.every((item): item is string => typeof item === 'string')) {
+        return tag;
+      }
+      return tag.flatMap((item) => Array.isArray(item?.tags) ? item.tags : []);
     }
+    if (Array.isArray(tag.tags)) return tag.tags;
     return [];
   }
-  hasTags(data: any): boolean {
+
+  hasTags(data: TagValue): boolean {
     return this.getTags(data).length > 0;
   }
+
   resetPaginador(): void {
     this.pageIndex = 0;
     this.pageSize = 10;

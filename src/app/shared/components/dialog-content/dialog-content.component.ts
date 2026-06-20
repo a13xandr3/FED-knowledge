@@ -1,14 +1,12 @@
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { DatePipe } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
-import { MatChipsModule } from '@angular/material/chips';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, DestroyRef, Inject, OnInit, Optional, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
-import { SafeResourceUrl } from '@angular/platform-browser';
 
-import { catchError, concatMap, forkJoin, map, Observable, of, Subscription, switchMap, throwError } from 'rxjs';
+import { catchError, concatMap, forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
 
 import { FileSavedResponse, ILinkRequest, ProcessedFile } from '../../request/request';
@@ -28,46 +26,39 @@ import { QuillComponent } from '../quill/quill.component';
 import { PreviewItem } from 'src/app/types/Files';
 
 @Component({
-    selector: 'app-dialog-content',
-    templateUrl: './dialog-content.component.html',
-    styleUrls: ['./dialog-content.component.scss'],
-    imports: [
-        MatDialogModule,
-        MatFormFieldModule,
-        MatChipsModule,
-        MatChipsComponent,
-        FormsModule,
-        MatInputModule,
-        ReactiveFormsModule,
-        NgxMaskDirective,
-        UploaderComponent,
-        QuillComponent,
-        TokenTimeLeftPipe,
-        TokenExpiringSoonPipe
-    ],
-    providers: [
-        DatePipe
-    ]
+  selector: 'app-dialog-content',
+  templateUrl: './dialog-content.component.html',
+  styleUrl: './dialog-content.component.scss',
+  imports: [
+    MatDialogModule,
+    MatFormFieldModule,
+    MatChipsComponent,
+    MatInputModule,
+    ReactiveFormsModule,
+    NgxMaskDirective,
+    UploaderComponent,
+    QuillComponent,
+    TokenTimeLeftPipe,
+    TokenExpiringSoonPipe
+  ],
+  providers: [
+    DatePipe
+  ]
 })
-export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('tagInput') tagInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('uriInput') uriInput!: ElementRef<HTMLInputElement>;
-  tempoRestanteMs: number = 0;
-  separatorKeysCodes: number[] = [ENTER, COMMA];
+export class DialogContentComponent implements OnInit {
+  tempoRestanteMs = 0;
   allTags: string[] = [];
   allUris: string[] = [];
   allFiles: FilesPayload = { files: [] };
   fr: FormGroup;
-  exibeSite: any;
-  safeUrl: SafeResourceUrl | undefined;
   currentContent = '';
   totalHorasDia!: string;
-  allowMultiple = true;
   public previewsFromIds: PreviewItem[] = [];
   /** Fila de arquivos processados pelo input-file (payloadBytes etc.) */
   private initialIds: number[] = [];  
   private fileQueue: ProcessedFile[] = [];
-  private sub?: Subscription;
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(
     private service: HomeService,
     private fb: FormBuilder,
@@ -104,6 +95,23 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
   private toDateBrOrEmpty(value: string | null | undefined): string {
     return this.linkMapperService.toDateBr(value ?? null) ?? '';
   }
+
+  get dialogTitleId(): unknown {
+    return this.fr.get('id')?.value;
+  }
+
+  get isTiCategory(): boolean {
+    return this.categoryValue.toLowerCase() === 'ti';
+  }
+
+  get isTimesheet(): boolean {
+    return this.categoryValue.toLowerCase() === 'timesheet';
+  }
+
+  private get categoryValue(): string {
+    return String(this.fr.get('categoria')?.value ?? '');
+  }
+
   ngOnInit(): void {
     const ids = (this.data?.fileID?.[0]?.fileRefs ?? [])
       .map((x: any) => Number(
@@ -118,14 +126,11 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
       });
     }
   }
-  ngAfterViewInit(): void {
-  }
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
-  }
-  fechar() {
+
+  fechar(): void {
     this.dialogRef.close();
   }
+
   deleteFiles(currentIds: number[]): Observable<unknown> {
     const delete$: Observable<unknown> = currentIds.length
       ? forkJoin(currentIds.map(id => this.filesApiService.delete(id)))
@@ -155,6 +160,7 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
       tempAnchor.click();
     }
   }
+
   private isValidHttpUrl(url: string): boolean {
     try {
       const parsedUrl = new URL(url);
@@ -163,41 +169,51 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
       return false;
     }
   }
+
   iniciarContagem(ms: number): void {
-    this.sub?.unsubscribe();
-    this.sub = this.linkMapperService.countdown(ms).subscribe({
+    this.linkMapperService.countdown(ms)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: remainingMs => this.tempoRestanteMs = remainingMs,
     });
   }
-  onProcessed(p: ProcessedFile) {
+
+  onProcessed(p: ProcessedFile): void {
     this.fileQueue.push(p);
     this.allFiles.files.push({ id: -1, filename: p.filename });
   }
-  onClearedFiles() {
+
+  onClearedFiles(): void {
     this.fileQueue = [];
     this.allFiles = { files: [] };
   }
-  onError(err: unknown) {
+
+  onError(err: unknown): void {
     console.error(err);
   }
-  onPreviewRemoved(idx: number) {
+
+  onPreviewRemoved(idx: number): void {
     const removedId = this.previewsFromIds[idx]?.id;
     this.removePreviewIdFromForm(removedId);
   }
-  onPreviewRemovedRef(ref: { id?: number; index: number; filename: string }) {
+
+  onPreviewRemovedRef(ref: { id?: number; index: number; filename: string }): void {
     this.removePreviewIdFromForm(ref.id);
   }
-  private removePreviewIdFromForm(removedId: unknown) {
+
+  private removePreviewIdFromForm(removedId: unknown): void {
     const id = Number(removedId);
     if (!Number.isFinite(id)) return;
     const ctrl = this.fr.get('fileID');
     const curr: number[] = (ctrl?.value ?? []).filter((v: any) => v !== id);
     ctrl?.setValue(curr);
   }
-  private deleteMany(ids: number[]): Observable<any> {
+
+  private deleteMany(ids: number[]): Observable<unknown> {
     return ids.length ? forkJoin(ids.map(id => this.filesApiService.delete(id))) : of(null);
   } 
-  private uploadQueue() {
+
+  private uploadQueue(): Observable<FileRefCore[]> {
     return this.fileQueue.length
       ? forkJoin(this.fileQueue.map(p => this.filesApiService.uploadOne(p))).pipe(
           map(resps => resps.map((r, i) => ({ id: r.id, filename: this.fileQueue[i]?.filename ?? `file-${r.id}` } as FileRefCore)))
@@ -234,7 +250,9 @@ export class DialogContentComponent implements OnInit, AfterViewInit, OnDestroy 
         this.snackService.mostrarMensagem(err?.message ?? 'Falha ao salvar', 'Fechar');
         return throwError(() => err);
       })
-    ).subscribe({
+    )
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
       next: () => {
         this.snackService.mostrarMensagem(
           isInclusao ? 'Card Inserido com sucesso!' : 'Card Atualizado com sucesso!', 'Fechar'

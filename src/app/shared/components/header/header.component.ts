@@ -1,5 +1,13 @@
-
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+  input,
+  output
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { MatDialog } from '@angular/material/dialog';
 
@@ -14,30 +22,33 @@ import { TokenExpiringSoonPipe } from 'src/app/shared/pipes/token-expiring-soon.
 import { AppFiltroComponent, FiltroSelecionado } from 'src/app/shared/components/app-filtro/app-filtro.component';
 
 @Component({
-    selector: 'app-header',
-    templateUrl: './header.component.html',
-    styleUrls: ['./header.component.scss'],
-    imports: [
-        AppFiltroComponent,
-        HoraFormatadaPipe,
-        TokenTimeLeftPipe,
-        TokenExpiringSoonPipe
-    ]
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    AppFiltroComponent,
+    HoraFormatadaPipe,
+    TokenTimeLeftPipe,
+    TokenExpiringSoonPipe
+  ]
 })
-export class HeaderComponent {
-  @Input() matcher: ErrorStateMatcher = new ErrorStateMatcher();
-  @Input() titulo!: string;
-  @Input() totalHoras!: any;
+export class HeaderComponent implements OnInit {
+  readonly matcher = input(new ErrorStateMatcher());
+  readonly titulo = input('');
+  readonly totalHoras = input<number | null | undefined>(null);
 
-  @Output() itemSelecionadoEvent = new EventEmitter<string>();
+  readonly itemSelecionadoEvent = output<string>();
 
-  selectedItemCategory: string = '';
-  selectedItemTag: string = '';
+  selectedItemCategory = '';
+  selectedItemTag = '';
 
-  constructor(
-    private linkStateService: LinkStateService,
-    private dialog: MatDialog) {
-      this.linkStateService.triggerRefresh();
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly linkStateService = inject(LinkStateService);
+  private readonly dialog = inject(MatDialog);
+
+  ngOnInit(): void {
+    this.linkStateService.triggerRefresh();
   }
 
   onFiltroSelecionado(filtro: FiltroSelecionado): void {
@@ -52,7 +63,7 @@ export class HeaderComponent {
     this.itemSelecionadoEvent.emit(`${filtro.valor}_${filtro.tipo}`);
   }
 
-  ISODate(dt: any): any {
+  ISODate(dt: string | null): string | null {
     if ( dt === null || dt === '' ) return null;
     const [datePart, timePart] = dt.split(' ');
     const [day, month, year] = datePart.split('/');
@@ -60,7 +71,8 @@ export class HeaderComponent {
     const dtNew = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:${(second || '00').padStart(2, '0')}`;
     return dtNew;
   }
-  private brDate(): any {
+
+  private brDate(): string {
     const dataHoraAtual = new Date();
     const pad = (n: number) => n.toString().padStart(2, '0');
     const dia = pad(dataHoraAtual.getDate());
@@ -72,7 +84,8 @@ export class HeaderComponent {
     const formatado = `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
     return formatado;
   }
-  abrirDialog(ev?: Event) {
+
+  abrirDialog(ev?: Event): void {
     // 1) Remova o foco do gatilho imediatamente (evita “descendant retained focus”)
     (ev?.target as HTMLElement | null)?.blur?.();
 
@@ -101,10 +114,12 @@ export class HeaderComponent {
         dataSaidaNoite: this.ISODate(this.brDate()),
       }
     });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result?.categoria) {
-        this.linkStateService.triggerRefresh();
-      }
-    });
+    dialogRef.afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (result?.categoria) {
+          this.linkStateService.triggerRefresh();
+        }
+      });
   }
 }

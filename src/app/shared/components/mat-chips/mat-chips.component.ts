@@ -2,14 +2,12 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { CommonModule } from '@angular/common';
 import { 
   Component, 
+  input,
   Input, 
-  Output, 
-  EventEmitter, 
-  AfterViewInit, 
+  output,
   OnChanges, 
   SimpleChanges, 
   forwardRef, 
-  OnInit, 
   ElementRef, 
   ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -24,7 +22,7 @@ import { map, Observable, startWith } from 'rxjs';
 @Component({
     selector: 'app-mat-chips',
     templateUrl: './mat-chips.component.html',
-    styleUrls: ['./mat-chips.component.scss'],
+    styleUrl: './mat-chips.component.scss',
     imports: [
         CommonModule,
         MatAutocompleteModule,
@@ -42,18 +40,20 @@ import { map, Observable, startWith } from 'rxjs';
         }
     ]
 })
-export class MatChipsComponent implements ControlValueAccessor, OnInit, OnChanges {
-  @Input() public label!: string;
+export class MatChipsComponent implements ControlValueAccessor, OnChanges {
+  readonly label = input('');
+
   @Input() 
   set allChips(v: string[] | undefined) {
     this._allChips = v ? v.slice() : [];
   }
-  @Output() allChipsChange = new EventEmitter<string[]>();
+
+  readonly allChipsChange = output<string[]>();
   
   @ViewChild('chipInput') chipInput!: ElementRef<HTMLInputElement>;
 
-  separatorKeysCodes: number[] = [ENTER, COMMA];
-  chipCtrl = new FormControl('');
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+  readonly chipCtrl = new FormControl<string | null>('');
   filteredChips!: Observable<string[]>;
   chips: string[] = [];
   
@@ -68,16 +68,6 @@ export class MatChipsComponent implements ControlValueAccessor, OnInit, OnChange
     );
   }
 
-  ngOnInit(): void {}
-  
-  ngAfterViewInit(): void {
-    // Se precisar notificar o estado inicial, faça APÓS o 1º ciclo
-    queueMicrotask(() => {
-      // só emite se realmente precisar sincronizar o estado inicial com o pai
-      // this.allChipsChange.emit([...this.allChips]);
-    });
-  }
-
   // Se o Input mudar pela primeira vez (binding inicial), não reemita nesse ciclo
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['allChips']?.firstChange) {
@@ -86,11 +76,11 @@ export class MatChipsComponent implements ControlValueAccessor, OnInit, OnChange
   }
   
   //controlvalueAcessor impl
-  private onChange = (value: any) => {};
+  private onChange: (value: string[]) => void = () => {};
   private onTouched = () => {};
 
   // NORMALIZA e atualiza tanto o estado interno quanto o pai (allChips) e o form control
-  writeValue(value: any): void {
+  writeValue(value: unknown): void {
     const normalized = this.normalizeIncoming(value);
     this.chips = normalized;
     // atualiza o parent ([(allChips)]) com o valor inicial, se necessário
@@ -99,8 +89,8 @@ export class MatChipsComponent implements ControlValueAccessor, OnInit, OnChange
     //this.onChange(this.chips);
   }
 
-  registerOnChange(fn: any): void { this.onChange = fn; }
-  registerOnTouched(fn: any): void { this.onTouched = fn; }
+  registerOnChange(fn: (value: string[]) => void): void { this.onChange = fn; }
+  registerOnTouched(fn: () => void): void { this.onTouched = fn; }
 
   setDisabledState(isDisabled: boolean): void {
     if (isDisabled) this.chipCtrl.disable({ emitEvent: false });
@@ -177,14 +167,14 @@ export class MatChipsComponent implements ControlValueAccessor, OnInit, OnChange
     const filterValue = value.toLowerCase();
     return this.allChips.filter(chip => chip.toLowerCase().includes(filterValue));
   }
-  private _update() {
+  private _update(): void {
     this.onChange(this.chips);
     this.onTouched();
     this.allChipsChange.emit(this.chips);
   }
 
   // --- Normalização robusta
-  private normalizeIncoming(value: any): string[] {
+  private normalizeIncoming(value: unknown): string[] {
     if (!value && value !== 0) return [];
     // caso venha já um array de strings ou mistas
     if (Array.isArray(value)) {
@@ -192,10 +182,11 @@ export class MatChipsComponent implements ControlValueAccessor, OnInit, OnChange
     }
     // se veio um objeto { tags: [...]} ou { uris: [...] }
     if (typeof value === 'object') {
-      if (Array.isArray(value.tags)) return value.tags.map((i: any) => this.itemToString(i)).filter(Boolean);
-      if (Array.isArray(value.uris)) return value.uris.map((i: any) => this.itemToString(i)).filter(Boolean);
+      const record = value as Record<string, unknown>;
+      if (Array.isArray(record['tags'])) return record['tags'].map((i) => this.itemToString(i)).filter(Boolean);
+      if (Array.isArray(record['uris'])) return record['uris'].map((i) => this.itemToString(i)).filter(Boolean);
       // objeto simples -> tentar extrair propriedades conhecidas
-      if (value.value) return [String(value.value)];
+      if (record['value']) return [String(record['value'])];
     }
     // string ou número único
     if (typeof value === 'string' || typeof value === 'number') {
@@ -205,15 +196,16 @@ export class MatChipsComponent implements ControlValueAccessor, OnInit, OnChange
     return [];
   }
 
-  private itemToString(item: any): string {
+  private itemToString(item: unknown): string {
     if (typeof item === 'string') return item;
     if (typeof item === 'number') return String(item);
     if (item == null) return '';
     // objetos comuns: { value: 'x' } || { tag: 'x' } || { uri: 'x' }
     if (typeof item === 'object') {
-      if (item.value) return String(item.value);
-      if (item.tag) return String(item.tag);
-      if (item.uri) return String(item.uri);
+      const record = item as Record<string, unknown>;
+      if (record['value']) return String(record['value']);
+      if (record['tag']) return String(record['tag']);
+      if (record['uri']) return String(record['uri']);
       // fallback: JSON string (evite isso se puder)
       try { return JSON.stringify(item); } catch { return ''; }
     }

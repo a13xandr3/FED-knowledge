@@ -1,6 +1,6 @@
 <div class="main-chips">
   <mat-form-field appearance="fill" class="w-100">
-    <mat-label>{{ label }}</mat-label>
+    <mat-label>{{ label() }}</mat-label>
 
     <!-- caixa com borda + rolagem controlada -->
     <div class="chipbox">
@@ -18,7 +18,7 @@
 
     <input
       placeholder="fill text"
-      [attr.placeholder]="label"
+      [attr.placeholder]="label()"
       #chipInput
       [formControl]="chipCtrl"
       [matChipInputFor]="chipGrid"

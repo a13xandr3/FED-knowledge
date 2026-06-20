@@ -1,14 +1,15 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   forwardRef,
-  Input,
+  input,
   OnDestroy
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import Quill from 'quill';
 import { QuillConfiguration } from './quill-configuration';
-import { QuillModule, type EditorChangeContent } from 'ngx-quill';
+import { QuillModule } from 'ngx-quill';
 
 type QuillAttributor = {
   whitelist: string[];
@@ -23,22 +24,23 @@ SizeStyle.whitelist = ['8px', '10px', '12px', '14px', '16px', '18px', '20px', '3
 Quill.register(SizeStyle as any, true);
 
 @Component({
-    selector: 'app-quill',
-    templateUrl: './quill.component.html',
-    styleUrls: ['./quill.component.scss'],
-    imports: [
-        QuillModule
-    ],
-    providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            useExisting: forwardRef(() => QuillComponent),
-            multi: true
-        }
-    ]
+  selector: 'app-quill',
+  templateUrl: './quill.component.html',
+  styleUrl: './quill.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    QuillModule
+  ],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => QuillComponent),
+      multi: true
+    }
+  ]
 })
 export class QuillComponent implements ControlValueAccessor, OnDestroy {
-  @Input() placeholder = '';
+  readonly placeholder = input('');
 
   quillConfiguration = QuillConfiguration.modules;
 
@@ -51,10 +53,8 @@ export class QuillComponent implements ControlValueAccessor, OnDestroy {
   private onChange: (v: string) => void = () => {};
   private onTouched: () => void = () => {};
 
-  constructor() {}
-
   // chamado pelo (onEditorCreated) do ngx-quill
-  onEditorCreated(quillInstance: Quill) {
+  onEditorCreated(quillInstance: Quill): void {
     this.quill = quillInstance;
     if (this._disabled) {
       this.quill.enable(false);
@@ -72,7 +72,7 @@ export class QuillComponent implements ControlValueAccessor, OnDestroy {
     setTimeout(applyHtml, 200);
   }
   // chamado pelo (onContentChanged) do ngx-quill
-  onContentChanged(event: EditorChangeContent | any) {
+  onContentChanged(event: { source?: string; html?: string | null } | null): void {
     if (this.isSettingContents) return;
     if (!event) return;
     // só propaga mudanças feitas pelo usuário (evita loops com setContents('silent'))
@@ -84,12 +84,10 @@ export class QuillComponent implements ControlValueAccessor, OnDestroy {
     }
   }
   // marcar como "tocado"
-  onBlur() {
+  onBlur(): void {
     this.onTouched();
   }
-  onFocus() {
-    // opcional: lógica ao focar
-  }
+
   // ControlValueAccessor
   writeValue(value: string | null): void {
     this._value = value ?? '';
@@ -110,7 +108,7 @@ export class QuillComponent implements ControlValueAccessor, OnDestroy {
     }
   }
   // aplica HTML ao editor sem disparar eventos do Quill
-  private setEditorHtmlSilent(html: string) {
+  private setEditorHtmlSilent(html: string): void {
     if (!this.quill) return;
     this.isSettingContents = true;
     try {

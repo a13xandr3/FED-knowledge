@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -10,13 +10,16 @@ import { RenderKind } from 'src/app/types/Files';
 import { ShowFileData } from '../../interfaces/interface.file-ref';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
 @Component({
-    selector: 'app-show-file',
-    templateUrl: './show-file.component.html',
-    styleUrls: ['./show-file.component.scss'],
-    imports: []
+  selector: 'app-show-file',
+  templateUrl: './show-file.component.html',
+  styleUrl: './show-file.component.scss'
 })
 export class ShowFileComponent implements OnInit, OnDestroy {
   @ViewChild('docxHost', { static: false }) docxHost?: ElementRef<HTMLDivElement>;
+
+  readonly data = inject<ShowFileData | null>(MAT_DIALOG_DATA);
+  readonly dialogRef = inject(MatDialogRef<ShowFileComponent>);
+
   xlsxHtml: SafeHtml | null = null;
   docxHtml: SafeHtml | null = null;
   loading = true;
@@ -26,6 +29,11 @@ export class ShowFileComponent implements OnInit, OnDestroy {
   previewText = '';
   renderKind: RenderKind = 'other';
   itemId: string | number | undefined;
+
+  private readonly filesApiService = inject(FileApiService);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   get prettySize(): string {
     if (!this.originalFile) return '';
     const b = this.originalFile.size;
@@ -33,14 +41,8 @@ export class ShowFileComponent implements OnInit, OnDestroy {
     if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} kB`;
     return `${(b / (1024 * 1024)).toFixed(2)} MB`;
   }
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: ShowFileData | null,
-    public dialogRef: MatDialogRef<ShowFileComponent>,
-    private filesApiService: FileApiService,
-    private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef
-  ) {}
-  async ngOnInit() {
+
+  async ngOnInit(): Promise<void> {
     this.loading = true;
     try {
       this.itemId = this.data?.itemId;
@@ -119,12 +121,13 @@ export class ShowFileComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
     await new Promise(r => setTimeout(r, 0));
   }
-  download() {
+  download(): void {
     if (this.originalFile) {
       downloadFile(this.originalFile);
     }
   }
-  close() {
+
+  close(): void {
     this.dialogRef.close();
   }
   ngOnDestroy(): void {
@@ -170,7 +173,7 @@ export class ShowFileComponent implements OnInit, OnDestroy {
   }
   /** Fallback: converte DOCX -> HTML com mammoth (menor fidelidade, mais leve) */
   private async renderDocxWithMammoth(ab: ArrayBuffer): Promise<void> {
-    const mammoth: any = await import('mammoth/mammoth.browser');
+    const mammoth = await import('mammoth/mammoth.browser');
     const result = await mammoth.convertToHtml({ arrayBuffer: ab }, {
       styleMap: [
         "p[style-name='Title'] => h1:fresh",

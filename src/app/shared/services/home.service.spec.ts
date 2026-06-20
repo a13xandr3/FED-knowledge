@@ -13,11 +13,11 @@ describe('HomeService', () => {
   const mockLinkRequest: ILinkRequest = {
     id: 1,
     name: 'Teste',
-    uri: {},
+    uri: { uris: [] },
     categoria: 'Categoria A',
     descricao: 'Descricao do link',
     subCategoria: 'teste',
-    tag: { teste: 'teste' },
+    tag: { tags: ['teste'] },
     oldCategoria: 'Categoria A',
     dataEntradaManha: '',
     dataSaidaManha: '',

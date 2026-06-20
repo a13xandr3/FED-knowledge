@@ -1,9 +1,7 @@
 :host {
   display: block;
 }
-body{
-  max-height: 9dvh;
-}
+
 .app-footer {
   flex: 0 0 auto;
   background: #222;
@@ -11,17 +9,7 @@ body{
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   min-height: clamp(56px, 9dvh, 88px);
 }
-/*
-.app-footer {
-  flex: 0 0 auto;
-  background: #222;
-  color: #fff;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.75rem 1rem;
-  --footer-min-height: clamp(56px, 9dvh, 88px);
-  min-height: var(--footer-min-height);
-}
-*/
+
 .app-footer__inner {
   /* Layout responsivo sem breakpoints desnecessários */
   max-width: 1200px;

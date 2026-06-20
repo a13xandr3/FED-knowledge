@@ -1,1 +1,1 @@
-export type MatFormFieldAppearance = 'legacy' | 'standard' | 'fill' | 'outline';
+export type MatFormFieldAppearance = 'fill' | 'outline';

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { of, Subject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 
 import { HeaderComponent } from './header.component';
 import { HomeService } from 'src/app/shared/services/home.service';
@@ -13,19 +13,19 @@ import { FiltroSelecionado } from 'src/app/shared/components/app-filtro/app-filt
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  let refreshSubject: Subject<boolean>;
+  let refreshSubject: BehaviorSubject<boolean>;
   let homeService: { getCategorias: jest.Mock; getTags: jest.Mock };
-  let linkStateService: { refreshLink$: Subject<boolean>; triggerRefresh: jest.Mock };
+  let linkStateService: { refreshLink$: ReturnType<BehaviorSubject<boolean>['asObservable']>; triggerRefresh: jest.Mock };
   let dialog: { open: jest.Mock };
 
   beforeEach(async () => {
-    refreshSubject = new Subject<boolean>();
+    refreshSubject = new BehaviorSubject<boolean>(false);
     homeService = {
       getCategorias: jest.fn().mockReturnValue(of(['TI'])),
       getTags: jest.fn().mockReturnValue(of(['angular'])),
     };
     linkStateService = {
-      refreshLink$: refreshSubject,
+      refreshLink$: refreshSubject.asObservable(),
       triggerRefresh: jest.fn(),
     };
     dialog = {

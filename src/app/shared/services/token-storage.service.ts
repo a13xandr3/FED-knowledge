@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
 
+interface JwtPayload {
+  exp?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TokenStorageService {
 
@@ -20,7 +24,7 @@ export class TokenStorageService {
   }
 
   /** Decodifica o payload do JWT (sem validar assinatura). */
-  private decodePayload(token: string): any | null {
+  private decodePayload(token: string): JwtPayload | null {
     try {
       const parts = token.split('.');
       if (parts.length !== 3) return null;

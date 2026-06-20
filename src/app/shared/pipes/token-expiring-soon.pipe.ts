@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform, inject } from '@angular/core';
 
 @Pipe({ name: 'tokenExpiringSoon', standalone: true, pure: false })
 export class TokenExpiringSoonPipe implements PipeTransform, OnDestroy {
-  private timerId: any;
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly timerId: ReturnType<typeof setInterval>;
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor() {
     this.timerId = setInterval(() => this.cdr.markForCheck(), 1000);
   }
 

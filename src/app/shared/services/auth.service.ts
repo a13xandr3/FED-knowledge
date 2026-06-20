@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { TokenStorageService } from './token-storage.service';
@@ -13,16 +13,13 @@ export interface LoginResponse {
 }
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly tokenStorage = inject(TokenStorageService);
 
   // Responsabilidade única: conversar com o BFF (backend) para login e revalidação de token.
 
   /** Endpoint do BFF para autenticação */
   private readonly api = 'http://localhost:8080/api/auth';
-
-  constructor(
-    private http: HttpClient,
-    private tokenStorage: TokenStorageService
-  ) {}
 
   /**
    * Login: envia credenciais em plain-text para o BFF.

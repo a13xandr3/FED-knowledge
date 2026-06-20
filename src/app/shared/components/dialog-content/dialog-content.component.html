@@ -6,7 +6,7 @@
           <div class="col-12 linha">
             <div mat-dialog-title class="dialog-title knowledge-base">
               {{ data.status === 'inclusao' ? 'Inclusão' : 'Alteração' }}
-              {{ data.status !== 'inclusao' ? ' - ID: ' + this.fr.get('id')?.value : '' }}
+              {{ data.status !== 'inclusao' ? ' - ID: ' + dialogTitleId : '' }}
             </div>
             <span
               class="token-timer"
@@ -21,8 +21,7 @@
             <!-- Categoria com autocomplete editável -->
             <mat-form-field
               appearance="outline"
-                [class]="this.fr.get('categoria')?.value == 'TI' || 
-                         this.fr.get('categoria')?.value == 'Ti' ? 'w-50' : 'w-100'" 
+                [class]="isTiCategory ? 'w-50' : 'w-100'" 
               >
               <mat-label>Categoria</mat-label>
               <input
@@ -33,14 +32,10 @@
                 title="categoria"
                 >
             </mat-form-field>
-            @if (this.fr.get('categoria')?.value == 'TI'
-              || this.fr.get('categoria')?.value == 'Ti'
-              || this.fr.get('categoria')?.value == 'ti') {
+            @if (isTiCategory) {
               <mat-form-field
                 appearance="outline"
-                [class]="this.fr.get('categoria')?.value == 'TI' 
-                      || this.fr.get('categoria')?.value == 'Ti' 
-                      || this.fr.get('categoria')?.value == 'ti' ? 'w-50' : 'w-100'"
+                [class]="isTiCategory ? 'w-50' : 'w-100'"
                 >
                 <mat-label>SubCategoria</mat-label>
                 <input
@@ -77,7 +72,7 @@
         <div class="row">
           <div class="col-12"> {{ totalHorasDia }}</div>
         </div>
-        @if (this.fr.get('categoria')?.value.toLowerCase() == 'timesheet' ) {
+        @if (isTimesheet) {
           <div
             class="row"
             >

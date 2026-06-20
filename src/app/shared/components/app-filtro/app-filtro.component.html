@@ -3,10 +3,9 @@
   <select
     class="form-select form-select-sm"
     aria-label="Choose one category"
-    [formControl]="categoryCtrl"
-    (change)="onChangeCategory(categoryCtrl.value?.value)">
+    [formControl]="categoryCtrl">
     <option [ngValue]="null" disabled>Choose one category</option>
-    @for (opt of statusOptionsCat; track opt) {
+    @for (opt of statusOptionsCat(); track opt.value) {
       <option [ngValue]="opt">
         {{ opt.label }}
       </option>
@@ -19,10 +18,9 @@
   <select
     class="form-select form-select-sm"
     aria-label="Choose one tag"
-    [formControl]="tagCtrl"
-    (change)="onChangeTag(tagCtrl.value?.value)">
+    [formControl]="tagCtrl">
     <option [ngValue]="null" disabled>Choose one tag</option>
-    @for (opt of statusOptionsTag; track opt) {
+    @for (opt of statusOptionsTag(); track opt.value) {
       <option [ngValue]="opt">
         {{ opt.label }}
       </option>

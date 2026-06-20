@@ -1,12 +1,26 @@
+import type { IFileRef } from '../interfaces/interface.file-ref';
+
+export interface LinkUriPayload {
+  uris: string[];
+}
+
+export interface LinkTagPayload {
+  tags: string[];
+}
+
+export interface LinkFilePayload {
+  fileRefs: IFileRef[];
+}
+
 export interface ILinkRequest {
     id: number;
     name: string;
-    uri: any;
+    uri: LinkUriPayload;
     categoria: string;
     subCategoria: string;
     descricao: string;
-    tag: any;
-    fileID?: any;
+    tag: LinkTagPayload;
+    fileID?: LinkFilePayload;
     horas: unknown;
     oldCategoria?: string;
     showSite?: boolean
@@ -72,5 +86,5 @@ export interface ICategoria {
 }
 export interface ITag {
   id: number;
-  tag: any;
+  tag: string;
 }

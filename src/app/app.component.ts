@@ -1,44 +1,36 @@
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
-import { filter, Subject, takeUntil } from 'rxjs';
+import { filter } from 'rxjs';
 import { FooterComponent } from 'src/app/shared/components/footer/footer.component';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    imports: [
-        FooterComponent,
-        RouterModule
-    ]
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    FooterComponent,
+    RouterModule
+  ]
 })
-export class AppComponent implements OnInit, OnDestroy  {
-  
-  private destroy$ = new Subject<void>();
-  
-  currentRoute = '';
+export class AppComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+
+  readonly currentRoute = signal('');
 
   title = 'fed-knowledge';
-  
-  constructor(
-    private readonly router: Router
-  ) {}
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 
   ngOnInit(): void {
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        takeUntil(this.destroy$)
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((event) => {
-        this.currentRoute = event.urlAfterRedirects;
+        this.currentRoute.set(event.urlAfterRedirects);
       });
   }
-
 }

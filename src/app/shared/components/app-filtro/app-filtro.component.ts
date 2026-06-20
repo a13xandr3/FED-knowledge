@@ -1,8 +1,17 @@
-
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  WritableSignal,
+  inject,
+  output,
+  signal
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, skip } from 'rxjs';
 
 import { SelectOption } from 'src/app/shared/models/select-option.model';
 import { HomeService } from 'src/app/shared/services/home.service';
@@ -17,94 +26,70 @@ export interface FiltroSelecionado {
 }
 
 @Component({
-    selector: 'app-filtro',
-    templateUrl: './app-filtro.component.html',
-    styleUrls: ['./app-filtro.component.scss'],
-    imports: [
-        ReactiveFormsModule
-    ]
+  selector: 'app-filtro',
+  templateUrl: './app-filtro.component.html',
+  styleUrl: './app-filtro.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ReactiveFormsModule]
 })
-export class AppFiltroComponent implements OnInit, OnDestroy {
-  @Output() filtroSelecionado = new EventEmitter<FiltroSelecionado>();
+export class AppFiltroComponent implements OnInit {
+  readonly filtroSelecionado = output<FiltroSelecionado>();
 
-  statusOptionsCat: SelectOption<string>[] = [];
-  statusOptionsTag: SelectOption<string>[] = [];
+  readonly statusOptionsCat = signal<readonly SelectOption<string>[]>([]);
+  readonly statusOptionsTag = signal<readonly SelectOption<string>[]>([]);
 
-  categoryCtrl = new FormControl<SelectOption<string> | null>(null);
-  tagCtrl = new FormControl<SelectOption<string> | null>(null);
+  readonly categoryCtrl = new FormControl<SelectOption<string> | null>(null);
+  readonly tagCtrl = new FormControl<SelectOption<string> | null>(null);
 
-  private destroy$ = new Subject<void>();
-
-  constructor(
-    private homeService: HomeService,
-    private linkStateService: LinkStateService,
-    private snackService: SnackService
-  ) {}
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly homeService = inject(HomeService);
+  private readonly linkStateService = inject(LinkStateService);
+  private readonly snackService = inject(SnackService);
 
   ngOnInit(): void {
-    this.getCategories();
-    this.getTags();
+    this.bindFilterControl(this.categoryCtrl, 'categoria');
+    this.bindFilterControl(this.tagCtrl, 'tag');
+    this.loadFilters();
 
     this.linkStateService.refreshLink$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.getCategories();
-        this.getTags();
+      .pipe(skip(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadFilters());
+  }
+
+  private emitFilter(tipo: FiltroTipo, value?: string): void {
+    if (!value) {
+      return;
+    }
+
+    this.filtroSelecionado.emit({ tipo, valor: value });
+  }
+
+  private bindFilterControl(control: FormControl<SelectOption<string> | null>, tipo: FiltroTipo): void {
+    control.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((option) => this.emitFilter(tipo, option?.value));
+  }
+
+  private loadFilters(): void {
+    this.loadOptions(this.homeService.getCategorias(), this.statusOptionsCat);
+    this.loadOptions(this.homeService.getTags(), this.statusOptionsTag);
+  }
+
+  private loadOptions(
+    source$: Observable<unknown>,
+    target: WritableSignal<readonly SelectOption<string>[]>
+  ): void {
+    source$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => target.set(this.toOptions(response)),
+        error: (error: unknown) => this.showError(error)
       });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  onChangeCategory(value?: string): void {
-    if (!value) {
-      return;
-    }
-
-    this.filtroSelecionado.emit({ tipo: 'categoria', valor: value });
-  }
-
-  onChangeTag(value?: string): void {
-    if (!value) {
-      return;
-    }
-
-    this.filtroSelecionado.emit({ tipo: 'tag', valor: value });
-  }
-
-  getTags(): void {
-    this.homeService.getTags().subscribe({
-      next: (response: unknown) => {
-        const resp = this.toStringArray(response);
-
-        resp.unshift('todos');
-        this.statusOptionsTag = resp.map((tag) => ({
-          value: tag,
-          label: tag
-        }));
-      },
-      error: (err: HttpErrorResponse) => {
-        this.snackService.mostrarMensagem(err.message, 'Fechar');
-      }
-    });
-  }
-
-  getCategories(): void {
-    this.homeService.getCategorias().subscribe({
-      next: (response: unknown) => {
-        const resp = this.toStringArray(response);
-
-        resp.unshift('todos');
-        this.statusOptionsCat = resp.map((cat) => ({
-          value: cat,
-          label: cat
-        }));
-      },
-      error: (err: HttpErrorResponse) => {
-        this.snackService.mostrarMensagem(err.message, 'Fechar');
-      }
+  private toOptions(response: unknown): readonly SelectOption<string>[] {
+    return ['todos', ...this.toStringArray(response)].map((value) => {
+      return { value, label: value };
     });
   }
 
@@ -112,5 +97,13 @@ export class AppFiltroComponent implements OnInit, OnDestroy {
     return Array.isArray(response)
       ? response.filter((item): item is string => typeof item === 'string')
       : [];
+  }
+
+  private showError(error: unknown): void {
+    const message = error instanceof HttpErrorResponse || error instanceof Error
+      ? error.message
+      : 'Não foi possível carregar os filtros.';
+
+    this.snackService.mostrarMensagem(message, 'Fechar');
   }
 }

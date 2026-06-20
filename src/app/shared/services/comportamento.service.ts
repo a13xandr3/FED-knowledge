@@ -11,8 +11,8 @@ export interface Comportamento {
   providedIn: 'root'
 })
 export class ComportamentoService {
-  private comportamentosSubject = new BehaviorSubject<Comportamento[]>([]);
-  comportamentos$ = this.comportamentosSubject.asObservable();
+  private readonly comportamentosSubject = new BehaviorSubject<Comportamento[]>([]);
+  readonly comportamentos$ = this.comportamentosSubject.asObservable();
 
   adicionar(comportamento: Comportamento): void {
     const atual = this.comportamentosSubject.getValue();

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, Input, OnInit, inject, output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { gzip as pakoGzip, ungzip as pakoUngzip } from 'pako';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import { FileApiService } from 'src/app/shared/services/file-api.service';
 import { FilePreviewBusService } from 'src/app/shared/services/file-preview.bus.service';
@@ -15,15 +16,15 @@ import { ShowFileComponent } from 'src/app/shared/components/show-file/show-file
 import { PreviewItem, FilesPayload, ZlibLevel } from 'src/app/types/Files';
 import { IFileRef } from 'src/app/shared/interfaces/interface.file-ref';
 @Component({
-    selector: 'app-input-file',
-    templateUrl: './input-file.component.html',
-    styleUrls: ['./input-file.component.scss'],
-    imports: [
-        CommonModule,
-        MatProgressBarModule
-    ]
+  selector: 'app-input-file',
+  templateUrl: './input-file.component.html',
+  styleUrl: './input-file.component.scss',
+  imports: [
+    CommonModule,
+    MatProgressBarModule
+  ]
 })
-export class InputFileComponent implements OnInit, OnDestroy {
+export class InputFileComponent implements OnInit {
   /** MIME(s) aceitos. Ex.: 'image/*' | 'application/pdf' */
   @Input() accept = '*/*';
   /** Limite opcional (bytes). Ex.: 20 * 1024 * 1024 = 20MB */
@@ -36,14 +37,12 @@ export class InputFileComponent implements OnInit, OnDestroy {
   @Input() gzipLevel: ZlibLevel = 6;
   @Input() allowMultiple = true;
   @Input() previews: PreviewItem[] = [];
-  @Output() removedAt = new EventEmitter<number>();
-  @Output() processed = new EventEmitter<ProcessedFile>();
-  @Output() error = new EventEmitter<unknown>();
-  @Output() cleared = new EventEmitter<void>();
-  @Output() removedRef = new EventEmitter<{ id?: number; index: number; filename: string }>();
+  readonly removedAt = output<number>();
+  readonly processed = output<ProcessedFile>();
+  readonly error = output<unknown>();
+  readonly cleared = output<void>();
+  readonly removedRef = output<{ id?: number; index: number; filename: string }>();
 
-  // dentro da classe:
-  private previewBusSub?: Subscription;
   // --------- estado UI ---------
   dragActive = false;
   isProcessing = false;
@@ -54,34 +53,37 @@ export class InputFileComponent implements OnInit, OnDestroy {
   gzipSizeBytes?: number;          // opcional, coerente com a interface
   base64Gzip: string | null = null;
   hashSha256Hex: string | null = null;
-  constructor(
-    private filesSvc: FileApiService, 
-    private previewBus: FilePreviewBusService,
-    private dialog: MatDialog
-  ) {}
+
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly filesSvc = inject(FileApiService);
+  private readonly previewBus = inject(FilePreviewBusService);
+  private readonly dialog = inject(MatDialog);
+
   ngOnInit(): void {
     // escuta requisições externas de carregar previews a partir de fileId(s):
-    this.previewBusSub = this.previewBus.loadPreviews$
+    this.previewBus.loadPreviews$
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ ids, cleanBefore }) => {
         this.addPreviewsFromFileIds(ids, cleanBefore);
       });      
   }
-  ngOnDestroy(): void {
-    this.previewBusSub?.unsubscribe();
-  }
+
   // ---------------- Drag & Drop ----------------
-  onDragOver(e: DragEvent) {
+  onDragOver(e: DragEvent): void {
     e.preventDefault(); e.stopPropagation();
   }
-  onDragEnter(e: DragEvent) {
+
+  onDragEnter(e: DragEvent): void {
     e.preventDefault(); e.stopPropagation();
     this.dragActive = true;
   }
-  onDragLeave(e: DragEvent) {
+
+  onDragLeave(e: DragEvent): void {
     e.preventDefault(); e.stopPropagation();
     this.dragActive = false;
   }
-  onDrop(e: DragEvent) {
+
+  onDrop(e: DragEvent): void {
     e.preventDefault(); e.stopPropagation();
     this.dragActive = false;
     const fl = e.dataTransfer?.files;
@@ -89,8 +91,9 @@ export class InputFileComponent implements OnInit, OnDestroy {
       for (const f of Array.from(fl)) this.processFile(f);
     }
   }
+
   // ---------------- Input padrão ----------------
-  onFileInputChange(e: Event) {
+  onFileInputChange(e: Event): void {
     const input = e.target as HTMLInputElement;
     const files = input.files;
     if (files && files.length) {
@@ -99,12 +102,14 @@ export class InputFileComponent implements OnInit, OnDestroy {
       input.value = '';
     }
   }
+
   isImage(p: PreviewItem): boolean {
     // True para qualquer "image/*", ignorando caixa/letras
     return /^image\//i.test(p?.mimeType ?? '');
   }
+
   // ---------------- Pipeline principal ----------------
-  private resetState() {
+  private resetState(): void {
     this.isProcessing = false;
     this.progress = 0;
     this.fileName = '';
@@ -126,7 +131,7 @@ export class InputFileComponent implements OnInit, OnDestroy {
     }
     try {
       const snapshot = await firstValueFrom(this.filesSvc.getSnapshot(idNum, true));
-      const dialogRef = this.dialog.open(ShowFileComponent, {
+      this.dialog.open(ShowFileComponent, {
           autoFocus: true,
           width: '90vw',
           maxWidth: '98vw',
@@ -136,17 +141,13 @@ export class InputFileComponent implements OnInit, OnDestroy {
             itemId: idNum 
           },
         });
-        dialogRef.afterClosed().subscribe((result) => {
-          if (result?.categoria) {
-            //this.linkStateService.triggerRefresh();
-          }
-        });
     } catch (err) {
       console.error('Falha ao carregar snapshot para preview:', err);
       this.error.emit(err);
     }
   }
-  async processFile(file: File) {
+
+  async processFile(file: File): Promise<void> {
     try {
       this.resetState();
       this.isProcessing = true;
@@ -230,7 +231,8 @@ export class InputFileComponent implements OnInit, OnDestroy {
       this.isProcessing = false;
     }
   }
-  clear() {
+
+  clear(): void {
     // revoga todos os object URLs para evitar vazamento
     for (const p of this.previews) this.revokeObjectUrl(p.url);
     this.previews = [];
@@ -266,7 +268,7 @@ export class InputFileComponent implements OnInit, OnDestroy {
     return gz;
   }
   // ---------------- Utilitários ----------------
-  private setProgress(p: number) {
+  private setProgress(p: number): void {
     this.progress = Math.max(0, Math.min(100, p | 0));
   }
   private readFileAsArrayBuffer(file: File, onProgress?: (ratio: number) => void): Promise<ArrayBuffer> {
@@ -371,7 +373,7 @@ export class InputFileComponent implements OnInit, OnDestroy {
     return URL.createObjectURL(file);
   }
   /** Revoga o Object URL quando não precisar mais (evita vazamento de memória) */
-  private revokeObjectUrl(url?: string | null) {
+  private revokeObjectUrl(url?: string | null): void {
     if (url) URL.revokeObjectURL(url);
   }
   removePreviewAt(

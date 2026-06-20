@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of, Subject, throwError } from 'rxjs';
+import { BehaviorSubject, of, throwError } from 'rxjs';
 
 import { AppFiltroComponent } from './app-filtro.component';
 import { HomeService } from 'src/app/shared/services/home.service';
@@ -9,12 +9,12 @@ import { SnackService } from 'src/app/shared/services/snack.service';
 describe('AppFiltroComponent', () => {
   let component: AppFiltroComponent;
   let fixture: ComponentFixture<AppFiltroComponent>;
-  let refreshSubject: Subject<boolean>;
+  let refreshSubject: BehaviorSubject<boolean>;
   let homeService: { getCategorias: jest.Mock; getTags: jest.Mock };
   let snackService: { mostrarMensagem: jest.Mock };
 
   beforeEach(async () => {
-    refreshSubject = new Subject<boolean>();
+    refreshSubject = new BehaviorSubject<boolean>(false);
     homeService = {
       getCategorias: jest.fn().mockReturnValue(of(['TI'])),
       getTags: jest.fn().mockReturnValue(of(['angular'])),
@@ -27,7 +27,7 @@ describe('AppFiltroComponent', () => {
       imports: [AppFiltroComponent],
       providers: [
         { provide: HomeService, useValue: homeService },
-        { provide: LinkStateService, useValue: { refreshLink$: refreshSubject } },
+        { provide: LinkStateService, useValue: { refreshLink$: refreshSubject.asObservable() } },
         { provide: SnackService, useValue: snackService },
       ],
     }).compileComponents();
@@ -45,15 +45,16 @@ describe('AppFiltroComponent', () => {
 
     expect(homeService.getCategorias).toHaveBeenCalledTimes(1);
     expect(homeService.getTags).toHaveBeenCalledTimes(1);
-    expect(component.statusOptionsCat.map(opt => opt.value)).toEqual(['todos', 'TI']);
-    expect(component.statusOptionsTag.map(opt => opt.value)).toEqual(['todos', 'angular']);
+    expect(component.statusOptionsCat().map(opt => opt.value)).toEqual(['todos', 'TI']);
+    expect(component.statusOptionsTag().map(opt => opt.value)).toEqual(['todos', 'angular']);
   });
 
   it('deve emitir o filtro selecionado', () => {
+    fixture.detectChanges();
     const emitSpy = jest.spyOn(component.filtroSelecionado, 'emit');
 
-    component.onChangeCategory('TI');
-    component.onChangeTag('angular');
+    component.categoryCtrl.setValue({ value: 'TI', label: 'TI' });
+    component.tagCtrl.setValue({ value: 'angular', label: 'angular' });
 
     expect(emitSpy).toHaveBeenCalledWith({ tipo: 'categoria', valor: 'TI' });
     expect(emitSpy).toHaveBeenCalledWith({ tipo: 'tag', valor: 'angular' });

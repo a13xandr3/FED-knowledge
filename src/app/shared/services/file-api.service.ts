@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { firstValueFrom as rxjsFirstValueFrom } from 'rxjs';
@@ -13,10 +13,9 @@ import { PreviewItem, FilesPayload } from 'src/app/types/Files';
   providedIn: 'root'
 })
 export class FileApiService {
-  private url = 'http://localhost:8080';
+  private readonly http = inject(HttpClient);
+  private readonly url = 'http://localhost:8080';
   private readonly base = '/api/files';
-
-  constructor(private http: HttpClient) {}
 
   // 1) helpers mínimos (dentro da classe)
   private guessImageMimeByExt(filename?: string | null): string | null {
@@ -43,6 +42,16 @@ export class FileApiService {
     const t = localStorage.getItem('kb_token') || localStorage.getItem('token');
     return t ? new HttpHeaders({ 'Authorization': `Bearer ${t}` }) : new HttpHeaders();
   }
+
+  private coerceFileId(value: unknown): unknown {
+    if (typeof value === 'object' && value !== null) {
+      const record = value as Record<string, unknown>;
+      return record['id'] ?? record['fileId'] ?? record['file_id'] ?? record['fileID'];
+    }
+
+    return value;
+  }
+
   upload(form: FormData): Observable<FileSavedResponse[]> {
     return this.http.post<FileSavedResponse[]>(`${this.url}/api/files`, form, {
       headers: this.authHeaders()
@@ -151,9 +160,9 @@ export class FileApiService {
       { responseType: 'blob', headers: this.authHeaders() });
   }
   // 2) ajuste no método (troque apenas o bloco do jobs)
-  public async buildPreviewsFromFileIds(ids: any[]) {
+  public async buildPreviewsFromFileIds(ids: readonly unknown[]): Promise<PreviewItem[]> {
     const numericIds = (ids || [])
-      .map(x => typeof x === 'object' && x !== null ? (x.id ?? x.fileId ?? x.file_id ?? x.fileID) : x)
+      .map(x => this.coerceFileId(x))
       .map(Number)
       .filter(Number.isFinite);
     if (!numericIds.length) return [];

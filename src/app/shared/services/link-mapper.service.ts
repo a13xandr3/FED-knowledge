@@ -7,23 +7,24 @@ import { IFileRef, IFilesPayload } from '../interfaces/interface.file-ref';
   providedIn: 'root'
 })
 export class LinkMapperService {
-  constructor() { }
-
-  normalizeTags(data: any): string[] {
+  normalizeTags(data: { tag?: Array<{ tags?: unknown[] }> } | null | undefined): string[] {
     return Array.isArray(data?.tag?.[0]?.tags)
       ? data.tag[0].tags.map((t: any) =>
           typeof t === 'string' ? t : (t.value ?? t.tag ?? String(t)))
       : [];
   }
-  normalizeUris(data: any): string[] {
+
+  normalizeUris(data: { uri?: Array<{ uris?: unknown[] }> } | null | undefined): string[] {
     return Array.isArray(data?.uri?.[0]?.uris)
       ? data.uri[0].uris.map((u: any) =>
           typeof u === 'string' ? u : (u.value ?? u.uri ?? String(u)))
       : [];
   }
-  normalizeFileID(data: any): string[] {
-    return Array.isArray(data?.fileId?.[0]?.uris)
-      ? data.fileID[0].fileID.map((u: any) =>
+
+  normalizeFileID(data: { fileID?: Array<{ fileID?: unknown[] }> } | null | undefined): string[] {
+    const fileIds = data?.fileID?.[0]?.fileID;
+    return Array.isArray(fileIds)
+      ? fileIds.map((u: any) =>
           typeof u === 'string' ? u : (u.value ?? u.fileID ?? String(u)))
       : [];
   }

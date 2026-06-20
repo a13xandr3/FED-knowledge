@@ -10,8 +10,6 @@ export class CryptoService {
   private readonly salt = new TextEncoder().encode('angular-knowledge-salt'); // sal fixo (ou dinâmico)
   private readonly ivLength = 12; // recomendação AES-GCM: 96 bits = 12 bytes
 
-  constructor() {}
-
   /** ===================================
    * GERAÇÃO E DERIVAÇÃO DE CHAVE AES-256
    * ==================================== */

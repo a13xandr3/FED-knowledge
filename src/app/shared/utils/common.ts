@@ -25,8 +25,9 @@ export function parseNumberSafe(v: unknown, fallback = 0): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-export function handleHttpError(error: any): never {
+export function handleHttpError(error: unknown): never {
   // Centraliza tratamento de erro HTTP
-  const message = error?.error?.message ?? error?.message ?? 'Erro inesperado';
+  const err = error as { error?: { message?: string }; message?: string };
+  const message = err.error?.message ?? err.message ?? 'Erro inesperado';
   throw new Error(message);
 }
