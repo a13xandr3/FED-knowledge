@@ -20,19 +20,19 @@
 ::ng-deep *::before,
 ::ng-deep *::after {box-sizing: border-box;margin: 0;padding: 0;}
 ::ng-deep * {
-    --mdc-typography-body1-font-family: "Poppins";
-    --mdc-typography-body2-font-family: "Poppins";
-    --mdc-typography-button-font-family: "Poppins";
-    --mdc-typography-caption-font-family: "Poppins";
-    --mdc-typography-headline1-font-family: "Poppins";
-    --mdc-typography-headline2-font-family: "Poppins";
-    --mdc-typography-headline3-font-family: "Poppins";
-    --mdc-typography-headline4-font-family: "Poppins";
-    --mdc-typography-headline5-font-family: "Poppins";
-    --mdc-typography-headline6-font-family: "Poppins";
-    --mdc-typography-overline-font-family: "Poppins";
-    --mdc-typography-subtitle1-font-family: "Poppins";
-    --mdc-typography-subtitle2-font-family: "Poppins";
+    --mat-typography-body1-font-family: "Poppins";
+    --mat-typography-body2-font-family: "Poppins";
+    --mat-typography-button-font-family: "Poppins";
+    --mat-typography-caption-font-family: "Poppins";
+    --mat-typography-headline1-font-family: "Poppins";
+    --mat-typography-headline2-font-family: "Poppins";
+    --mat-typography-headline3-font-family: "Poppins";
+    --mat-typography-headline4-font-family: "Poppins";
+    --mat-typography-headline5-font-family: "Poppins";
+    --mat-typography-headline6-font-family: "Poppins";
+    --mat-typography-overline-font-family: "Poppins";
+    --mat-typography-subtitle1-font-family: "Poppins";
+    --mat-typography-subtitle2-font-family: "Poppins";
     font-size: 1rem;
     background-color: lawngreen;
 }

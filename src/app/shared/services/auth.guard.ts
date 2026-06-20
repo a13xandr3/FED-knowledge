@@ -1,20 +1,15 @@
-import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { TokenStorageService } from './token-storage.service';
 
-@Injectable({ providedIn: 'root' })
-export class AuthGuard {
+export const AuthGuard: CanActivateFn = () => {
+  const tokenStorage = inject(TokenStorageService);
+  const router = inject(Router);
 
-  constructor(
-    private tokenStorage: TokenStorageService, 
-    private router: Router
-  ) {}
-
-  canActivate(): boolean {
-    if (this.tokenStorage.isTokenExpired()) {
-      this.router.navigate(['/login']);
-      return false;
-    }
-    return true;
+  if (tokenStorage.isTokenExpired()) {
+    router.navigate(['/login']);
+    return false;
   }
-}
+
+  return true;
+};

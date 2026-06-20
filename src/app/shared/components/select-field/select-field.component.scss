@@ -64,14 +64,14 @@
     .mat-mdc-select {
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
-        font-family: var(--mdc-typography-body1-font-family, var(--mdc-typography-font-family));
-        font-size: var(--mdc-typography-body1-font-size, 0.8rem);
-        line-height: var(--mdc-typography-body1-line-height, 0.6rem);
-        font-weight: var(--mdc-typography-body1-font-weight, 400);
-        letter-spacing: var(--mdc-typography-body1-letter-spacing, 0.03125em);
-        -webkit-text-decoration: var(--mdc-typography-body1-text-decoration, inherit);
-        text-decoration: var(--mdc-typography-body1-text-decoration, inherit);
-        text-transform: var(--mdc-typography-body1-text-transform, none);
+        font-family: var(--mat-typography-body1-font-family, var(--mat-typography-font-family));
+        font-size: var(--mat-typography-body1-font-size, 0.8rem);
+        line-height: var(--mat-typography-body1-line-height, 0.6rem);
+        font-weight: var(--mat-typography-body1-font-weight, 400);
+        letter-spacing: var(--mat-typography-body1-letter-spacing, 0.03125em);
+        -webkit-text-decoration: var(--mat-typography-body1-text-decoration, inherit);
+        text-decoration: var(--mat-typography-body1-text-decoration, inherit);
+        text-transform: var(--mat-typography-body1-text-transform, none);
     }
     .mat-mdc-select-value {
         width: 100% !important;
@@ -88,14 +88,14 @@
     .mat-mdc-form-field-subscript-wrapper, .mat-mdc-form-field-bottom-align::before {
         -moz-osx-font-smoothing: grayscale;
         -webkit-font-smoothing: antialiased;
-        font-family: var(--mdc-typography-caption-font-family, var(--mdc-typography-font-family));
-        font-size: var(--mdc-typography-caption-font-size, 0px);
-        line-height: var(--mdc-typography-caption-line-height, 0px);
-        font-weight: var(--mdc-typography-caption-font-weight, 0);
-        letter-spacing: var(--mdc-typography-caption-letter-spacing, 0.0333333333em);
-        -webkit-text-decoration: var(--mdc-typography-caption-text-decoration, inherit);
-        text-decoration: var(--mdc-typography-caption-text-decoration, inherit);
-        text-transform: var(--mdc-typography-caption-text-transform, none);
+        font-family: var(--mat-typography-caption-font-family, var(--mat-typography-font-family));
+        font-size: var(--mat-typography-caption-font-size, 0px);
+        line-height: var(--mat-typography-caption-line-height, 0px);
+        font-weight: var(--mat-typography-caption-font-weight, 0);
+        letter-spacing: var(--mat-typography-caption-letter-spacing, 0.0333333333em);
+        -webkit-text-decoration: var(--mat-typography-caption-text-decoration, inherit);
+        text-decoration: var(--mat-typography-caption-text-decoration, inherit);
+        text-transform: var(--mat-typography-caption-text-transform, none);
     }
     .mat-mdc-form-field-focus-overlay {
         background-color: transparent;

@@ -1,15 +1,11 @@
 /** @type {import('jest').Config} */
+const { createCjsPreset } = require('jest-preset-angular/presets');
+
 module.exports = {
-  preset: 'jest-preset-angular',
+  ...createCjsPreset(),
   setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
   testEnvironment: 'jsdom',
   testMatch: ['<rootDir>/src/**/*.spec.ts'],
-  testPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/dist/',
-    '<rootDir>/coverage/',
-    '<rootDir>/src/test.ts',
-  ],
   transformIgnorePatterns: [
     'node_modules/(?!(.*\\.mjs$|@angular/common/locales/.*\\.js$|quill|parchment|quill-delta|lodash-es|eventemitter3))',
   ],
