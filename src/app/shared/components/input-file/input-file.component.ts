@@ -117,7 +117,7 @@ export class InputFileComponent implements OnInit, OnDestroy {
   }
   /**
    * Manipula o clique em uma miniatura. Se houver um ID válido, obtém o snapshot
-   * completo via serviço, grava em sessionStorage e navega para /show-file.
+   * completo via serviço e abre o preview em modal.
    * Arquivos sem ID (id = 0) são ignorados.
    */
   async onPreviewClick(p: PreviewItem): Promise<void> {
