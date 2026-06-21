@@ -1,66 +1,201 @@
+$bg: linear-gradient(135deg, #232526 0%, #414345 100%);
+$card: rgba(255, 255, 255, 0.1);
+$border: rgba(255, 255, 255, 0.25);
+$text: #eaeaea;
+$accent: #00bcd4;
+$shadow: rgba(0, 0, 0, 0.6);
+
 :host {
   display: block;
-  min-height: 91%;
   height: 91%;
+  min-height: 91%;
   max-height: 100%;
-  
-  --row-h: 3rem;         /* altura padrão da linha */
-  --cell-vpad: 2px;      /* padding vertical total (top+bottom) */
+  --row-h: 3rem;
+  --cell-vpad: 2px;
 }
+
 :host,
 :host * {
-  font-family: "Poppins";
-  font-size: 0.67rem;
+  font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.72rem;
 }
-:host ::ng-deep .mat-mdc-table .mdc-data-table__header-row {
-    height: 1.5rem !important;
-}
-/* 1) Padroniza a altura das linhas */
-:host ::ng-deep tr.mat-mdc-row {
-  height: var(--row-h) !important;
-  overflow: auto;
-}
-/* 2) Evita que outras colunas aumentem a linha */
-:host ::ng-deep td.mat-mdc-cell {
-  vertical-align: middle;
-  padding-top: calc(var(--cell-vpad) / 2);
-  padding-bottom: calc(var(--cell-vpad) / 2);
-  overflow: auto;
-}
-/* 3) Scroll interno apenas na célula de tags */
-:host ::ng-deep .tag-cell {
-  min-height: calc(var(--row-h) - var(--cell-vpad));
-  max-height: calc(var(--row-h) - var(--cell-vpad));
-  height: calc(var(--row-h) - var(--cell-vpad));
-  overflow: auto;
-}
-/* Chips quebram em múltiplas linhas dentro do scroll */
-:host ::ng-deep mat-chip-listbox.responsive-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 0.5rem;
-  align-content: flex-start;
-  height: 5dvh !important;
-  overflow: auto;
-}
-:host ::ng-deep .mat-mdc-standard-chip {
-  padding: .3rem .3rem !important;  
-}
-:host ::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__action--primary {
-    padding: 0 !important;
-    margin: 0 !important;
-}
+
 .page-shell {
-  max-height: 91dvh;
+  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  max-height: 91dvh;
+  overflow: hidden;
+  color: $text;
+  background: $bg;
 }
+
+.page-shell::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    radial-gradient(circle at 18% 20%, #4a148c33, transparent 36%),
+    radial-gradient(circle at 82% 70%, #00bcd433, transparent 40%);
+  filter: blur(76px);
+}
+
+.page-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
 .page-main {
-  flex: 1 1 auto;  /* ocupa o espaço restante */
-  min-height: 0;   /* CRÍTICO: permite scroll interno sem “estourar” */
-  overflow: auto;  /* scroll fica apenas no conteúdo */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
-:host ::ng-deep .table-responsive {
-    height: 67dvh !important;
+
+.table-responsive {
+  height: 67dvh !important;
+  overflow: auto;
+  scrollbar-width: none;
+  border: 1px solid $border;
+  border-radius: 1rem;
+  background: $card;
+  box-shadow: 0 8px 25px $shadow;
+}
+
+.table-responsive::-webkit-scrollbar {
+  display: none;
+}
+
+:host ::ng-deep {
+  .mat-mdc-table {
+    color: $text;
+    background: transparent;
+  }
+
+  .mat-mdc-table .mdc-data-table__header-row {
+    height: 2rem !important;
+    color: $accent;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  tr.mat-mdc-row {
+    height: var(--row-h) !important;
+    color: $text;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  tr.mat-mdc-row:hover {
+    background: rgba(0, 188, 212, 0.12);
+  }
+
+  th.mat-mdc-header-cell,
+  td.mat-mdc-cell {
+    vertical-align: middle;
+    color: inherit;
+    border-bottom-color: $border;
+    padding-top: calc(var(--cell-vpad) / 2);
+    padding-bottom: calc(var(--cell-vpad) / 2);
+  }
+
+  .tag-cell {
+    min-height: calc(var(--row-h) - var(--cell-vpad));
+    max-height: calc(var(--row-h) - var(--cell-vpad));
+    height: calc(var(--row-h) - var(--cell-vpad));
+    overflow: auto;
+    scrollbar-width: none;
+  }
+
+  mat-chip-listbox.responsive-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    align-content: flex-start;
+    height: 5dvh !important;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .tag-cell::-webkit-scrollbar,
+  mat-chip-listbox.responsive-chips::-webkit-scrollbar,
+  mat-chip-listbox.responsive-chips *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  mat-chip-listbox.responsive-chips * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .mat-mdc-standard-chip {
+    --mdc-chip-elevated-container-color: rgba(255, 255, 255, 0.12);
+    --mdc-chip-label-text-color: #eaeaea;
+    padding: 0.3rem !important;
+    border: 1px solid $border;
+  }
+
+  .mat-mdc-standard-chip .mdc-evolution-chip__action--primary {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+}
+
+.paginator-shell {
+  display: flex;
+}
+
+.kb-paginator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border: 1px solid $border;
+  border-radius: 0.875rem;
+  background: $card;
+}
+
+.kb-page-btn {
+  min-width: 2rem;
+  height: 2rem;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.kb-page-btn:hover:not(:disabled),
+.kb-page-btn--active {
+  color: #fff;
+  border-color: rgba(0, 188, 212, 0.72);
+  background: rgba(0, 188, 212, 0.16);
+}
+
+.kb-page-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.tags {
+  color: $text;
+  cursor: pointer;
+}
+
+.tags:hover {
+  color: $accent;
+}
+
+a,
+.edit,
+.delete {
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+a.disabled {
+  pointer-events: none;
+  opacity: 0.35;
 }

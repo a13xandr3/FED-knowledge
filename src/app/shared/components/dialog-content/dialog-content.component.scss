@@ -1,29 +1,147 @@
+$bg: linear-gradient(135deg, #232526 0%, #414345 100%);
+$card: rgba(255, 255, 255, 0.1);
+$border: rgba(255, 255, 255, 0.25);
+$text: #eaeaea;
+$accent: #00bcd4;
+$shadow: rgba(0, 0, 0, 0.6);
+
 :host {
   display: block;
+  height: 100%;
+  color: $text;
 }
 
 .main {
+  position: relative;
   height: 100%;
+  overflow: hidden;
+  border: 1px solid $border;
+  border-radius: 1.5rem;
+  background: $bg;
+  box-shadow: 0 8px 25px $shadow;
+  box-sizing: border-box;
 }
 
-:host ::ng-deep .mat-mdc-dialog-content {
-  max-height: 100vh !important;
-  height: 100vh !important;
+.main::before {
+  position: absolute;
+  inset: -20%;
+  content: "";
+  background:
+    radial-gradient(circle at 20% 10%, #4a148c55, transparent 34%),
+    radial-gradient(circle at 78% 18%, #00bcd455, transparent 36%);
+  filter: blur(72px);
 }
 
-.body,
-.form-layout {
+:host ::ng-deep {
+  .mat-mdc-dialog-content {
+    height: 100% !important;
+    max-height: 100% !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .dialog-tabs {
+    .mat-mdc-tab-header {
+      flex: 0 0 auto;
+      margin-bottom: 0.75rem;
+      border: 0;
+    }
+
+    .mat-mdc-tab-labels {
+      gap: 0.75rem;
+    }
+
+    .mdc-tab {
+      flex: 1 1 0;
+      min-width: 0;
+      height: 3rem;
+      border: 1px solid $border;
+      border-radius: 0.75rem;
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .mdc-tab:hover,
+    .mdc-tab--active {
+      border-color: rgba(0, 188, 212, 0.72);
+      background: rgba(0, 188, 212, 0.16);
+      box-shadow: 0 0 0 1px rgba(0, 188, 212, 0.18), 0 6px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .mdc-tab__text-label {
+      color: rgba(234, 234, 234, 0.72) !important;
+      letter-spacing: 0.08rem;
+    }
+
+    .mdc-tab--active .mdc-tab__text-label {
+      color: #fff !important;
+    }
+
+    .mdc-tab-indicator {
+      display: none;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .mat-mdc-tab-body,
+    .mat-mdc-tab-body-content {
+      height: 100%;
+      overflow: hidden !important;
+    }
+  }
+
+  .mat-mdc-form-field {
+    --mdc-outlined-text-field-outline-color: rgba(255, 255, 255, 0.42);
+    --mdc-outlined-text-field-hover-outline-color: rgba(0, 188, 212, 0.72);
+    --mdc-outlined-text-field-focus-outline-color: #00bcd4;
+    --mdc-outlined-text-field-input-text-color: #fff;
+    --mdc-outlined-text-field-label-text-color: rgba(234, 234, 234, 0.74);
+    --mdc-outlined-text-field-focus-label-text-color: #00bcd4;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .main-chips .mat-mdc-text-field-wrapper.mdc-text-field--filled {
+    border-color: $border !important;
+    border-radius: 0.875rem;
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.body {
+  position: relative;
+  z-index: 1;
   height: 100%;
+  padding: 1.25rem 1.5rem 1rem;
+  box-sizing: border-box;
 }
 
 .form-layout {
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-height: 0;
+}
+
+.dialog-content-grid {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .linha {
   display: flex;
+  flex: 0 0 auto;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
@@ -31,34 +149,66 @@
 }
 
 .knowledge-base {
+  padding: 0.25rem 0 1rem;
+  color: $accent !important;
   font-size: 1rem !important;
   font-weight: 700;
-  color: #212626 !important;
-  text-shadow: 0 0 1px #14302e, 2px 2px 3px #1c4a48, -1px -1px 1px rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.5rem;
-  padding: 1rem 0;
+  letter-spacing: 0.32rem;
+  text-shadow: 0 0 1px #14302e, 2px 2px 3px #1c4a48, -1px -1px 1px rgba(255, 255, 255, 0.28);
+}
+
+.token-timer {
+  align-self: flex-start;
+  margin-left: auto;
+  padding: 0.25rem 0.5rem;
+  color: rgba(234, 234, 234, 0.78);
+  font-size: 10px;
+  line-height: 1.2;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.token-timer strong {
+  font-size: 10px;
 }
 
 .token-timer--danger {
-  color: #dc3545;
+  color: #ff8a80;
   font-weight: 600;
 }
 
 .dialog-tabs {
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
-}
-
-:host ::ng-deep .dialog-tabs .mat-mdc-tab-body-wrapper {
-  min-height: 0;
-  height: 100%;
+  padding: 0.75rem;
+  overflow: hidden;
+  border: 1px solid $border;
+  border-radius: 1rem;
+  background: $card;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-sizing: border-box;
 }
 
 .tab-panel {
-  height: calc(100vh - 14rem);
-  min-height: 22rem;
+  height: 100%;
+  min-height: 0;
+  padding: 1rem;
   overflow: auto;
-  padding: 1rem 0.25rem 0;
+  border: 1px solid $border;
+  border-radius: 0.875rem;
+  background: rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+.tab-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-panel--details {
@@ -67,25 +217,22 @@
   gap: 0.5rem;
 }
 
-.tab-panel--files {
-  padding-top: 1.25rem;
-}
-
-.tab-panel--comments {
-  padding-top: 1rem;
-}
-
 .timesheet-total {
-  color: #666;
+  color: rgba(234, 234, 234, 0.78);
   font-weight: 600;
   padding-bottom: 0.5rem;
 }
 
 .dialog-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
   flex: 0 0 auto;
-  padding: 0.75rem 0 0.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0 0;
+}
+
+.dialog-actions button {
+  border-radius: 0.75rem;
+  letter-spacing: 0.08rem;
 }

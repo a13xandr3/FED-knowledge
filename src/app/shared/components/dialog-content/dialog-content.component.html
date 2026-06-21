@@ -2,8 +2,8 @@
   <mat-dialog-content>
     <div class="container-fluid w-100 body">
       <form [formGroup]="fr" (ngSubmit)="salvar()" class="form-layout">
-        <div class="row">
-          <div class="col-12 linha">
+        <div class="dialog-content-grid">
+          <div class="linha">
             <div mat-dialog-title class="dialog-title knowledge-base">
               {{ data.status === 'inclusao' ? 'Inclusão' : 'Alteração' }}
               {{ data.status !== 'inclusao' ? ' - ID: ' + dialogTitleId : '' }}
@@ -14,168 +14,163 @@
               sessão expira em: <strong>{{ '' | tokenTimeLeft }}</strong>
             </span>
           </div>
-        </div>
-        <mat-tab-group
-          class="dialog-tabs"
-          animationDuration="150ms"
-          [preserveContent]="true">
-          <mat-tab label="Detalhes">
-            <div class="tab-panel tab-panel--details">
-              <div class="row g-2">
-                <div class="col-12 col-lg-6">
-                  <div class="d-flex gap-1">
-                    <mat-form-field appearance="outline" [class]="isTiCategory ? 'w-50' : 'w-100'">
-                      <mat-label>Categoria</mat-label>
-                      <input
-                        type="text"
-                        matInput
-                        formControlName="categoria"
-                        cdkFocusInitial
-                        title="Categoria">
-                    </mat-form-field>
-                    @if (isTiCategory) {
-                      <mat-form-field appearance="outline" class="w-50">
-                        <mat-label>SubCategoria</mat-label>
+          <mat-tab-group
+            class="dialog-tabs"
+            animationDuration="150ms"
+            [preserveContent]="true"
+            >
+            <mat-tab label="Detalhes">
+              <div class="tab-panel tab-panel--details">
+                <div class="d-flex -row -g-2">
+                  <div class="col-12 col-md-6 col-lg-6 col-xl-6">
+                    <div class="d-flex gap-1">
+                      <mat-form-field appearance="outline" [class]="isTiCategory ? 'w-50' : 'w-100'">
+                        <mat-label>Categoria</mat-label>
                         <input
                           type="text"
                           matInput
-                          formControlName="subCategoria"
-                          title="Sub-Categoria">
+                          formControlName="categoria"
+                          cdkFocusInitial
+                          title="Categoria">
                       </mat-form-field>
-                    }
+                      @if (isTiCategory) {
+                        <mat-form-field appearance="outline" class="w-50">
+                          <mat-label>SubCategoria</mat-label>
+                          <input
+                            type="text"
+                            matInput
+                            formControlName="subCategoria"
+                            title="Sub-Categoria">
+                        </mat-form-field>
+                      }
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6 col-lg-6 col-xl-6">
+                    <mat-form-field appearance="outline" class="w-100">
+                      <mat-label>Nome</mat-label>
+                      <input
+                        matInput
+                        formControlName="name"
+                        title="Nome">
+                    </mat-form-field>
                   </div>
                 </div>
-                <div class="col-12 col-lg-6">
-                  <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Nome</mat-label>
-                    <input
-                      matInput
-                      formControlName="name"
-                      title="Nome">
-                  </mat-form-field>
+                <div class="-row">
+                  <div class="col-12">
+                    <app-mat-chips formControlName="tag" [(allChips)]="allTags" [label]="'Tag'"></app-mat-chips>
+                  </div>
                 </div>
+                <div class="-row">
+                  <div class="col-12">
+                    <app-mat-chips
+                      formControlName="uri"
+                      [(allChips)]="allUris"
+                      [label]="'Url'"
+                      (click)="onChipClick($event)">
+                    </app-mat-chips>
+                  </div>
+                </div>
+                @if (isTimesheet) {
+                  <div class="-row">
+                    <div class="col-12 timesheet-total">{{ totalHorasDia }}</div>
+                  </div>
+                  <div class="-row g-2">
+                    <div class="col-12 col-md-6 col-xl-2">
+                      <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Data Entrada Manhã</mat-label>
+                        <input
+                          matInput
+                          formControlName="dataEntradaManha"
+                          title="Data de Entrada Período Manhã"
+                          mask="d0/M0/0000 H0:m0:s0"
+                          placeholder="dd/mm/aaaa hh:mm:ss"
+                          [dropSpecialCharacters]="false">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                      <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Data Saída Manhã</mat-label>
+                        <input
+                          matInput
+                          formControlName="dataSaidaManha"
+                          title="Data de Saída Período Manhã"
+                          mask="d0/M0/0000 H0:m0:s0"
+                          placeholder="dd/mm/aaaa hh:mm:ss"
+                          [dropSpecialCharacters]="false">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                      <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Data Entrada Tarde</mat-label>
+                        <input
+                          matInput
+                          formControlName="dataEntradaTarde"
+                          title="Data de Entrada Período Tarde"
+                          mask="d0/M0/0000 H0:m0:s0"
+                          placeholder="dd/mm/aaaa hh:mm:ss"
+                          [dropSpecialCharacters]="false">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                      <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Data Saída Tarde</mat-label>
+                        <input
+                          matInput
+                          formControlName="dataSaidaTarde"
+                          title="Data de Saída Período Tarde"
+                          mask="d0/M0/0000 H0:m0:s0"
+                          placeholder="dd/mm/aaaa hh:mm:ss"
+                          [dropSpecialCharacters]="false">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                      <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Data Entrada Noite</mat-label>
+                        <input
+                          matInput
+                          formControlName="dataEntradaNoite"
+                          title="Data de Entrada Período Noite"
+                          mask="d0/M0/0000 H0:m0:s0"
+                          placeholder="dd/mm/aaaa hh:mm:ss"
+                          [dropSpecialCharacters]="false">
+                      </mat-form-field>
+                    </div>
+                    <div class="col-12 col-md-6 col-xl-2">
+                      <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Data Saída Noite</mat-label>
+                        <input
+                          matInput
+                          formControlName="dataSaidaNoite"
+                          title="Data de Saída Período Noite"
+                          mask="d0/M0/0000 H0:m0:s0"
+                          placeholder="dd/mm/aaaa hh:mm:ss"
+                          [dropSpecialCharacters]="false">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                }
               </div>
-
-              <div class="row">
-                <div class="col-12">
-                  <app-mat-chips formControlName="tag" [(allChips)]="allTags" [label]="'Tag'"></app-mat-chips>
-                </div>
+            </mat-tab>
+            <mat-tab label="Images/Files">
+              <div class="tab-panel tab-panel--files">
+                <app-uploader
+                  #uploader
+                  (processed)="onProcessed($event)"
+                  (error)="onError($event)"
+                  (cleared)="onClearedFiles()"
+                  (removedRef)="onPreviewRemovedRef($event)"
+                  [allowMultiple]="true"
+                  [previews]="previewsFromIds">
+                </app-uploader>
               </div>
-
-              <div class="row">
-                <div class="col-12">
-                  <app-mat-chips
-                    formControlName="uri"
-                    [(allChips)]="allUris"
-                    [label]="'Url'"
-                    (click)="onChipClick($event)">
-                  </app-mat-chips>
-                </div>
+            </mat-tab>
+            <mat-tab label="Comentários">
+              <div class="tab-panel tab-panel--comments">
+                <app-quill formControlName="descricao"></app-quill>
               </div>
-
-              @if (isTimesheet) {
-                <div class="row">
-                  <div class="col-12 timesheet-total">{{ totalHorasDia }}</div>
-                </div>
-                <div class="row g-2">
-                  <div class="col-12 col-md-6 col-xl-2">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Data Entrada Manhã</mat-label>
-                      <input
-                        matInput
-                        formControlName="dataEntradaManha"
-                        title="Data de Entrada Período Manhã"
-                        mask="d0/M0/0000 H0:m0:s0"
-                        placeholder="dd/mm/aaaa hh:mm:ss"
-                        [dropSpecialCharacters]="false">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-12 col-md-6 col-xl-2">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Data Saída Manhã</mat-label>
-                      <input
-                        matInput
-                        formControlName="dataSaidaManha"
-                        title="Data de Saída Período Manhã"
-                        mask="d0/M0/0000 H0:m0:s0"
-                        placeholder="dd/mm/aaaa hh:mm:ss"
-                        [dropSpecialCharacters]="false">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-12 col-md-6 col-xl-2">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Data Entrada Tarde</mat-label>
-                      <input
-                        matInput
-                        formControlName="dataEntradaTarde"
-                        title="Data de Entrada Período Tarde"
-                        mask="d0/M0/0000 H0:m0:s0"
-                        placeholder="dd/mm/aaaa hh:mm:ss"
-                        [dropSpecialCharacters]="false">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-12 col-md-6 col-xl-2">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Data Saída Tarde</mat-label>
-                      <input
-                        matInput
-                        formControlName="dataSaidaTarde"
-                        title="Data de Saída Período Tarde"
-                        mask="d0/M0/0000 H0:m0:s0"
-                        placeholder="dd/mm/aaaa hh:mm:ss"
-                        [dropSpecialCharacters]="false">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-12 col-md-6 col-xl-2">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Data Entrada Noite</mat-label>
-                      <input
-                        matInput
-                        formControlName="dataEntradaNoite"
-                        title="Data de Entrada Período Noite"
-                        mask="d0/M0/0000 H0:m0:s0"
-                        placeholder="dd/mm/aaaa hh:mm:ss"
-                        [dropSpecialCharacters]="false">
-                    </mat-form-field>
-                  </div>
-                  <div class="col-12 col-md-6 col-xl-2">
-                    <mat-form-field appearance="outline" class="w-100">
-                      <mat-label>Data Saída Noite</mat-label>
-                      <input
-                        matInput
-                        formControlName="dataSaidaNoite"
-                        title="Data de Saída Período Noite"
-                        mask="d0/M0/0000 H0:m0:s0"
-                        placeholder="dd/mm/aaaa hh:mm:ss"
-                        [dropSpecialCharacters]="false">
-                    </mat-form-field>
-                  </div>
-                </div>
-              }
-            </div>
-          </mat-tab>
-
-          <mat-tab label="Images/Files">
-            <div class="tab-panel tab-panel--files">
-              <app-uploader
-                #uploader
-                (processed)="onProcessed($event)"
-                (error)="onError($event)"
-                (cleared)="onClearedFiles()"
-                (removedRef)="onPreviewRemovedRef($event)"
-                [allowMultiple]="true"
-                [previews]="previewsFromIds">
-              </app-uploader>
-            </div>
-          </mat-tab>
-
-          <mat-tab label="Comentários">
-            <div class="tab-panel tab-panel--comments">
-              <app-quill formControlName="descricao"></app-quill>
-            </div>
-          </mat-tab>
-        </mat-tab-group>
-
+            </mat-tab>
+          </mat-tab-group>
+        </div>
         <div class="dialog-actions">
             <button
               mat-flat-button

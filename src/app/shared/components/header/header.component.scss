@@ -1,83 +1,108 @@
+$bg: linear-gradient(135deg, #232526 0%, #414345 100%);
+$card: rgba(255, 255, 255, 0.1);
+$border: rgba(255, 255, 255, 0.25);
+$text: #eaeaea;
+$accent: #00bcd4;
+$shadow: rgba(0, 0, 0, 0.6);
+
 :host {
   display: block;
 }
-.token-timer--danger {
-  color: #dc3545; /* bootstrap danger */
-  font-weight: 600;
-}
-/* =========================
-   Header tokens (default)
-   ========================= */
+
 .header-container {
+  position: relative;
   flex: 0 0 auto;
-  background: #f5f5f5;
-  border-bottom: 1px solid #ccc;
-  min-height: clamp(56px, 9dvh, 88px);
+  min-height: clamp(64px, 12dvh, 112px);
+  overflow: hidden;
+  color: $text;
+  background: $bg;
+  border-bottom: 1px solid $border;
+  box-shadow: 0 8px 25px $shadow;
 }
-/* =========================
-   XS only (mobile)
-   ========================= */
-@media (max-width: 575.98px) {
-  .header-container {
-    --header-min-height: clamp(64px, 9dvh, 104px);
-    --select-font-size: 0.8rem;
-    --select-min-height: 34px;
-    --btn-font-size: 0.8rem;
-    --btn-padding-y: 0.175rem;
-    --btn-line-height: 1;
-  }
+
+.header-container::before {
+  position: absolute;
+  inset: -80%;
+  content: "";
+  background:
+    radial-gradient(circle at 20% 20%, #4a148c55, transparent 32%),
+    radial-gradient(circle at 78% 18%, #00bcd455, transparent 34%);
+  filter: blur(70px);
 }
-/* =========================
-   Title / Branding
-   ========================= */
+
+.header-container > div {
+  position: relative;
+  z-index: 1;
+}
+
 .header-container .knowledge-base {
   margin: 0;
-  font-size: clamp(0.8rem, 0.5rem + 1vw, 2.25rem);
+  color: $accent;
+  font-size: clamp(0.9rem, 0.5rem + 1vw, 2rem);
   font-weight: 700;
-  color: #212626;
-  text-shadow: 0 0 1px #14302e, 2px 2px 3px #1c4a48, -1px -1px 1px rgba(255, 255, 255, 0.4);
-  letter-spacing: clamp(0.08rem, 0.1rem + 0.8vw, 0.5rem);
   line-height: clamp(1.2rem, 1.2rem + 1vw, 2.5rem);
+  letter-spacing: clamp(0.08rem, 0.1rem + 0.7vw, 0.42rem);
+  text-shadow: 0 0 1px #14302e, 2px 2px 3px #1c4a48, -1px -1px 1px rgba(255, 255, 255, 0.28);
 }
-/* =========================
-   Select-field compact
-   (scoped + variable-driven)
-   ========================= */
-.header-container app-select-field.kb-select--compact {
-  display: block;
-  width: 100%;
-  font-size: var(--select-font-size, 0.9rem);
-}
-.header-container app-select-field.kb-select--compact ::ng-deep .mat-mdc-form-field {
-  width: 100%;
-  font-size: var(--select-font-size, 0.9rem);
-}
-.header-container app-select-field.kb-select--compact ::ng-deep .mat-mdc-text-field-wrapper {
-  min-height: var(--select-min-height, 38px);
-}
-.header-container app-select-field.kb-select--compact ::ng-deep .mat-mdc-form-field-infix {
-  padding: 6px 0;
-  min-height: var(--select-min-height, 38px);
-}
-.header-container app-select-field.kb-select--compact ::ng-deep .mat-mdc-select-trigger {
-  height: var(--select-min-height, 38px);
+
+.token-timer {
+  display: inline-flex;
   align-items: center;
+  padding: 0.25rem 0.55rem;
+  color: rgba(234, 234, 234, 0.78);
+  font-size: 10px;
+  line-height: 1.2;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  background: $card;
 }
-/* =========================
-   Header button (scoped)
-   ========================= */
-.header-container .header-btn {
-  font-size: var(--btn-font-size, 0.9rem);
-  padding: var(--btn-padding-y, 0.25rem) var(--btn-padding-x, 0.75rem);
-  line-height: var(--btn-line-height, 1.1);
+
+.token-timer--danger {
+  color: #ff8a80;
+  font-weight: 600;
 }
-/* Primary only inside header (no global impact) */
-.header-container .header-btn.btn-primary {
+
+:host ::ng-deep app-filtro .form-select {
+  min-height: 2rem;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+:host ::ng-deep app-filtro .form-select:focus {
+  border-color: rgba(0, 188, 212, 0.72);
+  box-shadow: 0 0 0 0.12rem rgba(0, 188, 212, 0.18);
+}
+
+:host ::ng-deep app-filtro .form-select option {
+  color: #212626;
+}
+
+.header-btn.btn-primary {
   --bs-btn-color: #fff;
-  --bs-btn-bg: #0d6efd;
-  --bs-btn-border-color: #0d6efd;
+  --bs-btn-bg: #00bcd4;
+  --bs-btn-border-color: #00bcd4;
   --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: #0b5ed7;
-  --bs-btn-hover-border-color: #0a58ca;
-  --bs-btn-focus-shadow-rgb: 49, 132, 253;
+  --bs-btn-hover-bg: #10cfe8;
+  --bs-btn-hover-border-color: #10cfe8;
+  --bs-btn-focus-shadow-rgb: 0, 188, 212;
+
+  min-height: 2rem;
+  padding: 0.25rem 0.85rem;
+  font-size: 0.8rem;
+  line-height: 1.1;
+  border-radius: 0.75rem;
+  box-shadow: 0 3px 10px rgba(0, 188, 212, 0.32);
+}
+
+.text-muted {
+  color: rgba(234, 234, 234, 0.72) !important;
+}
+
+@media (max-width: 575.98px) {
+  .header-container {
+    min-height: clamp(72px, 14dvh, 120px);
+  }
 }

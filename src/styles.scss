@@ -3,6 +3,83 @@ html, body {
   margin: 0;
 }
 
+.knowledge-dialog-panel {
+  overflow: hidden !important;
+}
+
+.knowledge-dialog-panel .mat-mdc-dialog-container,
+.knowledge-dialog-panel .mat-mdc-dialog-surface,
+.knowledge-dialog-panel .mdc-dialog__surface {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden !important;
+  border-radius: 1.5rem !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.knowledge-dialog-panel .dialog-tabs,
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-header,
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-label-container,
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-list,
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-body-wrapper,
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-body,
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-body-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  transform: none !important;
+  box-sizing: border-box;
+}
+
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-body-wrapper {
+  position: relative;
+  overflow: hidden !important;
+}
+
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-body:not(.mat-mdc-tab-body-active) {
+  display: none !important;
+}
+
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-body-active {
+  position: relative !important;
+  left: 0 !important;
+  right: auto !important;
+  flex: 1 1 auto !important;
+}
+
+.knowledge-dialog-panel .dialog-tabs .mat-mdc-tab-body-active > .mat-mdc-tab-body-content {
+  visibility: visible !important;
+}
+
+@media (max-width: 768px) {
+  .knowledge-dialog-panel {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+  }
+
+  .knowledge-dialog-panel .mat-mdc-dialog-surface,
+  .knowledge-dialog-panel .mdc-dialog__surface {
+    border-radius: 0 !important;
+  }
+
+  .knowledge-dialog-panel app-dialog-content .body {
+    padding: 1rem;
+  }
+
+  .knowledge-dialog-panel app-dialog-content .dialog-tabs .mat-mdc-tab-labels {
+    gap: 0.4rem;
+  }
+
+  .knowledge-dialog-panel app-dialog-content .dialog-tabs .mdc-tab__text-label {
+    letter-spacing: 0;
+  }
+}
+
 /* Mantém zoom do usuário e base em 16px (~1rem) */
 //html { font-size: 100%; }
 

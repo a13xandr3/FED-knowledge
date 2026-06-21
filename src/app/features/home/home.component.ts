@@ -81,6 +81,49 @@ export class HomeComponent implements OnInit {
     this.getLinks();
   }
 
+  get totalPages(): number {
+    return Math.max(Math.ceil(this.totalLinks / this.pageSize), 1);
+  }
+
+  get visiblePages(): number[] {
+    const maxVisiblePages = 5;
+    const lastStart = Math.max(this.totalPages - maxVisiblePages, 0);
+    const start = Math.min(Math.max(this.pageIndex - 2, 0), lastStart);
+    const length = Math.min(maxVisiblePages, this.totalPages);
+
+    return Array.from({ length }, (_, index) => start + index);
+  }
+
+  get isFirstPage(): boolean {
+    return this.pageIndex <= 0;
+  }
+
+  get isLastPage(): boolean {
+    return this.pageIndex >= this.totalPages - 1;
+  }
+
+  goToPage(pageIndex: number): void {
+    if (pageIndex === this.pageIndex || pageIndex < 0 || pageIndex >= this.totalPages) return;
+    this.pageIndex = pageIndex;
+    this.getLinks();
+  }
+
+  goToFirstPage(): void {
+    this.goToPage(0);
+  }
+
+  goToPreviousPage(): void {
+    this.goToPage(this.pageIndex - 1);
+  }
+
+  goToNextPage(): void {
+    this.goToPage(this.pageIndex + 1);
+  }
+
+  goToLastPage(): void {
+    this.goToPage(this.totalPages - 1);
+  }
+
   private subscreverAtualizacoes(): void {
     this.linkStateService.refreshLink$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -144,8 +187,11 @@ export class HomeComponent implements OnInit {
   abrirDialog(obj: IactionStatus, showSite?: boolean): void {
     const dialogRef = this.dialog.open(DialogContentComponent, {
       autoFocus: true,
-      width: '200vw',
-      height: '100vh',
+      width: 'calc(100vw - 2rem)',
+      height: 'calc(100vh - 2rem)',
+      maxWidth: 'calc(100vw - 2rem)',
+      maxHeight: 'calc(100vh - 2rem)',
+      panelClass: 'knowledge-dialog-panel',
       data: {
         id: obj.id,
         name: obj.name,

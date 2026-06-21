@@ -95,8 +95,11 @@ export class HeaderComponent implements OnInit {
 
     const dialogRef = this.dialog.open(DialogContentComponent, {
       autoFocus: true,
-      width: '100vw',
-      height: '100vh',
+      width: 'calc(100vw - 2rem)',
+      height: 'calc(100vh - 2rem)',
+      maxWidth: 'calc(100vw - 2rem)',
+      maxHeight: 'calc(100vh - 2rem)',
+      panelClass: 'knowledge-dialog-panel',
       data: {
         id: 0,
         name: '',

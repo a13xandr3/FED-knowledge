@@ -77,12 +77,47 @@
               <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
           </div>
-          <div class="d-flex justify-content-md-center justify-content-lg-end mt-2">
-            <mat-paginator
-              [length]="totalLinks"
-              [pageSize]="pageSize"
-              (page)="onPageChange($event)">
-            </mat-paginator>
+          <div class="paginator-shell w-100 mt-2">
+            <nav class="kb-paginator w-100" aria-label="Paginação">
+              <button
+                type="button"
+                class="kb-page-btn"
+                [disabled]="isFirstPage"
+                (click)="goToFirstPage()">
+                &lt;&lt;
+              </button>
+              <button
+                type="button"
+                class="kb-page-btn"
+                [disabled]="isFirstPage"
+                (click)="goToPreviousPage()">
+                &lt;
+              </button>
+              @for (page of visiblePages; track page) {
+                <button
+                  type="button"
+                  class="kb-page-btn"
+                  [class.kb-page-btn--active]="page === pageIndex"
+                  [attr.aria-current]="page === pageIndex ? 'page' : null"
+                  (click)="goToPage(page)">
+                  {{ page + 1 }}
+                </button>
+              }
+              <button
+                type="button"
+                class="kb-page-btn"
+                [disabled]="isLastPage"
+                (click)="goToNextPage()">
+                &gt;
+              </button>
+              <button
+                type="button"
+                class="kb-page-btn"
+                [disabled]="isLastPage"
+                (click)="goToLastPage()">
+                &gt;&gt;
+              </button>
+            </nav>
           </div>
         </div>
       </div>
