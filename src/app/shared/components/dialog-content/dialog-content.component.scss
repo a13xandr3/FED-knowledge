@@ -1,67 +1,91 @@
-::ng-deep .main {
-    .mat-mdc-dialog-content {
-        max-height: 100vh !important;
-        height: 100vh !important;
-        .body {
-            .form-layout {
-                .row {
-                    .linha {
-                        .knowledge-base {
-                          font-size: 1rem !important;
-                          font-weight: 700;
-                          color: #212626 !important;
-                          text-shadow: 0 0 1px #14302e, 2px 2px 3px #1C4A48, -1px -1px 1px rgba(255,255,255,0.4);
-                          letter-spacing: 0.5rem;
-                          padding: 1rem 0 1rem 0;
-                        }
-                    }
-                }
-                .row {
-                    div {
-
-                    }
-                }
-
-            }
-        }
-    }
-
+:host {
+  display: block;
 }
 
-/*
-.mat-mdc-form-field-infix {
-    flex: auto;
-    min-width: 0;
-    width: 180px;
-    position: relative;
-    box-sizing: border-box;
+.main {
+  height: 100%;
 }
 
-
-
-
-
- .mat-mdc-text-field-wrapper {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.02) !important;
+:host ::ng-deep .mat-mdc-dialog-content {
+  max-height: 100vh !important;
+  height: 100vh !important;
 }
+
+.body,
+.form-layout {
+  height: 100%;
+}
+
+.form-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .linha {
-    height: 14vh !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
 }
- .mdc-dialog__title {
-    display: block;
-    margin-top: 0;
-    position: relative;
-    flex-shrink: 0;
-    box-sizing: border-box;
-    margin: 0 0 1px;
-    padding: 0 !important;
+
+.knowledge-base {
+  font-size: 1rem !important;
+  font-weight: 700;
+  color: #212626 !important;
+  text-shadow: 0 0 1px #14302e, 2px 2px 3px #1c4a48, -1px -1px 1px rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5rem;
+  padding: 1rem 0;
 }
- .mat-h2, 
- .mat-headline-6, 
- .mat-typography .mat-h2, 
- .mat-typography .mat-headline-6, 
- .mat-typography h2 {
-    margin: 0 !important;
+
+.token-timer--danger {
+  color: #dc3545;
+  font-weight: 600;
 }
-    */
+
+.dialog-tabs {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+:host ::ng-deep .dialog-tabs .mat-mdc-tab-body-wrapper {
+  min-height: 0;
+  height: 100%;
+}
+
+.tab-panel {
+  height: calc(100vh - 14rem);
+  min-height: 22rem;
+  overflow: auto;
+  padding: 1rem 0.25rem 0;
+}
+
+.tab-panel--details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tab-panel--files {
+  padding-top: 1.25rem;
+}
+
+.tab-panel--comments {
+  padding-top: 1rem;
+}
+
+.timesheet-total {
+  color: #666;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex: 0 0 auto;
+  padding: 0.75rem 0 0.25rem;
+}

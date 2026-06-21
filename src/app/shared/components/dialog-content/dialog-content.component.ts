@@ -5,6 +5,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { catchError, concatMap, forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
@@ -31,7 +33,9 @@ import { PreviewItem } from 'src/app/types/Files';
   styleUrl: './dialog-content.component.scss',
   imports: [
     MatDialogModule,
+    MatButtonModule,
     MatFormFieldModule,
+    MatTabsModule,
     MatChipsComponent,
     MatInputModule,
     ReactiveFormsModule,
