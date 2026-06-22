@@ -76,6 +76,7 @@ describe('DialogContentComponent (standalone + Jest)', () => {
   let fixture: ComponentFixture<DialogContentComponent>;
   let component: DialogContentComponent;
   const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
   const previewsMock: PreviewItem[] = [
     { id: 10, url: 'http://file-10', filename: 'file-10' } as any,
@@ -107,7 +108,7 @@ describe('DialogContentComponent (standalone + Jest)', () => {
         { provide: SnackService, useValue: snackServiceMock },
         { provide: FileApiService, useValue: filesApiServiceMock },
         { provide: MatDialogRef, useValue: matDialogRefMock },
-        { provide: MAT_DIALOG_DATA, useValue: dialogDataMock },
+        { provide: MAT_DIALOG_DATA, useFactory: createDialogDataMock },
         // ngx-mask config para a NgxMaskDirective usada pelo componente
         provideNgxMask({ validation: false }),
       ],
@@ -124,6 +125,7 @@ describe('DialogContentComponent (standalone + Jest)', () => {
 
   afterAll(() => {
     logSpy.mockRestore();
+    errorSpy.mockRestore();
   });
 
   it('deve criar o componente e inicializar contagem regressiva/totalHorasDia', () => {
@@ -138,6 +140,108 @@ describe('DialogContentComponent (standalone + Jest)', () => {
     expect(raw.name).toBe(dialogDataMock.name);
     expect(raw.categoria).toBe(dialogDataMock.categoria);
     expect(raw.descricao).toBe(dialogDataMock.descricao);
+    expect(component.dialogTitleId).toBe(dialogDataMock.id);
+    expect(component.isTimesheet).toBe(true);
+
+    component.fr.get('categoria')?.setValue('TI');
+    expect(component.isTiCategory).toBe(true);
+  });
+
+  it('ngOnInit deve ignorar quando nao houver ids validos', () => {
+    component.data = { fileID: [] };
+    filesApiServiceMock.buildPreviewsFromFileIds.mockClear();
+
+    component.ngOnInit();
+
+    expect(filesApiServiceMock.buildPreviewsFromFileIds).not.toHaveBeenCalled();
+  });
+
+  it('ngOnInit deve aceitar formatos alternativos de ids', async () => {
+    component.data = {
+      fileID: [
+        {
+          fileRefs: [{ fileId: 30 }, { file_id: 40 }, { fileID: 50 }, 60],
+        },
+      ],
+    };
+
+    component.ngOnInit();
+    await Promise.resolve();
+
+    expect(filesApiServiceMock.buildPreviewsFromFileIds).toHaveBeenCalledWith([30, 40, 50, 60]);
+  });
+
+  it('fechar deve fechar o dialog', () => {
+    component.fechar();
+
+    expect(matDialogRefMock.close).toHaveBeenCalled();
+  });
+
+  it('onChipClick deve abrir URL http valida em nova aba', () => {
+    const click = jest.fn();
+    const anchor = { href: '', target: '', click };
+    const createSpy = jest.spyOn(document, 'createElement').mockReturnValue(anchor as unknown as HTMLElement);
+
+    component.onChipClick({ target: { innerText: 'https://site.com' } } as unknown as MouseEvent);
+
+    expect(anchor.href).toBe('https://site.com');
+    expect(anchor.target).toBe('_blank');
+    expect(click).toHaveBeenCalled();
+    createSpy.mockRestore();
+  });
+
+  it('onChipClick deve ignorar URL invalida ou removida', () => {
+    const createSpy = jest.spyOn(document, 'createElement');
+
+    component.onChipClick({ target: { innerText: 'javascript:alert(1)' } } as unknown as MouseEvent);
+    component.onChipClick({ target: { innerText: 'nao-e-url' } } as unknown as MouseEvent);
+    component.onChipClick({ target: { innerText: 'https://site.comX' } } as unknown as MouseEvent);
+
+    expect(createSpy).not.toHaveBeenCalled();
+    createSpy.mockRestore();
+  });
+
+  it('deve inicializar com dados opcionais ausentes sem quebrar defaults', async () => {
+    TestBed.resetTestingModule();
+    linkMapperServiceMock.toDateBr.mockReturnValueOnce(null);
+
+    await TestBed.configureTestingModule({
+      imports: [DialogContentComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideNoopAnimations(),
+        { provide: HomeService, useValue: homeServiceMock },
+        { provide: LinkStateService, useValue: linkStateServiceMock },
+        { provide: LinkMapperService, useValue: linkMapperServiceMock },
+        { provide: SnackService, useValue: snackServiceMock },
+        { provide: FileApiService, useValue: filesApiServiceMock },
+        { provide: MatDialogRef, useValue: matDialogRefMock },
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
+            categoria: 'TI',
+            fileID: 'valor-invalido',
+            status: 'inclusao',
+          },
+        },
+        provideNgxMask({ validation: false }),
+      ],
+    }).compileComponents();
+
+    const partialFixture = TestBed.createComponent(DialogContentComponent);
+    const partial = partialFixture.componentInstance;
+    partialFixture.detectChanges();
+
+    expect(partial.totalHorasDia).toBeUndefined();
+    expect(partial.fr.getRawValue().id).toBe('');
+    expect(partial.fr.getRawValue().fileID).toEqual([]);
+    expect(partial.fr.getRawValue().descricao).toBe('');
+    expect(partial.fr.getRawValue().dataEntradaManha).toBe('');
+    expect(partial.isTimesheet).toBe(false);
+
+    partial.fr.get('categoria')?.setValue(null);
+    expect(partial.isTiCategory).toBe(false);
   });
 
   it('ngOnInit deve carregar previews e preencher controle fileID', async () => {
@@ -185,6 +289,27 @@ describe('DialogContentComponent (standalone + Jest)', () => {
     expect((component as any).initialIds).toEqual([10]);
   });
 
+  it('onPreviewRemoved deve remover id por indice e ignorar id invalido', () => {
+    component.previewsFromIds = [{ id: 10, url: 'http://file-10', filename: 'file-10' } as any];
+    component.fr.get('fileID')?.setValue([10]);
+
+    component.onPreviewRemoved(0);
+    component.onPreviewRemoved(99);
+    component.onPreviewRemovedRef({ id: undefined, index: 0, filename: '' });
+    component.fr.get('fileID')?.setValue(null);
+    component.onPreviewRemovedRef({ id: 10, index: 0, filename: 'file-10' });
+
+    expect(component.fr.get('fileID')?.value).toEqual([]);
+  });
+
+  it('onError deve registrar erro no console', () => {
+    const err = new Error('falha');
+
+    component.onError(err);
+
+    expect(errorSpy).toHaveBeenCalledWith(err);
+  });
+
   it('salvar com form inválido não deve chamar serviços', () => {
     component.fr.setErrors({ qualquer: true });
 
@@ -221,6 +346,45 @@ describe('DialogContentComponent (standalone + Jest)', () => {
     expect((component as any).fileQueue.length).toBe(0);
   });
 
+  it('salvar deve usar defaults quando tags, uris e filename novo estiverem ausentes', () => {
+    component.fr.setErrors(null);
+    component.fr.get('tag')?.setValue(null);
+    component.fr.get('uri')?.setValue(null);
+    component.previewsFromIds = [];
+    (component as any).fileQueue = [{}];
+    (filesApiServiceMock.uploadOne as jest.Mock).mockReturnValue(of({ id: 321 }));
+
+    component.salvar();
+
+    expect(linkMapperServiceMock.buildRequest).toHaveBeenCalledWith(
+      expect.any(Object),
+      [],
+      [],
+      { files: [{ id: 321, filename: 'file-321' }] },
+    );
+  });
+
+  it('salvar (alteração) deve atualizar, excluir anexos removidos e atualizar snapshot', () => {
+    component.fr.setErrors(null);
+    component.data.status = 'alteracao';
+    component.previewsFromIds = [{ id: 10, url: 'http://file-10', filename: 'file-10' } as any];
+    (component as any).initialIds = [10, 20];
+    (component as any).fileQueue = [];
+    (homeServiceMock.putLink as jest.Mock).mockReturnValue(of(null));
+    (filesApiServiceMock.delete as jest.Mock).mockReturnValue(of(null));
+
+    component.salvar();
+
+    expect(homeServiceMock.putLink).toHaveBeenCalledTimes(1);
+    expect(homeServiceMock.postLink).not.toHaveBeenCalled();
+    expect(filesApiServiceMock.delete).toHaveBeenCalledWith(20);
+    expect(snackServiceMock.mostrarMensagem).toHaveBeenCalledWith(
+      'Card Atualizado com sucesso!',
+      'Fechar'
+    );
+    expect((component as any).initialIds).toEqual([10]);
+  });
+
   it('salvar deve exibir mensagem de erro quando serviço retornar erro', () => {
     component.fr.setErrors(null);
     (homeServiceMock.postLink as jest.Mock).mockReturnValue(
@@ -231,4 +395,23 @@ describe('DialogContentComponent (standalone + Jest)', () => {
 
     expect(snackServiceMock.mostrarMensagem).toHaveBeenCalledWith('Falha ao salvar', 'Fechar');
   });
+
+  it('salvar deve exibir mensagem generica quando erro nao tiver message', () => {
+    component.fr.setErrors(null);
+    (homeServiceMock.postLink as jest.Mock).mockReturnValue(throwError(() => ({})));
+
+    component.salvar();
+
+    expect(snackServiceMock.mostrarMensagem).toHaveBeenCalledWith('Falha ao salvar', 'Fechar');
+  });
 });
+
+function createDialogDataMock(): any {
+  return {
+    ...dialogDataMock,
+    fileID: dialogDataMock.fileID.map((item: any) => ({
+      ...item,
+      fileRefs: item.fileRefs.map((ref: any) => ({ ...ref })),
+    })),
+  };
+}

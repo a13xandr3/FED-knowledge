@@ -5,7 +5,7 @@
     aria-label="Choose one category"
     [formControl]="categoryCtrl">
     <option [ngValue]="null" disabled>Choose one category</option>
-    @for (opt of statusOptionsCat(); track opt.value) {
+    @for (opt of categoriaOptions(); track opt.value) {
       <option [ngValue]="opt">
         {{ opt.label }}
       </option>
@@ -20,7 +20,7 @@
     aria-label="Choose one tag"
     [formControl]="tagCtrl">
     <option [ngValue]="null" disabled>Choose one tag</option>
-    @for (opt of statusOptionsTag(); track opt.value) {
+    @for (opt of tagOptions(); track opt.value) {
       <option [ngValue]="opt">
         {{ opt.label }}
       </option>

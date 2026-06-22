@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatDialog } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
-import { gzip as pakoGzip, ungzip as pakoUngzip } from 'pako';
+import { gzip as pakoGzip } from 'pako';
 import { firstValueFrom } from 'rxjs';
 
 import { FileApiService } from 'src/app/shared/services/file-api.service';
@@ -199,14 +199,14 @@ export class InputFileComponent implements OnInit {
       this.hashSha256Hex = hashHex;
       // 4.1) Preview (somente imagens) — use SEMPRE as variáveis locais
       //if ((mimeType ?? '').startsWith('image/')) {
-        const previewFile = await this.payloadToFile({
+        const previewFile = await this.filesSvc.payloadToFile({
           payloadBytes,
           contentEncoding,
           filename: fileName,
           mimeType
         });
         const id = 0;
-        const url = this.fileToObjectUrl(previewFile);
+        const url = this.filesSvc.fileToObjectUrl(previewFile);
         this.previews.push({id, url, filename: fileName, mimeType, sizeBytes: fileSizeBytes});
       //}
       this.setProgress(100);
@@ -234,32 +234,13 @@ export class InputFileComponent implements OnInit {
 
   clear(): void {
     // revoga todos os object URLs para evitar vazamento
-    for (const p of this.previews) this.revokeObjectUrl(p.url);
+    for (const p of this.previews) this.filesSvc.revokeObjectUrl(p.url);
     this.previews = [];
     this.resetState();
     this.cleared.emit();
   }
   // ---------------- Compressão com progresso ----------------
   private async compressWithProgress(file: File): Promise<Uint8Array> {
-    const hasCompressionStream = typeof (globalThis as any).CompressionStream === 'function';
-    // Preferência: API nativa de streams (não bloqueia a UI)
-    if (hasCompressionStream && typeof (file as any).stream === 'function') {
-      const total = file.size || 1;
-      let loaded = 0;
-      const progressStream = new TransformStream<Uint8Array, Uint8Array>({
-        transform: (chunk, controller) => {
-          loaded += chunk.byteLength;
-          // mapeia leitura 0..1 -> progresso até 70%
-          this.setProgress(Math.min(70, Math.floor((loaded / total) * 70)));
-          controller.enqueue(chunk);
-        }
-      });
-      const cs = new (globalThis as any).CompressionStream('gzip');
-      const compressedStream = (file as any).stream().pipeThrough(progressStream).pipeThrough(cs);
-      const ab = await new Response(compressedStream).arrayBuffer();
-      return new Uint8Array(ab);
-    }
-    // Fallback: FileReader + pako (sincrono). Atualiza progresso na leitura.
     const arrayBuffer = await this.readFileAsArrayBuffer(file, (ratio) => {
       this.setProgress(Math.min(60, Math.floor(ratio * 60)));
     });
@@ -338,44 +319,6 @@ export class InputFileComponent implements OnInit {
   private shouldKeepGzip(rawLen: number, gzLen: number, threshold = 0.98): boolean {
     return gzLen <= rawLen * threshold;
   }
-  /* ===================== Helpers para preview ===================== */
-  /** Descompacta gzip para Uint8Array (DecompressionStream -> fallback p/ pako) */
-  private async gunzip(u8: Uint8Array): Promise<Uint8Array> {
-    const hasDS = typeof (globalThis as any).DecompressionStream === 'function';
-    if (hasDS) {
-      const ab = this.asArrayBuffer(u8); // garante ArrayBuffer puro
-      const ds = new (globalThis as any).DecompressionStream('gzip');
-      const stream = new Blob([ab]).stream().pipeThrough(ds);
-      const outAb = await new Response(stream).arrayBuffer();
-      return new Uint8Array(outAb);
-    }
-    // fallback: pako
-    return pakoUngzip(u8); // ver correção do alias abaixo
-  }
-  /**
-   * Transforma o payload em memória (gzip ou raw) em um File "abrível" no browser.
-   */
-  private async payloadToFile(p: {
-    payloadBytes: Uint8Array;
-    contentEncoding: 'gzip' | 'identity';
-    filename: string;
-    mimeType?: string;
-  }): Promise<File> {
-    const rawU8 = p.contentEncoding === 'gzip' ? await this.gunzip(p.payloadBytes) : p.payloadBytes;
-    const rawAb = this.asArrayBuffer(rawU8); // ArrayBuffer puro
-    return new File([rawAb], p.filename, {
-      type: p.mimeType || 'application/octet-stream',
-      lastModified: Date.now()
-    });
-  }
-  /** Gera um Object URL para exibir o File (revogue quando não precisar) */
-  private fileToObjectUrl(file: File): string {
-    return URL.createObjectURL(file);
-  }
-  /** Revoga o Object URL quando não precisar mais (evita vazamento de memória) */
-  private revokeObjectUrl(url?: string | null): void {
-    if (url) URL.revokeObjectURL(url);
-  }
   removePreviewAt(
       data: any,
       removeId: number
@@ -408,7 +351,7 @@ export class InputFileComponent implements OnInit {
           const idx = this.previews.findIndex(p => Number((p as any)?.id ?? (p as any)?.fileId) === idToRemove);
           if (idx >= 0) {
             const removed = this.previews[idx];
-            this.revokeObjectUrl(removed.url); // evita vazamento
+            this.filesSvc.revokeObjectUrl(removed.url); // evita vazamento
             this.previews.splice(idx, 1);      // mantém a mesma referência (detecção Angular)
             this.removedAt.emit(idx);          // notifica o pai
           }
@@ -418,7 +361,7 @@ export class InputFileComponent implements OnInit {
   }
   public async addPreviewsFromFileIds(ids: number[], cleanBefore = false): Promise<void> {
     if (cleanBefore) {
-      for (const p of this.previews) this.revokeObjectUrl(p.url);
+      for (const p of this.previews) this.filesSvc.revokeObjectUrl(p.url);
       this.previews = [];
     }
     const items = await this.filesSvc.buildPreviewsFromFileIds(ids);
@@ -437,7 +380,7 @@ export class InputFileComponent implements OnInit {
   onRemove(p: PreviewItem, index: number): void {
     if (!this.previews[index]) return;
     this.removedRef.emit({ id: p.id, index, filename: p.filename });
-    this.revokeObjectUrl(this.previews[index].url);
+    this.filesSvc.revokeObjectUrl(this.previews[index].url);
     this.previews.splice(index, 1);
     this.removedAt.emit(index); // pai atualiza o form/fileIDs
   }
@@ -461,6 +404,6 @@ export class InputFileComponent implements OnInit {
   }
   // Evita re-render desnecessário do *ngFor
   trackById(index: number, p: PreviewItem): string | number {
-    return p.id ?? p.filename ?? index;
+    return p.id ?? (p.filename || index);
   }
 }

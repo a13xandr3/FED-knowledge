@@ -11,14 +11,13 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { catchError, concatMap, forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
 
-import { FileSavedResponse, ILinkRequest, ProcessedFile } from '../../request/request';
+import { ILinkRequest, ProcessedFile } from '../../request/request';
 import { HomeService } from 'src/app/shared/services/home.service';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { LinkMapperService } from 'src/app/shared/services/link-mapper.service';
 import { SnackService } from 'src/app/shared/services/snack.service';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
 import { FilesPayload, FileRef as FileRefCore, extractIds, idToFilename, diffRemovedIds, mergeExistingAndNew } from 'src/app/shared/components/input-file/file-selection.util';
-import { FileRef } from 'src/app/shared/interfaces/interface.files';
 import { MatChipsComponent } from 'src/app/shared/components/mat-chips/mat-chips.component';
 import { UploaderComponent } from 'src/app/shared/components/uploader/uploader.component';
 import { TokenTimeLeftPipe } from 'src/app/shared/pipes/token-time-left.pipe';
@@ -135,25 +134,6 @@ export class DialogContentComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  deleteFiles(currentIds: number[]): Observable<unknown> {
-    const delete$: Observable<unknown> = currentIds.length
-      ? forkJoin(currentIds.map(id => this.filesApiService.delete(id)))
-      : of(null);
-    return delete$;
-  }
-  uploadOne(): Observable<FileRef[]> {
-    const upload$: Observable<FileRef[]> = this.fileQueue.length
-      ? forkJoin(this.fileQueue.map(p => this.filesApiService.uploadOne(p))).pipe(
-          map((resps: FileSavedResponse[]) =>
-            resps.map((r, i) => ({
-              id: r.id,
-              filename: this.fileQueue[i]?.filename ?? `file-${r.id}`
-            }))
-          )
-        )
-      : of<FileRef[]>([]);
-    return upload$;
-  }
   onChipClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const url = target?.innerText.trim();

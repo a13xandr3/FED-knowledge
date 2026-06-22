@@ -1,5 +1,7 @@
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform, inject } from '@angular/core';
 
+import { readJwtExpSeconds } from 'src/app/shared/utils/jwt-expiration.util';
+
 @Pipe({
   name: 'tokenTimeLeft',
   standalone: true,
@@ -22,7 +24,7 @@ export class TokenTimeLeftPipe implements PipeTransform, OnDestroy {
   transform(token?: string, fallbackLabel: string = '—'): string {
     const raw = token || localStorage.getItem('kb_token') || '';
 
-    const expSec = this.readExpSeconds(raw);
+    const expSec = readJwtExpSeconds(raw);
     if (!expSec) return fallbackLabel;
 
     const msLeft = expSec * 1000 - Date.now();
@@ -30,24 +32,6 @@ export class TokenTimeLeftPipe implements PipeTransform, OnDestroy {
     if (msLeft < 1000) return '< 1s';
 
     return this.formatHHMMSS(msLeft);
-  }
-
-  // === helpers ===
-
-  private readExpSeconds(jwt: string): number | null {
-    const parts = jwt.split('.');
-    if (parts.length < 2) return null;
-    try {
-      const base64Url = parts[1];
-      // Base64URL -> Base64 + padding
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const padded = base64 + '==='.slice((base64.length + 3) % 4);
-      const json = atob(padded);
-      const payload = JSON.parse(json) as { exp?: number };
-      return typeof payload.exp === 'number' ? payload.exp : null;
-    } catch {
-      return null;
-    }
   }
 
   private formatHHMMSS(ms: number): string {

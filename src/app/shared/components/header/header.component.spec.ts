@@ -8,7 +8,7 @@ import { HomeService } from 'src/app/shared/services/home.service';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { SnackService } from 'src/app/shared/services/snack.service';
 import { DialogContentComponent } from 'src/app/shared/components/dialog-content/dialog-content.component';
-import { FiltroSelecionado } from 'src/app/shared/components/app-filtro/app-filtro.component';
+import { FiltroSelecionado } from 'src/app/shared/interfaces/filtro-selecionado.interface';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -75,10 +75,31 @@ describe('HeaderComponent', () => {
     dialog.open.mockReturnValue(dialogRef);
     linkStateService.triggerRefresh.mockClear();
 
+    component.onFiltroSelecionado({ tipo: 'categoria', valor: 'Timesheet' });
     component.abrirDialog();
 
-    expect(dialog.open).toHaveBeenCalled();
+    expect(dialog.open).toHaveBeenCalledWith(
+      DialogContentComponent,
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: 'inclusao',
+          categoria: 'Timesheet',
+        }),
+      })
+    );
     expect(linkStateService.triggerRefresh).toHaveBeenCalled();
+  });
+
+  it('nao deve disparar refresh quando dialog fechar sem categoria', () => {
+    const dialogRef = {
+      afterClosed: jest.fn().mockReturnValue(of(undefined)),
+    } as unknown as MatDialogRef<DialogContentComponent>;
+    dialog.open.mockReturnValue(dialogRef);
+    linkStateService.triggerRefresh.mockClear();
+
+    component.abrirDialog();
+
+    expect(linkStateService.triggerRefresh).not.toHaveBeenCalled();
   });
 
   it('deve recarregar opções quando refreshLink$ emitir', () => {

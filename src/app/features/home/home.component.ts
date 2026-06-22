@@ -18,14 +18,14 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { MatChipsModule } from '@angular/material/chips';
+import { createHomeDialogData } from './home-dialog-data.factory';
+import { FileRefsValue, TagValue, getTagValues, hasTagValues, parseSelectedFilter, toFileIds } from './home-filter.util';
 
 type LinksResponse = {
   atividades?: ILinksResponse[];
   links?: ILinksResponse[];
   total: number;
 };
-
-type TagValue = { tags?: string[] } | Array<{ tags?: string[] }> | string[] | null | undefined;
 
 @Component({
   selector: 'app-home',
@@ -144,15 +144,11 @@ export class HomeComponent implements OnInit {
     this.onItemSelecionado(value);
   }
 
-  private parseItemSelecionado(value: string): { tipo: 'categoria' | 'tag', valor: string } {
-    const [valor, tipo] = value.split('_');
-    return { tipo: tipo as 'categoria' | 'tag', valor };
-  }
-
   onItemSelecionado(itemSelecionado: string): void {
-    const { tipo, valor } = this.parseItemSelecionado(itemSelecionado);
-    this.itemModificadoCategoria = tipo === 'categoria' ? valor : '';
-    this.itemModificadoTag = tipo === 'tag' ? valor : '';
+    const { tipo, valor } = parseSelectedFilter(itemSelecionado);
+    const filtroValor = valor === 'todos' ? '' : valor;
+    this.itemModificadoCategoria = tipo === 'categoria' ? filtroValor : '';
+    this.itemModificadoTag = tipo === 'tag' ? filtroValor : '';
     this.resetPaginador();
     this.getLinks();
   }
@@ -185,6 +181,15 @@ export class HomeComponent implements OnInit {
   }
 
   abrirDialog(obj: IactionStatus, showSite?: boolean): void {
+    const totalHorasDia = this.homeService.totalHorasTimeSheet([{
+      dataEntradaManha: obj.dataEntradaManha,
+      dataSaidaManha: obj.dataSaidaManha,
+      dataEntradaTarde: obj.dataEntradaTarde,
+      dataSaidaTarde: obj.dataSaidaTarde,
+      dataEntradaNoite: obj.dataEntradaNoite,
+      dataSaidaNoite: obj.dataSaidaNoite,
+    }]);
+
     const dialogRef = this.dialog.open(DialogContentComponent, {
       autoFocus: true,
       width: 'calc(100vw - 2rem)',
@@ -192,32 +197,7 @@ export class HomeComponent implements OnInit {
       maxWidth: 'calc(100vw - 2rem)',
       maxHeight: 'calc(100vh - 2rem)',
       panelClass: 'knowledge-dialog-panel',
-      data: {
-        id: obj.id,
-        name: obj.name,
-        uri: [obj.uri],
-        status: 'alteracao',
-        categoria: obj.categoria,
-        descricao: obj.descricao,
-        tag: [obj.tag],
-        fileID: [obj.fileID],
-        subCategoria: obj.subCategoria,
-        showSite: showSite,
-        dataEntradaManha: obj.dataEntradaManha,
-        dataSaidaManha: obj.dataSaidaManha,
-        dataEntradaTarde: obj.dataEntradaTarde,
-        dataSaidaTarde: obj.dataSaidaTarde,
-        dataEntradaNoite: obj.dataEntradaNoite,
-        dataSaidaNoite: obj.dataSaidaNoite,
-        totalHorasDia: this.homeService.totalHorasTimeSheet([{
-          dataEntradaManha: obj.dataEntradaManha,
-          dataSaidaManha: obj.dataSaidaManha,
-          dataEntradaTarde: obj.dataEntradaTarde,
-          dataSaidaTarde: obj.dataSaidaTarde,
-          dataEntradaNoite: obj.dataEntradaNoite,
-          dataSaidaNoite: obj.dataSaidaNoite,
-        }])
-      }
+      data: createHomeDialogData(obj, totalHorasDia, showSite)
     });
     dialogRef.afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -231,17 +211,14 @@ export class HomeComponent implements OnInit {
 
   deleteItem(
     linkId: number,
-    fileRefs: { id: number }[] | number[] | { id: number } | number | null | undefined
+    fileRefs: FileRefsValue
   ): void {
-    const fileIds: number[] = (Array.isArray(fileRefs) ? fileRefs : [fileRefs])
-      .filter((x): x is number | { id: number } => x != null)
-      .map(x => typeof x === 'number' ? x : x.id);
-    const payload = { linkId, fileIds };
+    const payload = { linkId, fileIds: toFileIds(fileRefs) };
     this.homeService.deleteItem(payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.mostrarMensagem('Card e arquivo(s) excluídos com sucesso!', 'Fechar');
+          this.snackService.mostrarMensagem('Card e arquivo(s) excluídos com sucesso!', 'Fechar');
           this.atualizarLista();
         },
         error: (err: HttpErrorResponse) => {
@@ -250,24 +227,12 @@ export class HomeComponent implements OnInit {
       });
   }
 
-  mostrarMensagem(msg: string, action: string): void {
-    this.snackService.mostrarMensagem(msg, action);
-  }
-
   getTags(tag: TagValue): string[] {
-    if (!tag) return [];
-    if (Array.isArray(tag)) {
-      if (tag.every((item): item is string => typeof item === 'string')) {
-        return tag;
-      }
-      return tag.flatMap((item) => Array.isArray(item?.tags) ? item.tags : []);
-    }
-    if (Array.isArray(tag.tags)) return tag.tags;
-    return [];
+    return getTagValues(tag);
   }
 
   hasTags(data: TagValue): boolean {
-    return this.getTags(data).length > 0;
+    return hasTagValues(data);
   }
 
   resetPaginador(): void {

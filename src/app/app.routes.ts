@@ -15,6 +15,7 @@ export const routes: Routes = [
   {
     path: 'home',
     canActivate: [AuthGuard],
+    runGuardsAndResolvers: 'always',
     loadComponent: () =>
       import('./features/home/home.component').then(m => m.HomeComponent),
   },

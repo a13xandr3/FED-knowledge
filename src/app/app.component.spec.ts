@@ -1,7 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { provideLocationMocks } from '@angular/common/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
+import { Component } from '@angular/core';
 import { AppComponent } from './app.component';
+
+@Component({
+  template: '',
+})
+class DummyRouteComponent {}
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -10,7 +16,7 @@ describe('AppComponent', () => {
         AppComponent
       ],
       providers: [
-        provideRouter([]),
+        provideRouter([{ path: 'login', component: DummyRouteComponent }]),
         provideLocationMocks(),
       ],
     }).compileComponents();
@@ -33,5 +39,16 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
+  });
+
+  it('should update currentRoute after NavigationEnd', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    const router = TestBed.inject(Router);
+
+    fixture.detectChanges();
+    await router.navigateByUrl('/login');
+
+    expect(app.currentRoute()).toBe('/login');
   });
 });

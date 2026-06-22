@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -13,17 +12,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Observable, skip } from 'rxjs';
 
+import { createFilterOptions } from 'src/app/shared/components/app-filtro/filter-options.util';
+import { FiltroSelecionado, FiltroTipo } from 'src/app/shared/interfaces/filtro-selecionado.interface';
 import { SelectOption } from 'src/app/shared/models/select-option.model';
 import { HomeService } from 'src/app/shared/services/home.service';
 import { SnackService } from 'src/app/shared/services/snack.service';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
-
-export type FiltroTipo = 'categoria' | 'tag';
-
-export interface FiltroSelecionado {
-  tipo: FiltroTipo;
-  valor: string;
-}
+import { getErrorMessage } from 'src/app/shared/utils/error-message.util';
 
 @Component({
   selector: 'app-filtro',
@@ -35,8 +30,8 @@ export interface FiltroSelecionado {
 export class AppFiltroComponent implements OnInit {
   readonly filtroSelecionado = output<FiltroSelecionado>();
 
-  readonly statusOptionsCat = signal<readonly SelectOption<string>[]>([]);
-  readonly statusOptionsTag = signal<readonly SelectOption<string>[]>([]);
+  readonly categoriaOptions = signal<readonly SelectOption<string>[]>([]);
+  readonly tagOptions = signal<readonly SelectOption<string>[]>([]);
 
   readonly categoryCtrl = new FormControl<SelectOption<string> | null>(null);
   readonly tagCtrl = new FormControl<SelectOption<string> | null>(null);
@@ -71,8 +66,8 @@ export class AppFiltroComponent implements OnInit {
   }
 
   private loadFilters(): void {
-    this.loadOptions(this.homeService.getCategorias(), this.statusOptionsCat);
-    this.loadOptions(this.homeService.getTags(), this.statusOptionsTag);
+    this.loadOptions(this.homeService.getCategorias(), this.categoriaOptions);
+    this.loadOptions(this.homeService.getTags(), this.tagOptions);
   }
 
   private loadOptions(
@@ -82,28 +77,15 @@ export class AppFiltroComponent implements OnInit {
     source$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => target.set(this.toOptions(response)),
+        next: (response) => target.set(createFilterOptions(response)),
         error: (error: unknown) => this.showError(error)
       });
   }
 
-  private toOptions(response: unknown): readonly SelectOption<string>[] {
-    return ['todos', ...this.toStringArray(response)].map((value) => {
-      return { value, label: value };
-    });
-  }
-
-  private toStringArray(response: unknown): string[] {
-    return Array.isArray(response)
-      ? response.filter((item): item is string => typeof item === 'string')
-      : [];
-  }
-
   private showError(error: unknown): void {
-    const message = error instanceof HttpErrorResponse || error instanceof Error
-      ? error.message
-      : 'Não foi possível carregar os filtros.';
-
-    this.snackService.mostrarMensagem(message, 'Fechar');
+    this.snackService.mostrarMensagem(
+      getErrorMessage(error, 'Não foi possível carregar os filtros.'),
+      'Fechar'
+    );
   }
 }

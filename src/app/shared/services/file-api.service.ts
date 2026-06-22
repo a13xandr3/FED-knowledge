@@ -81,17 +81,8 @@ export class FileApiService {
   }
   /** Descompacta gzip para Uint8Array (DecompressionStream -> fallback p/ pako). */
   private async gunzip(u8: Uint8Array): Promise<Uint8Array> {
-    const hasDS = typeof (globalThis as any).DecompressionStream === 'function';
-    if (hasDS) {
-      const ab = this.toPureArrayBuffer(u8);
-      const ds = new (globalThis as any).DecompressionStream('gzip');
-      const stream = new Blob([ab]).stream().pipeThrough(ds);
-      const outAb = await new Response(stream).arrayBuffer();
-      return new Uint8Array(outAb);
-    }
-    // fallback: pako.ungzip (lazy import)
     const { ungzip } = await import('pako');
-    return ungzip(u8); // retorna Uint8Array
+    return ungzip(u8);
   }
   /**
    * Transforma o payload em memória (gzip ou raw) em um File "abrível" no browser.

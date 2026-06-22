@@ -1,14 +1,13 @@
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {
-  restoreFilesFromSnapshot,
-  downloadFile} from '../input-file/file-utils';
+import { downloadFile, restoreFilesFromSnapshot } from '../input-file/file-utils';
 import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 
 import { RenderKind } from 'src/app/types/Files';
 import { ShowFileData } from '../../interfaces/interface.file-ref';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
+import { formatFileSize, hasSnapshotBase64, resolveRenderKind } from './show-file.util';
 @Component({
   selector: 'app-show-file',
   templateUrl: './show-file.component.html',
@@ -35,11 +34,7 @@ export class ShowFileComponent implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
 
   get prettySize(): string {
-    if (!this.originalFile) return '';
-    const b = this.originalFile.size;
-    if (b < 1024) return `${b} B`;
-    if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} kB`;
-    return `${(b / (1024 * 1024)).toFixed(2)} MB`;
+    return formatFileSize(this.originalFile);
   }
 
   async ngOnInit(): Promise<void> {
@@ -53,10 +48,7 @@ export class ShowFileComponent implements OnInit, OnDestroy {
         this.loading = false;
         return;
       }
-      // Restaura arquivo original
-      // Se o snapshot incluir base64 (base64Gzip ou base64Payload) usamos o util
-      const hasBase64 = !!((snap as any)?.base64Gzip || (snap as any)?.base64Payload);
-      if (hasBase64) {
+      if (hasSnapshotBase64(snap)) {
         const { originalFile } = await restoreFilesFromSnapshot(snap, true);
         this.originalFile = originalFile;
       } else if (this.itemId) {
@@ -74,47 +66,38 @@ export class ShowFileComponent implements OnInit, OnDestroy {
       } else {
         throw new Error('Snapshot sem dados base64');
       }
-      // Decide renderização
       const originalFile = this.originalFile!;
-      const mt = (originalFile.type || '').toLowerCase();
-      const name = (originalFile.name || '').toLowerCase();
-      if (mt.startsWith('image/')) {
-        this.renderKind = 'image';
+      this.renderKind = resolveRenderKind(originalFile);
+
+      if (this.renderKind === 'image') {
         this.objectUrl = URL.createObjectURL(originalFile);
-      } else if (mt.startsWith('text/') || name.endsWith('.csv') || name.endsWith('.json')) {
-        this.renderKind = 'text';
+      } else if (this.renderKind === 'text') {
         const ab = await originalFile.arrayBuffer();
         this.previewText = new TextDecoder('utf-8').decode(ab).slice(0, 50_000);
-      } else if (mt === 'application/pdf' || name.endsWith('.pdf')) {
-        this.renderKind = 'pdf';
+      } else if (this.renderKind === 'pdf') {
         this.objectUrl = URL.createObjectURL(originalFile);
         this.safeObjectUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.objectUrl);
-      } else if (mt === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || name.endsWith('.xlsx')) {
+      } else if (this.renderKind === 'xlsx') {
         const ab = await originalFile.arrayBuffer();
-        await this.renderXlsx(ab);        // <<-- novo
-        this.renderKind = 'xlsx';
-      } else if (mt === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || name.endsWith('.docx')) {
-        this.renderKind = 'docx';
+        await this.renderXlsx(ab);
+      } else if (this.renderKind === 'docx') {
         const ab = await originalFile.arrayBuffer();
         this.loading = false;
         await this.nextTick();
         await this.ensureDocxHostReady();
         try {
-          await this.renderDocxIntoHost(ab);       // docx-preview (melhor fidelidade)
+          await this.renderDocxIntoHost(ab);
         } catch (e) {
           console.warn('[ShowFile] docx-preview falhou, fallback mammoth:', e);
-          await this.renderDocxWithMammoth(ab);    // fallback para HTML
+          await this.renderDocxWithMammoth(ab);
         }
         return;
-      } else {
-        this.renderKind = 'other';
       }
     } catch (e) {
       console.error('[ShowFile] erro ao inicializar preview:', e);
       this.renderKind = 'other';
-    } finally {
     }
-    this.loading = false; 
+    this.loading = false;
     return;
   }
   private async nextTick(): Promise<void> {

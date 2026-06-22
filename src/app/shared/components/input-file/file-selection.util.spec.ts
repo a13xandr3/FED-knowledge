@@ -89,5 +89,18 @@ describe('file-selection.util', () => {
       expect(namesById.get(2)).toBe('new-bar.txt');
       expect(namesById.get(3)).toBe('baz.txt');
     });
+
+    it('deve ignorar ids existentes invalidos e aplicar fallback de filename', () => {
+      const payload = mergeExistingAndNew(
+        [0, -1, 7],
+        new Map<number, string>(),
+        [{ id: 8, filename: undefined as unknown as string }],
+      );
+
+      expect(payload.files).toEqual([
+        { id: 7, filename: 'file-7' },
+        { id: 8, filename: 'file-8' },
+      ]);
+    });
   });
 });

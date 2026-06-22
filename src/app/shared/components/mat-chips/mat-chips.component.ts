@@ -18,6 +18,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { map, Observable, startWith } from 'rxjs';
+import { normalizeChipValue } from './mat-chips-value.util';
 
 @Component({
     selector: 'app-mat-chips',
@@ -81,8 +82,7 @@ export class MatChipsComponent implements ControlValueAccessor, OnChanges {
 
   // NORMALIZA e atualiza tanto o estado interno quanto o pai (allChips) e o form control
   writeValue(value: unknown): void {
-    const normalized = this.normalizeIncoming(value);
-    this.chips = normalized;
+    this.chips = normalizeChipValue(value);
     // atualiza o parent ([(allChips)]) com o valor inicial, se necessário
     //this.allChipsChange.emit(this.chips);
     // notifica o form (garante sincronização)
@@ -173,42 +173,4 @@ export class MatChipsComponent implements ControlValueAccessor, OnChanges {
     this.allChipsChange.emit(this.chips);
   }
 
-  // --- Normalização robusta
-  private normalizeIncoming(value: unknown): string[] {
-    if (!value && value !== 0) return [];
-    // caso venha já um array de strings ou mistas
-    if (Array.isArray(value)) {
-      return value.map(item => this.itemToString(item)).filter(Boolean);
-    }
-    // se veio um objeto { tags: [...]} ou { uris: [...] }
-    if (typeof value === 'object') {
-      const record = value as Record<string, unknown>;
-      if (Array.isArray(record['tags'])) return record['tags'].map((i) => this.itemToString(i)).filter(Boolean);
-      if (Array.isArray(record['uris'])) return record['uris'].map((i) => this.itemToString(i)).filter(Boolean);
-      // objeto simples -> tentar extrair propriedades conhecidas
-      if (record['value']) return [String(record['value'])];
-    }
-    // string ou número único
-    if (typeof value === 'string' || typeof value === 'number') {
-      const s = String(value).trim();
-      return s ? [s] : [];
-    }
-    return [];
-  }
-
-  private itemToString(item: unknown): string {
-    if (typeof item === 'string') return item;
-    if (typeof item === 'number') return String(item);
-    if (item == null) return '';
-    // objetos comuns: { value: 'x' } || { tag: 'x' } || { uri: 'x' }
-    if (typeof item === 'object') {
-      const record = item as Record<string, unknown>;
-      if (record['value']) return String(record['value']);
-      if (record['tag']) return String(record['tag']);
-      if (record['uri']) return String(record['uri']);
-      // fallback: JSON string (evite isso se puder)
-      try { return JSON.stringify(item); } catch { return ''; }
-    }
-    return '';
-  }
 }

@@ -45,8 +45,8 @@ describe('AppFiltroComponent', () => {
 
     expect(homeService.getCategorias).toHaveBeenCalledTimes(1);
     expect(homeService.getTags).toHaveBeenCalledTimes(1);
-    expect(component.statusOptionsCat().map(opt => opt.value)).toEqual(['todos', 'TI']);
-    expect(component.statusOptionsTag().map(opt => opt.value)).toEqual(['todos', 'angular']);
+    expect(component.categoriaOptions().map(opt => opt.value)).toEqual(['todos', 'TI']);
+    expect(component.tagOptions().map(opt => opt.value)).toEqual(['todos', 'angular']);
   });
 
   it('deve emitir o filtro selecionado', () => {
@@ -58,6 +58,15 @@ describe('AppFiltroComponent', () => {
 
     expect(emitSpy).toHaveBeenCalledWith({ tipo: 'categoria', valor: 'TI' });
     expect(emitSpy).toHaveBeenCalledWith({ tipo: 'tag', valor: 'angular' });
+  });
+
+  it('nao deve emitir filtro quando valor selecionado for vazio', () => {
+    fixture.detectChanges();
+    const emitSpy = jest.spyOn(component.filtroSelecionado, 'emit');
+
+    component.categoryCtrl.setValue({ value: '', label: '' });
+
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('deve recarregar opções quando refreshLink$ emitir', () => {
