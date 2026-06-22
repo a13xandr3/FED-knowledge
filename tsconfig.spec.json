@@ -2,9 +2,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
     "outDir": "./out-tsc/spec",
+    "rootDir": "./src",
     "types": [
       "jest",
       "node"
