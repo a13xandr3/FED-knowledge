@@ -20,9 +20,7 @@ jest.mock('xlsx', () => ({
 
 jest.mock('docx-preview', () => ({
   __esModule: true,
-  default: {
-    renderAsync: jest.fn().mockResolvedValue(undefined),
-  },
+  renderAsync: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('mammoth/mammoth.browser', () => ({
@@ -40,7 +38,7 @@ describe('ShowFileComponent', () => {
     read: jest.Mock;
     utils: { sheet_to_html: jest.Mock };
   };
-  const docxPreviewMock = jest.requireMock('docx-preview').default as {
+  const docxPreviewMock = jest.requireMock('docx-preview') as {
     renderAsync: jest.Mock;
   };
   const mammothMock = jest.requireMock('mammoth/mammoth.browser') as {
@@ -176,6 +174,7 @@ describe('ShowFileComponent', () => {
     expect(docxPreviewMock.renderAsync).toHaveBeenCalledWith(
       expect.any(ArrayBuffer),
       component.docxHost?.nativeElement,
+      undefined,
       expect.objectContaining({ className: 'docx' }),
     );
     expect(component.loading).toBe(false);

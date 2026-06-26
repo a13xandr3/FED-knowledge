@@ -4,9 +4,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { downloadFile, restoreFilesFromSnapshot } from '../input-file/file-utils';
 import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 
-import { RenderKind } from 'src/app/types/Files';
-import { ShowFileData } from '../../interfaces/interface.file-ref';
-import { FileApiService } from 'src/app/shared/services/file-api.service';
+import type { RenderKind } from '../../../types/Files';
+import type { ShowFileData } from '../../interfaces/interface.file-ref';
+import { FileApiService } from '../../services/file-api.service';
 import { formatFileSize, hasSnapshotBase64, resolveRenderKind } from './show-file.util';
 @Component({
   selector: 'app-show-file',
@@ -142,17 +142,22 @@ export class ShowFileComponent implements OnInit, OnDestroy {
   }
   /** Renderiza DOCX diretamente no container via docx-preview */
   private async renderDocxIntoHost(ab: ArrayBuffer): Promise<void> {
-    const docx = (await import('docx-preview')).default;
+    const { renderAsync } = await import('docx-preview');
     const host = this.docxHost!.nativeElement;
     host.innerHTML = ''; // limpa render anterior, se houver
-    await docx.renderAsync(ab, host, {
-      className: 'docx',
-      useBase64URL: true,  // evita links blob externos
-      ignoreWidth: false,
-      ignoreHeight: false,
-      breakPages: false,
-      // experimental: true, // se quiser habilitar recursos experimentais
-    });
+    await renderAsync(
+      ab,
+      host,
+      undefined,
+      {
+        className: 'docx',
+        useBase64URL: true, // evita links blob externos
+        ignoreWidth: false,
+        ignoreHeight: false,
+        breakPages: false,
+        // experimental: true, // se quiser habilitar recursos experimentais
+      }
+    );
   }
   /** Fallback: converte DOCX -> HTML com mammoth (menor fidelidade, mais leve) */
   private async renderDocxWithMammoth(ab: ArrayBuffer): Promise<void> {

@@ -1,4 +1,4 @@
-import { RenderKind } from 'src/app/types/Files';
+import type { RenderKind } from '../../../types/Files';
 
 type SnapshotWithPayload = {
   base64Gzip?: unknown;
