@@ -1,48 +1,64 @@
 import { DatePipe } from '@angular/common';
-import { Component, DestroyRef, Inject, OnInit, Optional, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { 
+  MatDialogModule, 
+  MatDialogRef, 
+  MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from '@angular/material/tabs';
 
-import { catchError, concatMap, forkJoin, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { 
+  catchError, 
+  concatMap, 
+  forkJoin, 
+  map, 
+  Observable, 
+  of, 
+  switchMap, 
+  throwError } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
 
+import { QuillComponent } from '../quill/quill.component';
 import { ILinkRequest, ProcessedFile } from '../../request/request';
 import { HomeService } from 'src/app/shared/services/home.service';
 import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { LinkMapperService } from 'src/app/shared/services/link-mapper.service';
 import { SnackService } from 'src/app/shared/services/snack.service';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
-import { FilesPayload, FileRef as FileRefCore, extractIds, idToFilename, diffRemovedIds, mergeExistingAndNew } from 'src/app/shared/components/input-file/file-selection.util';
+import { 
+  FilesPayload, 
+  FileRef as FileRefCore, 
+  extractIds, 
+  idToFilename, 
+  diffRemovedIds, 
+  mergeExistingAndNew } from 'src/app/shared/components/input-file/file-selection.util';
 import { MatChipsComponent } from 'src/app/shared/components/mat-chips/mat-chips.component';
 import { UploaderComponent } from 'src/app/shared/components/uploader/uploader.component';
 import { TokenTimeLeftPipe } from 'src/app/shared/pipes/token-time-left.pipe';
 import { TokenExpiringSoonPipe } from 'src/app/shared/pipes/token-expiring-soon.pipe';
-
-import { QuillComponent } from '../quill/quill.component';
 import { PreviewItem } from 'src/app/types/Files';
-
 @Component({
   selector: 'app-dialog-content',
   templateUrl: './dialog-content.component.html',
   styleUrl: './dialog-content.component.scss',
   imports: [
-    MatDialogModule,
     MatButtonModule,
-    MatFormFieldModule,
-    MatTabsModule,
     MatChipsComponent,
+    MatDialogModule,
+    MatFormFieldModule,
     MatInputModule,
-    ReactiveFormsModule,
+    MatTabsModule,
     NgxMaskDirective,
-    UploaderComponent,
     QuillComponent,
+    ReactiveFormsModule,
     TokenTimeLeftPipe,
-    TokenExpiringSoonPipe
+    TokenExpiringSoonPipe,
+    UploaderComponent,
   ],
   providers: [
     DatePipe
@@ -53,48 +69,24 @@ export class DialogContentComponent implements OnInit {
   allTags: string[] = [];
   allUris: string[] = [];
   allFiles: FilesPayload = { files: [] };
-  fr: FormGroup;
+  fr!: FormGroup;
   currentContent = '';
   totalHorasDia!: string;
   public previewsFromIds: PreviewItem[] = [];
   /** Fila de arquivos processados pelo input-file (payloadBytes etc.) */
   private initialIds: number[] = [];  
   private fileQueue: ProcessedFile[] = [];
-  private readonly destroyRef = inject(DestroyRef);
 
-  constructor(
-    private service: HomeService,
-    private fb: FormBuilder,
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
-    private dialogRef: MatDialogRef<DialogContentComponent>,
-    private linkStateService: LinkStateService,
-    private linkMapperService: LinkMapperService,
-    private snackService: SnackService,
-    private filesApiService: FileApiService
-    ){
-    this.iniciarContagem(86400000); // 24 horas
-    if ( this.data?.categoria?.toLowerCase() == 'timesheet' ) {
-      this.totalHorasDia = data?.totalHorasDia;
-    }
-    this.fr = this.fb.group({
-      id: [{ value: data?.id || '', disabled: true }],
-      name: [data?.name],
-      uri: [this.linkMapperService.normalizeUris(data)],
-      tag: [this.linkMapperService.normalizeTags(data)],
-      fileID: [Array.isArray(this.data?.fileID) ? this.data.fileID : []],
-      categoria: [data?.categoria],
-      subCategoria: [data?.subCategoria],
-      descricao: [data?.descricao || ''],
-      oldCategoria: [data?.oldCategoria],
-      status: [data?.status],
-      dataEntradaManha: [this.toDateBrOrEmpty(data?.dataEntradaManha)],
-      dataSaidaManha: [this.toDateBrOrEmpty(data?.dataSaidaManha)],
-      dataEntradaTarde: [this.toDateBrOrEmpty(data?.dataEntradaTarde)],
-      dataSaidaTarde: [this.toDateBrOrEmpty(data?.dataSaidaTarde)],
-      dataEntradaNoite: [this.toDateBrOrEmpty(data?.dataEntradaNoite)],
-      dataSaidaNoite: [this.toDateBrOrEmpty(data?.dataSaidaNoite)]
-    });
-  }
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly service = inject(HomeService);
+  private readonly fb = inject(FormBuilder);
+  public data: any = inject(MAT_DIALOG_DATA, {optional: true} );
+  private readonly dialogRef = inject(MatDialogRef<DialogContentComponent>);
+  private readonly linkStateService = inject(LinkStateService);
+  private readonly linkMapperService = inject(LinkMapperService);
+  private readonly snackService = inject(SnackService);
+  private readonly filesApiService = inject(FileApiService);
+
   private toDateBrOrEmpty(value: string | null | undefined): string {
     return this.linkMapperService.toDateBr(value ?? null) ?? '';
   }
@@ -116,6 +108,28 @@ export class DialogContentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.iniciarContagem(86400000); // 24 horas
+    if ( this.data?.categoria?.toLowerCase() == 'timesheet' ) {
+      this.totalHorasDia = this.data?.totalHorasDia;
+    }
+    this.fr = this.fb.group({
+      id: [{ value: this.data?.id || '', disabled: true }],
+      name: [this.data?.name],
+      uri: [this.linkMapperService.normalizeUris(this.data)],
+      tag: [this.linkMapperService.normalizeTags(this.data)],
+      fileID: [Array.isArray(this.data?.fileID) ? this.data.fileID : []],
+      categoria: [this.data?.categoria],
+      subCategoria: [this.data?.subCategoria],
+      descricao: [this.data?.descricao || ''],
+      oldCategoria: [this.data?.oldCategoria],
+      status: [this.data?.status],
+      dataEntradaManha: [this.toDateBrOrEmpty(this.data?.dataEntradaManha)],
+      dataSaidaManha: [this.toDateBrOrEmpty(this.data?.dataSaidaManha)],
+      dataEntradaTarde: [this.toDateBrOrEmpty(this.data?.dataEntradaTarde)],
+      dataSaidaTarde: [this.toDateBrOrEmpty(this.data?.dataSaidaTarde)],
+      dataEntradaNoite: [this.toDateBrOrEmpty(this.data?.dataEntradaNoite)],
+      dataSaidaNoite: [this.toDateBrOrEmpty(this.data?.dataSaidaNoite)]
+    });
     const ids = (this.data?.fileID?.[0]?.fileRefs ?? [])
       .map((x: any) => Number(
         typeof x === 'object' ? (x.id ?? x.fileId ?? x.file_id ?? x.fileID) : x
@@ -129,11 +143,9 @@ export class DialogContentComponent implements OnInit {
       });
     }
   }
-
   fechar(): void {
     this.dialogRef.close();
   }
-
   onChipClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
     const url = target?.innerText.trim();
@@ -144,7 +156,6 @@ export class DialogContentComponent implements OnInit {
       tempAnchor.click();
     }
   }
-
   private isValidHttpUrl(url: string): boolean {
     try {
       const parsedUrl = new URL(url);
@@ -153,7 +164,6 @@ export class DialogContentComponent implements OnInit {
       return false;
     }
   }
-
   iniciarContagem(ms: number): void {
     this.linkMapperService.countdown(ms)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -161,30 +171,24 @@ export class DialogContentComponent implements OnInit {
       next: remainingMs => this.tempoRestanteMs = remainingMs,
     });
   }
-
   onProcessed(p: ProcessedFile): void {
     this.fileQueue.push(p);
     this.allFiles.files.push({ id: -1, filename: p.filename });
   }
-
   onClearedFiles(): void {
     this.fileQueue = [];
     this.allFiles = { files: [] };
   }
-
   onError(err: unknown): void {
     console.error(err);
   }
-
   onPreviewRemoved(idx: number): void {
     const removedId = this.previewsFromIds[idx]?.id;
     this.removePreviewIdFromForm(removedId);
   }
-
   onPreviewRemovedRef(ref: { id?: number; index: number; filename: string }): void {
     this.removePreviewIdFromForm(ref.id);
   }
-
   private removePreviewIdFromForm(removedId: unknown): void {
     const id = Number(removedId);
     if (!Number.isFinite(id)) return;
@@ -192,11 +196,9 @@ export class DialogContentComponent implements OnInit {
     const curr: number[] = (ctrl?.value ?? []).filter((v: any) => v !== id);
     ctrl?.setValue(curr);
   }
-
   private deleteMany(ids: number[]): Observable<unknown> {
     return ids.length ? forkJoin(ids.map(id => this.filesApiService.delete(id))) : of(null);
   } 
-
   private uploadQueue(): Observable<FileRefCore[]> {
     return this.fileQueue.length
       ? forkJoin(this.fileQueue.map(p => this.filesApiService.uploadOne(p))).pipe(

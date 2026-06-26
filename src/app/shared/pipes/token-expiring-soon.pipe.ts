@@ -1,16 +1,15 @@
-import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform, inject } from '@angular/core';
+import { ChangeDetectorRef, OnDestroy, OnInit, Pipe, PipeTransform, inject } from '@angular/core';
 
 import { readJwtExpSeconds } from 'src/app/shared/utils/jwt-expiration.util';
 
 @Pipe({ name: 'tokenExpiringSoon', standalone: true, pure: false })
-export class TokenExpiringSoonPipe implements PipeTransform, OnDestroy {
+export class TokenExpiringSoonPipe implements PipeTransform, OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly timerId: ReturnType<typeof setInterval>;
+  private timerId!: ReturnType<typeof setInterval>;
 
-  constructor() {
+  ngOnInit(): void {
     this.timerId = setInterval(() => this.cdr.markForCheck(), 1000);
   }
-
   ngOnDestroy(): void {
     clearInterval(this.timerId);
   }

@@ -3,6 +3,7 @@ import {
   Component,
   effect,
   input,
+  OnInit,
   output
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -27,28 +28,23 @@ import { SelectOption } from 'src/app/shared/models/select-option.model';
     ReactiveFormsModule
 ],
 })
-export class SelectFieldComponent {
+export class SelectFieldComponent implements OnInit {
   readonly options = input<ReadonlyArray<SelectOption<unknown>>>([]);
   readonly placeholder = input('Select an option');
   readonly value = input<unknown>(null);
   readonly matcher = input(new ErrorStateMatcher());
-
   readonly valueChange = output<SelectOption<unknown> | null>();
-
   readonly selected = new FormControl<unknown | null>(null);
-
-  constructor() {
+  ngOnInit(): void {
     effect(() => {
       this.selected.setValue(this.value() ?? null, { emitEvent: false });
     });
   }
-
   onSelectionChange(ev: MatSelectChange): void {
     const val = ev.value;
     const found = this.options().find(o => o.value === val) ?? null;
     this.valueChange.emit(found);
   }
-
   clear(): void {
     this.selected.setValue(null);
     this.valueChange.emit(null);
