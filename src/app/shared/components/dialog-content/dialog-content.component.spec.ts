@@ -12,7 +12,7 @@ import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { LinkMapperService } from 'src/app/shared/services/link-mapper.service';
 import { SnackService } from 'src/app/shared/services/snack.service';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
-import { FilesPayload } from 'src/app/shared/components/input-file/file-selection.util';
+import { FilesPayload } from 'src/app/shared/utils/file-selection.util';
 import { PreviewItem } from 'src/app/types/Files';
 
 // ngx-mask (standalone)

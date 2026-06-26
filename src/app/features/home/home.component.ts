@@ -19,7 +19,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { createHomeDialogData } from './home-dialog-data.factory';
-import { FileRefsValue, TagValue, getTagValues, hasTagValues, parseSelectedFilter, toFileIds } from './home-filter.util';
+import { FileRefsValue, TagValue, getTagValues, hasTagValues, parseSelectedFilter, toFileIds } from 'src/app/shared/utils/home-filter.util';
 
 type LinksResponse = {
   atividades?: ILinksResponse[];

@@ -1,13 +1,13 @@
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { downloadFile, restoreFilesFromSnapshot } from '../input-file/file-utils';
+import { downloadFile, restoreFilesFromSnapshot } from '../../utils/file-utils';
 import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 
 import type { RenderKind } from '../../../types/Files';
 import type { ShowFileData } from '../../interfaces/interface.file-ref';
 import { FileApiService } from '../../services/file-api.service';
-import { formatFileSize, hasSnapshotBase64, resolveRenderKind } from './show-file.util';
+import { formatFileSize, hasSnapshotBase64, resolveRenderKind } from '../../utils/show-file.util';
 @Component({
   selector: 'app-show-file',
   templateUrl: './show-file.component.html',

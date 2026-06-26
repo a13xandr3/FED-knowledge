@@ -1,4 +1,4 @@
-import { ProcessedSnapshot } from "../components/input-file/file-utils";
+import { ProcessedSnapshot } from "../utils/file-utils";
 
 export interface IFileRef {
   id: number;

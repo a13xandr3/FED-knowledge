@@ -36,7 +36,7 @@ import {
   extractIds, 
   idToFilename, 
   diffRemovedIds, 
-  mergeExistingAndNew } from 'src/app/shared/components/input-file/file-selection.util';
+  mergeExistingAndNew } from 'src/app/shared/utils/file-selection.util';
 import { MatChipsComponent } from 'src/app/shared/components/mat-chips/mat-chips.component';
 import { UploaderComponent } from 'src/app/shared/components/uploader/uploader.component';
 import { TokenTimeLeftPipe } from 'src/app/shared/pipes/token-time-left.pipe';

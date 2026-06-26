@@ -29,7 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { map, Observable, startWith } from 'rxjs';
 
-import { normalizeChipValue } from './mat-chips-value.util';
+import { normalizeChipValue } from 'src/app/shared/utils/mat-chips-value.util';
 @Component({
     selector: 'app-mat-chips',
     templateUrl: './mat-chips.component.html',

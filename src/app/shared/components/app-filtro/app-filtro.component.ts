@@ -12,7 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Observable, skip } from 'rxjs';
 
-import { createFilterOptions } from 'src/app/shared/components/app-filtro/filter-options.util';
+import { createFilterOptions } from 'src/app/shared/utils/filter-options.util';
 import { FiltroSelecionado, FiltroTipo } from 'src/app/shared/interfaces/filtro-selecionado.interface';
 import { SelectOption } from 'src/app/shared/models/select-option.model';
 import { HomeService } from 'src/app/shared/services/home.service';
