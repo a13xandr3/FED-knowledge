@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { Router } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 
 import { HeaderComponent } from './header.component';
@@ -9,6 +10,7 @@ import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { SnackService } from 'src/app/shared/services/snack.service';
 import { DialogContentComponent } from 'src/app/shared/components/dialog-content/dialog-content.component';
 import { FiltroSelecionado } from 'src/app/shared/interfaces/filtro-selecionado.interface';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -17,6 +19,8 @@ describe('HeaderComponent', () => {
   let homeService: { getCategorias: jest.Mock; getTags: jest.Mock };
   let linkStateService: { refreshLink$: ReturnType<BehaviorSubject<boolean>['asObservable']>; triggerRefresh: jest.Mock };
   let dialog: { open: jest.Mock };
+  let authService: { isAuthenticated: jest.Mock; logout: jest.Mock };
+  let router: { navigate: jest.Mock };
 
   beforeEach(async () => {
     refreshSubject = new BehaviorSubject<boolean>(false);
@@ -31,6 +35,13 @@ describe('HeaderComponent', () => {
     dialog = {
       open: jest.fn(),
     };
+    authService = {
+      isAuthenticated: jest.fn().mockReturnValue(true),
+      logout: jest.fn(),
+    };
+    router = {
+      navigate: jest.fn().mockResolvedValue(true),
+    };
 
     await TestBed.configureTestingModule({
       imports: [HeaderComponent],
@@ -40,6 +51,8 @@ describe('HeaderComponent', () => {
         { provide: LinkStateService, useValue: linkStateService },
         { provide: MatDialog, useValue: dialog },
         { provide: SnackService, useValue: { mostrarMensagem: jest.fn() } },
+        { provide: AuthService, useValue: authService },
+        { provide: Router, useValue: router },
       ],
     }).compileComponents();
 
@@ -54,8 +67,18 @@ describe('HeaderComponent', () => {
   it('deve carregar categorias e tags ao iniciar', () => {
     fixture.detectChanges();
 
+    expect(authService.isAuthenticated).toHaveBeenCalled();
     expect(homeService.getCategorias).toHaveBeenCalledTimes(1);
     expect(homeService.getTags).toHaveBeenCalledTimes(1);
+  });
+
+  it('deve redirecionar para login quando nao houver sessao valida ao iniciar', () => {
+    authService.isAuthenticated.mockReturnValue(false);
+
+    fixture.detectChanges();
+
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
+    expect(linkStateService.triggerRefresh).not.toHaveBeenCalled();
   });
 
   it('deve emitir categoria e tag selecionadas', () => {
@@ -108,5 +131,13 @@ describe('HeaderComponent', () => {
 
     expect(homeService.getCategorias).toHaveBeenCalledTimes(2);
     expect(homeService.getTags).toHaveBeenCalledTimes(2);
+  });
+
+  it('deve fazer logout limpando sessao e navegando para login', () => {
+    component.logout();
+
+    expect(authService.logout).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
+    expect(linkStateService.triggerRefresh).not.toHaveBeenCalled();
   });
 });

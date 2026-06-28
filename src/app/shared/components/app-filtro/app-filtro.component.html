@@ -1,29 +1,35 @@
-<!-- Categoria -->
-<div class="col-4 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
-  <select
-    class="form-select form-select-sm"
-    aria-label="Choose one category"
-    [formControl]="categoryCtrl">
-    <option [ngValue]="null" disabled>Choose one category</option>
-    @for (opt of categoriaOptions(); track opt.value) {
-      <option [ngValue]="opt">
-        {{ opt.label }}
-      </option>
-    }
-  </select>
-</div>
+<div class="row g-2 gx-sm-0 align-items-center">
+  <!-- Categoria -->
+  <div class="col-12 col-sm-6">
+    <div class="filter-select-wrap mx-2">
+      <select
+        class="form-select form-select-sm"
+        aria-label="Choose one category"
+        [formControl]="categoryCtrl">
+        <option [ngValue]="null" disabled>Choose one category</option>
+        @for (opt of categoriaOptions(); track opt.value) {
+          <option [ngValue]="opt">
+            {{ opt.label }}
+          </option>
+        }
+      </select>
+    </div>
+  </div>
 
-<!-- Tag -->
-<div class="col-4 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
-  <select
-    class="form-select form-select-sm"
-    aria-label="Choose one tag"
-    [formControl]="tagCtrl">
-    <option [ngValue]="null" disabled>Choose one tag</option>
-    @for (opt of tagOptions(); track opt.value) {
-      <option [ngValue]="opt">
-        {{ opt.label }}
-      </option>
-    }
-  </select>
+  <!-- Tag -->
+  <div class="col-12 col-sm-6">
+    <div class="filter-select-wrap mx-2">
+      <select
+        class="form-select form-select-sm"
+        aria-label="Choose one tag"
+        [formControl]="tagCtrl">
+        <option [ngValue]="null" disabled>Choose one tag</option>
+        @for (opt of tagOptions(); track opt.value) {
+          <option [ngValue]="opt">
+            {{ opt.label }}
+          </option>
+        }
+      </select>
+    </div>
+  </div>
 </div>

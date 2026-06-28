@@ -13,10 +13,13 @@ export const AuthGuard: CanActivateFn = (): AuthGuardResult | Observable<AuthGua
   const authService = inject(AuthService);
   const router = inject(Router);
   const redirectToLogin = () => router.createUrlTree(['/login']);
-  const currentToken = tokenStorage.getToken();
 
-  if (!currentToken || tokenStorage.isTokenExpired()) {
-    tokenStorage.clear();
+  if (!authService.isAuthenticated()) {
+    return redirectToLogin();
+  }
+
+  const currentToken = authService.getToken();
+  if (!currentToken) {
     return redirectToLogin();
   }
 

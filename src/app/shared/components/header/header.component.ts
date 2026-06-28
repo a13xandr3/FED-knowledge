@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DOCUMENT } from '@angular/common';
+import { Router } from '@angular/router';
 
 import { MatDialog } from '@angular/material/dialog';
 
@@ -24,6 +25,7 @@ import { createHeaderDialogData } from 'src/app/shared/components/header/header-
 import { DialogContentCloseResult, DialogContentData } from 'src/app/shared/interfaces/dialog-content-data.interface';
 import { FiltroSelecionado } from 'src/app/shared/interfaces/filtro-selecionado.interface';
 import { clearElementFocus } from 'src/app/shared/utils/focus.util';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -49,8 +51,15 @@ export class HeaderComponent implements OnInit {
   private readonly linkStateService = inject(LinkStateService);
   private readonly dialog = inject(MatDialog);
   private readonly document = inject(DOCUMENT);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   ngOnInit(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.redirectToLogin();
+      return;
+    }
+
     this.linkStateService.triggerRefresh();
   }
 
@@ -87,5 +96,13 @@ export class HeaderComponent implements OnInit {
     if (result?.categoria) {
       this.linkStateService.triggerRefresh();
     }
+  }
+  logout(): void {
+    this.authService.logout();
+    this.redirectToLogin();
+  }
+
+  private redirectToLogin(): void {
+    void this.router.navigate(['/login'], { replaceUrl: true });
   }
 }

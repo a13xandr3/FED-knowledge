@@ -26,9 +26,15 @@ export const tokenInterceptor: HttpInterceptorFn = (
     return next(req);
   }
 
+  if (!authService.isAuthenticated()) {
+    router.navigate(['/login'], { replaceUrl: true });
+    return throwError(() => new Error('Sessão expirada ou inválida'));
+  }
+
   const currentToken = tokenStorage.getToken();
   if (!currentToken) {
-    return next(req);
+    router.navigate(['/login'], { replaceUrl: true });
+    return throwError(() => new Error('Sessão expirada ou inválida'));
   }
 
   const aboutToExpire = tokenStorage.willExpireIn(60); // ≤ 60s
@@ -51,7 +57,7 @@ export const tokenInterceptor: HttpInterceptorFn = (
       const newToken = resp?.token;
       if (!newToken) {
         tokenStorage.clear();
-        router.navigate(['/login']);
+        router.navigate(['/login'], { replaceUrl: true });
         return throwError(() => new Error('Token inválido na revalidação'));
       }
 
@@ -64,7 +70,7 @@ export const tokenInterceptor: HttpInterceptorFn = (
     catchError(err => {
       isRefreshing = false;
       tokenStorage.clear();
-      router.navigate(['/login']);
+      router.navigate(['/login'], { replaceUrl: true });
       return throwError(() => err);
     })
   );
@@ -72,7 +78,7 @@ export const tokenInterceptor: HttpInterceptorFn = (
 function handleAuthError(err: any, tokenStorage: TokenStorageService, router: Router) {
   if (err?.status === 401 || err?.status === 403) {
     tokenStorage.clear();
-    router.navigate(['/login']);
+    router.navigate(['/login'], { replaceUrl: true });
   }
   return throwError(() => err);
 }

@@ -50,6 +50,17 @@ export class AuthService {
   logout(): void {
     this.tokenStorage.clear();
   }
+
+  isAuthenticated(): boolean {
+    const token = this.tokenStorage.getToken();
+    if (!token || this.tokenStorage.isTokenExpired()) {
+      this.tokenStorage.clear();
+      return false;
+    }
+
+    return true;
+  }
+
   getToken(): string | null {
     return this.tokenStorage.getToken();
   }

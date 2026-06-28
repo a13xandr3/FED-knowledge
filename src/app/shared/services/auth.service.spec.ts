@@ -8,13 +8,14 @@ import { TokenStorageService } from './token-storage.service';
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
-  let tokenStorage: { setToken: jest.Mock; clear: jest.Mock; getToken: jest.Mock };
+  let tokenStorage: { setToken: jest.Mock; clear: jest.Mock; getToken: jest.Mock; isTokenExpired: jest.Mock };
 
   beforeEach(() => {
     tokenStorage = {
       setToken: jest.fn(),
       clear: jest.fn(),
       getToken: jest.fn(),
+      isTokenExpired: jest.fn(),
     };
 
     TestBed.configureTestingModule({
@@ -91,5 +92,26 @@ describe('AuthService', () => {
 
     expect(tokenStorage.clear).toHaveBeenCalled();
     expect(service.getToken()).toBe('stored-token');
+  });
+
+  it('deve identificar sessao autenticada somente com token existente e nao expirado', () => {
+    tokenStorage.getToken.mockReturnValue('stored-token');
+    tokenStorage.isTokenExpired.mockReturnValue(false);
+
+    expect(service.isAuthenticated()).toBe(true);
+    expect(tokenStorage.clear).not.toHaveBeenCalled();
+  });
+
+  it('deve limpar token e negar autenticacao quando token nao existir ou estiver expirado', () => {
+    tokenStorage.getToken.mockReturnValue(null);
+
+    expect(service.isAuthenticated()).toBe(false);
+    expect(tokenStorage.clear).toHaveBeenCalledTimes(1);
+
+    tokenStorage.getToken.mockReturnValue('expired-token');
+    tokenStorage.isTokenExpired.mockReturnValue(true);
+
+    expect(service.isAuthenticated()).toBe(false);
+    expect(tokenStorage.clear).toHaveBeenCalledTimes(2);
   });
 });

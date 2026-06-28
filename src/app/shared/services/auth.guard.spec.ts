@@ -15,6 +15,8 @@ describe('AuthGuard', () => {
   };
 
   const authServiceMock = {
+    isAuthenticated: jest.fn(),
+    getToken: jest.fn(),
     revalidateToken: jest.fn(),
   };
 
@@ -37,41 +39,51 @@ describe('AuthGuard', () => {
   });
 
   it('deve permitir acesso quando o token estiver válido e longe de expirar', async () => {
-    tokenStorageServiceMock.getToken.mockReturnValue('token');
-    tokenStorageServiceMock.isTokenExpired.mockReturnValue(false);
+    authServiceMock.isAuthenticated.mockReturnValue(true);
+    authServiceMock.getToken.mockReturnValue('token');
     tokenStorageServiceMock.willExpireIn.mockReturnValue(false);
 
     const result = await runGuard();
 
     expect(result).toBe(true);
+    expect(authServiceMock.isAuthenticated).toHaveBeenCalled();
     expect(authServiceMock.revalidateToken).not.toHaveBeenCalled();
     expect(routerMock.createUrlTree).not.toHaveBeenCalled();
   });
 
   it('deve bloquear acesso e criar redirect para login quando nao houver token', async () => {
-    tokenStorageServiceMock.getToken.mockReturnValue(null);
+    authServiceMock.isAuthenticated.mockReturnValue(false);
 
     const result = await runGuard();
 
     expect(result).toBe(loginTree);
-    expect(tokenStorageServiceMock.clear).toHaveBeenCalled();
+    expect(authServiceMock.isAuthenticated).toHaveBeenCalled();
     expect(routerMock.createUrlTree).toHaveBeenCalledWith(['/login']);
   });
 
   it('deve bloquear acesso e criar redirect para login quando o token estiver expirado', async () => {
-    tokenStorageServiceMock.getToken.mockReturnValue('token');
-    tokenStorageServiceMock.isTokenExpired.mockReturnValue(true);
+    authServiceMock.isAuthenticated.mockReturnValue(false);
 
     const result = await runGuard();
 
     expect(result).toBe(loginTree);
-    expect(tokenStorageServiceMock.clear).toHaveBeenCalled();
+    expect(authServiceMock.isAuthenticated).toHaveBeenCalled();
+    expect(routerMock.createUrlTree).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('deve redirecionar para login quando sessao diz ativa mas token nao existe', async () => {
+    authServiceMock.isAuthenticated.mockReturnValue(true);
+    authServiceMock.getToken.mockReturnValue(null);
+
+    const result = await runGuard();
+
+    expect(result).toBe(loginTree);
     expect(routerMock.createUrlTree).toHaveBeenCalledWith(['/login']);
   });
 
   it('deve revalidar token quando estiver perto de expirar', async () => {
-    tokenStorageServiceMock.getToken.mockReturnValue('old-token');
-    tokenStorageServiceMock.isTokenExpired.mockReturnValue(false);
+    authServiceMock.isAuthenticated.mockReturnValue(true);
+    authServiceMock.getToken.mockReturnValue('old-token');
     tokenStorageServiceMock.willExpireIn.mockReturnValue(true);
     authServiceMock.revalidateToken.mockReturnValue(of({ status: 'ok', token: 'new-token' }));
 
@@ -82,8 +94,8 @@ describe('AuthGuard', () => {
   });
 
   it('deve redirecionar para login quando revalidacao nao retorna token', async () => {
-    tokenStorageServiceMock.getToken.mockReturnValue('old-token');
-    tokenStorageServiceMock.isTokenExpired.mockReturnValue(false);
+    authServiceMock.isAuthenticated.mockReturnValue(true);
+    authServiceMock.getToken.mockReturnValue('old-token');
     tokenStorageServiceMock.willExpireIn.mockReturnValue(true);
     authServiceMock.revalidateToken.mockReturnValue(of({ status: 'ok', token: '' }));
 
@@ -95,8 +107,8 @@ describe('AuthGuard', () => {
   });
 
   it('deve redirecionar para login quando revalidacao falhar', async () => {
-    tokenStorageServiceMock.getToken.mockReturnValue('old-token');
-    tokenStorageServiceMock.isTokenExpired.mockReturnValue(false);
+    authServiceMock.isAuthenticated.mockReturnValue(true);
+    authServiceMock.getToken.mockReturnValue('old-token');
     tokenStorageServiceMock.willExpireIn.mockReturnValue(true);
     authServiceMock.revalidateToken.mockReturnValue(throwError(() => new Error('falha')));
 

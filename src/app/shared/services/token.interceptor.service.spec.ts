@@ -9,7 +9,7 @@ import { tokenInterceptor } from './token.interceptor.service';
 
 describe('tokenInterceptor', () => {
   let tokenStorage: { getToken: jest.Mock; willExpireIn: jest.Mock; setToken: jest.Mock; clear: jest.Mock };
-  let authService: { revalidateToken: jest.Mock };
+  let authService: { isAuthenticated: jest.Mock; revalidateToken: jest.Mock };
   let router: { navigate: jest.Mock };
 
   beforeEach(() => {
@@ -20,6 +20,7 @@ describe('tokenInterceptor', () => {
       clear: jest.fn(),
     };
     authService = {
+      isAuthenticated: jest.fn().mockReturnValue(true),
       revalidateToken: jest.fn(),
     };
     router = {
@@ -47,17 +48,32 @@ describe('tokenInterceptor', () => {
     await firstValueFrom(runInterceptor(req, next));
 
     expect(next).toHaveBeenCalledWith(req);
+    expect(authService.isAuthenticated).not.toHaveBeenCalled();
     expect(authService.revalidateToken).not.toHaveBeenCalled();
   });
 
-  it('deve seguir sem alterar request quando nao houver token', async () => {
+  it('deve bloquear request protegido quando sessao estiver invalida', async () => {
+    authService.isAuthenticated.mockReturnValue(false);
     tokenStorage.getToken.mockReturnValue(null);
     const req = new HttpRequest('GET', '/api/data');
     const next = jest.fn(() => of(new HttpResponse({ status: 200 })));
 
-    await firstValueFrom(runInterceptor(req, next));
+    await expect(firstValueFrom(runInterceptor(req, next))).rejects.toThrow('Sessão expirada ou inválida');
 
-    expect(next).toHaveBeenCalledWith(req);
+    expect(next).not.toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
+  });
+
+  it('deve bloquear request protegido quando token sumir apos validacao', async () => {
+    authService.isAuthenticated.mockReturnValue(true);
+    tokenStorage.getToken.mockReturnValue(null);
+    const req = new HttpRequest('GET', '/api/data');
+    const next = jest.fn(() => of(new HttpResponse({ status: 200 })));
+
+    await expect(firstValueFrom(runInterceptor(req, next))).rejects.toThrow('Sessão expirada ou inválida');
+
+    expect(next).not.toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
   });
 
   it('deve anexar Authorization quando token nao esta perto de expirar', async () => {
@@ -84,7 +100,7 @@ describe('tokenInterceptor', () => {
     await expect(firstValueFrom(runInterceptor(req, next))).rejects.toBe(error);
 
     expect(tokenStorage.clear).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/login']);
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
   });
 
   it('nao deve limpar token para erro diferente de 401/403', async () => {
@@ -126,7 +142,7 @@ describe('tokenInterceptor', () => {
     await expect(firstValueFrom(runInterceptor(req, next))).rejects.toThrow('Token inválido na revalidação');
 
     expect(tokenStorage.clear).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/login']);
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -140,7 +156,7 @@ describe('tokenInterceptor', () => {
     await expect(firstValueFrom(runInterceptor(req, jest.fn()))).rejects.toBe(error);
 
     expect(tokenStorage.clear).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/login']);
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], { replaceUrl: true });
   });
 
   it('deve seguir com token atual enquanto outra revalidacao esta em andamento', async () => {
