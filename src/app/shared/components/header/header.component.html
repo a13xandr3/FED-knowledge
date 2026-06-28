@@ -28,6 +28,7 @@
     <div class="row align-items-center g-2 mt-2">
       <app-filtro
         class="col-12 col-md-10 header-filter-col"
+        [selectedFilter]="selectedFilter()"
         (filtroSelecionado)="onFiltroSelecionado($event)">
       </app-filtro>
 

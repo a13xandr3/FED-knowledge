@@ -20,6 +20,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
 import { MatChipsModule } from '@angular/material/chips';
 import { createHomeDialogData } from './home-dialog-data.factory';
 import { FileRefsValue, TagValue, getTagValues, hasTagValues, parseSelectedFilter, toFileIds } from 'src/app/shared/utils/home-filter.util';
+import { FiltroSelecionado } from 'src/app/shared/interfaces/filtro-selecionado.interface';
 
 type LinksResponse = {
   atividades?: ILinksResponse[];
@@ -46,6 +47,7 @@ export class HomeComponent implements OnInit {
   titulo = '';
   itemModificadoCategoria = '';
   itemModificadoTag = '';
+  selectedFilter: FiltroSelecionado | null = null;
 
   links: ILinksResponse[] = [];
 
@@ -146,6 +148,7 @@ export class HomeComponent implements OnInit {
 
   onItemSelecionado(itemSelecionado: string): void {
     const { tipo, valor } = parseSelectedFilter(itemSelecionado);
+    this.selectedFilter = { tipo, valor };
     const filtroValor = valor === 'todos' ? '' : valor;
     this.itemModificadoCategoria = tipo === 'categoria' ? filtroValor : '';
     this.itemModificadoTag = tipo === 'tag' ? filtroValor : '';

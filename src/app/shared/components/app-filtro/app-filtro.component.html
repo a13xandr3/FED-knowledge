@@ -5,6 +5,7 @@
       <select
         class="form-select form-select-sm"
         aria-label="Choose one category"
+        [compareWith]="compareOptions"
         [formControl]="categoryCtrl">
         <option [ngValue]="null" disabled>Choose one category</option>
         @for (opt of categoriaOptions(); track opt.value) {
@@ -22,6 +23,7 @@
       <select
         class="form-select form-select-sm"
         aria-label="Choose one tag"
+        [compareWith]="compareOptions"
         [formControl]="tagCtrl">
         <option [ngValue]="null" disabled>Choose one tag</option>
         @for (opt of tagOptions(); track opt.value) {

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, Subject, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 
 import { HomeComponent } from './home.component';
@@ -10,6 +10,7 @@ import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { ComportamentoService } from 'src/app/shared/services/comportamento.service';
 import { SnackService } from 'src/app/shared/services/snack.service';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 // ---- Mocks de serviços ----
 
@@ -49,6 +50,15 @@ const activatedRouteMock = {
   queryParams: of({ titulo: 'Título via rota' }),
 };
 
+const authServiceMock = {
+  isAuthenticated: jest.fn().mockReturnValue(true),
+  logout: jest.fn(),
+};
+
+const routerMock = {
+  navigate: jest.fn().mockResolvedValue(true),
+};
+
 describe('HomeComponent (standalone + Jest)', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
@@ -66,6 +76,8 @@ describe('HomeComponent (standalone + Jest)', () => {
         { provide: LinkStateService, useValue: linkStateServiceMock },
         { provide: HomeService, useValue: homeServiceMock },
         { provide: SnackService, useValue: snackServiceMock },
+        { provide: AuthService, useValue: authServiceMock },
+        { provide: Router, useValue: routerMock },
       ],
     })
     .overrideProvider(MatDialog, { useValue: matDialogMock })
@@ -108,6 +120,7 @@ describe('HomeComponent (standalone + Jest)', () => {
 
     component.onItemSelecionado('financeiro_categoria');
 
+    expect(component.selectedFilter).toEqual({ tipo: 'categoria', valor: 'financeiro' });
     expect(component.itemModificadoCategoria).toBe('financeiro');
     expect(component.itemModificadoTag).toBe('');
     expect(component.pageIndex).toBe(0);
@@ -122,6 +135,7 @@ describe('HomeComponent (standalone + Jest)', () => {
 
     component.onItemSelecionado('tagImportante_tag');
 
+    expect(component.selectedFilter).toEqual({ tipo: 'tag', valor: 'tagImportante' });
     expect(component.itemModificadoCategoria).toBe('');
     expect(component.itemModificadoTag).toBe('tagImportante');
     expect(spyGetLinks).toHaveBeenCalled();
@@ -131,10 +145,12 @@ describe('HomeComponent (standalone + Jest)', () => {
     homeServiceMock.getLinks.mockReturnValue(of({ atividades: [], total: 0 }));
 
     component.onItemSelecionado('todos_categoria');
+    expect(component.selectedFilter).toEqual({ tipo: 'categoria', valor: 'todos' });
     expect(component.itemModificadoCategoria).toBe('');
     expect(component.itemModificadoTag).toBe('');
 
     component.onItemSelecionado('todos_tag');
+    expect(component.selectedFilter).toEqual({ tipo: 'tag', valor: 'todos' });
     expect(component.itemModificadoCategoria).toBe('');
     expect(component.itemModificadoTag).toBe('');
   });
@@ -351,6 +367,7 @@ describe('HomeComponent (standalone + Jest)', () => {
     component.onChangeTag('angular_tag');
 
     expect(resetSpy).toHaveBeenCalled();
+    expect(component.selectedFilter).toEqual({ tipo: 'tag', valor: 'angular' });
     expect(component.itemModificadoTag).toBe('angular');
   });
 

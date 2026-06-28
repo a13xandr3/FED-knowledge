@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   OnInit,
+  effect,
   inject,
   input,
   output
@@ -42,6 +43,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 export class HeaderComponent implements OnInit {
   readonly titulo = input('');
   readonly totalHoras = input<number | null | undefined>(null);
+  readonly selectedFilter = input<FiltroSelecionado | null>(null);
 
   readonly itemSelecionadoEvent = output<string>();
 
@@ -54,6 +56,18 @@ export class HeaderComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
+  private readonly selectedFilterEffect = effect(() => {
+    const selectedFilter = this.selectedFilter();
+
+    if (!selectedFilter) {
+      return;
+    }
+
+    this.selectedItemCategory = selectedFilter.tipo === 'categoria' && selectedFilter.valor !== 'todos'
+      ? selectedFilter.valor
+      : '';
+  });
+
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {
       this.redirectToLogin();
@@ -64,9 +78,9 @@ export class HeaderComponent implements OnInit {
   }
 
   onFiltroSelecionado(filtro: FiltroSelecionado): void {
-    if (filtro.tipo === 'categoria') {
-      this.selectedItemCategory = filtro.valor;
-    }
+    this.selectedItemCategory = filtro.tipo === 'categoria' && filtro.valor !== 'todos'
+      ? filtro.valor
+      : '';
 
     this.itemSelecionadoEvent.emit(`${filtro.valor}_${filtro.tipo}`);
   }

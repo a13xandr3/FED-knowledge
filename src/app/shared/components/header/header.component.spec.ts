@@ -91,6 +91,28 @@ describe('HeaderComponent', () => {
     expect(emitSpy).toHaveBeenCalledWith('angular_tag');
   });
 
+  it('deve sincronizar categoria selecionada recebida por input', () => {
+    fixture.componentRef.setInput(
+      'selectedFilter',
+      { tipo: 'categoria', valor: 'Timesheet' } satisfies FiltroSelecionado
+    );
+    fixture.detectChanges();
+
+    expect(component.selectedItemCategory).toBe('Timesheet');
+  });
+
+  it('deve limpar categoria ativa quando filtro recebido for tag', () => {
+    component.selectedItemCategory = 'Timesheet';
+
+    fixture.componentRef.setInput(
+      'selectedFilter',
+      { tipo: 'tag', valor: 'angular' } satisfies FiltroSelecionado
+    );
+    fixture.detectChanges();
+
+    expect(component.selectedItemCategory).toBe('');
+  });
+
   it('deve abrir o dialog e disparar refresh quando houver categoria no resultado', () => {
     const dialogRef = {
       afterClosed: jest.fn().mockReturnValue(of({ categoria: 'Nova Categoria' })),

@@ -90,6 +90,14 @@ $shadow: rgba(0, 0, 0, 0.6);
   box-shadow: 0 0 0 0.12rem rgba(0, 188, 212, 0.18);
 }
 
+:host ::ng-deep app-filtro .form-select:disabled {
+  color: rgba(234, 234, 234, 0.48);
+  border-color: rgba(255, 255, 255, 0.14);
+  background-color: rgba(255, 255, 255, 0.04);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 :host ::ng-deep app-filtro .form-select option {
   color: #212626;
 }
