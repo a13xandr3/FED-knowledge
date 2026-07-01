@@ -12,20 +12,20 @@
   scrollbar-gutter: stable;   /* evita “pulo” de layout */
   /* Firefox */
   scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,.40) transparent;
+  scrollbar-color: var(--kb-scrollbar-thumb-strong) transparent;
 }
 /* Chrome/Edge/Safari – largura da barra vertical (em px) e estilo */
 ::ng-deep .main-chips .mdc-evolution-chip-set__chips::-webkit-scrollbar {
   width: 5px;     /* largura da barra de rolagem vertical */
   height: 5px;    /* espessura da barra horizontal (se aparecer) */
-  background-color: aqua;
+  background-color: var(--kb-scrollbar-bg);
 }
 ::ng-deep .main-chips .mdc-evolution-chip-set__chips::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,.35);
+  background: var(--kb-scrollbar-thumb);
   border-radius: 8px;
 }
 ::ng-deep .main-chips .mdc-evolution-chip-set__chips::-webkit-scrollbar-track {
-  background: red;
+  background: var(--kb-scrollbar-track);
 }
 /* limpa interferências visuais do form-field (sem remover o label) */
 ::ng-deep .main-chips .mat-mdc-text-field-wrapper.mdc-text-field--filled {

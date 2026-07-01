@@ -7,8 +7,8 @@
   height: 90vh; /* ocupa bem o espaço do MatDialog */
   max-height: 90vh;
   position: relative;
-  background: var(--sf-bg, #0f0f12);
-  color: #e9eaee;
+  background: var(--sf-bg, var(--kb-preview-bg));
+  color: var(--kb-preview-text);
   //border-radius: 12px;
   overflow: hidden;
 }
@@ -18,8 +18,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: var(--kb-preview-header-bg);
+  border-bottom: 1px solid var(--kb-preview-white-08);
 }
 .sf-title {
   min-width: 0;
@@ -41,8 +41,8 @@
   font-size: 12px;
   padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--kb-preview-white-08);
+  border: 1px solid var(--kb-preview-white-06);
 }
 /* Botão fechar minimalista */
 .icon-btn.close {
@@ -50,13 +50,13 @@
   height: 32px;
   border-radius: 8px;
   border: none;
-  background: rgba(255,255,255,0.08);
-  color: #fff;
+  background: var(--kb-preview-white-08);
+  color: var(--kb-text-strong);
   font-size: 20px;
   line-height: 20px;
   cursor: pointer;
 }
-.icon-btn.close:hover { background: rgba(255,255,255,0.12); }
+.icon-btn.close:hover { background: var(--kb-preview-white-12); }
 /* Body com 10px de margem interna */
 .sf-body {
   padding: 10px;
@@ -67,8 +67,8 @@
   display: flex;
   width: 100%;
   border-radius: 10px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--kb-preview-white-02);
+  border: 1px solid var(--kb-preview-white-06);
   overflow: auto;
 }
 .sf-media {
@@ -76,7 +76,7 @@
   height: 100%;
   display: block;
   object-fit: contain;
-  background: #0b0b0d;
+  background: var(--kb-preview-panel-bg);
 }
 /* Texto pré-formatado com scroll suave */
 .sf-text {
@@ -88,7 +88,7 @@
   white-space: pre-wrap;
   line-height: 1.35;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  background: #0b0b0d;
+  background: var(--kb-preview-panel-bg);
 }
 /* Footer com ações alinhadas à direita */
 .sf-footer {
@@ -96,23 +96,23 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid var(--kb-preview-white-08);
 }
 .spacer { flex: 1; }
 .btn {
   appearance: none;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
-  color: #fff;
+  border: 1px solid var(--kb-preview-white-18);
+  background: var(--kb-preview-button-bg);
+  color: var(--kb-text-strong);
   padding: 8px 14px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
 }
-.btn:hover { border-color: rgba(255,255,255,0.28); }
+.btn:hover { border-color: var(--kb-preview-white-28); }
 .btn.ghost {
   background: transparent;
-  border-color: rgba(255,255,255,0.14);
+  border-color: var(--kb-preview-white-14);
 }
 /* Overlay de loading */
 .sf-loading-overlay {
@@ -121,15 +121,15 @@
   display: grid;
   place-content: center;
   gap: 12px;
-  background: rgba(7,7,10,0.65);
+  background: var(--kb-preview-loading-bg);
   z-index: 2;
   text-align: center;
 }
 .spinner {
   width: 28px;
   height: 28px;
-  border: 3px solid rgba(255,255,255,0.16);
-  border-top-color: #fff;
+  border: 3px solid var(--kb-preview-white-16);
+  border-top-color: var(--kb-text-strong);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -142,13 +142,13 @@
 }
 .sheet-view, .docx-view {
   padding: 12px;
-  background: #0b0b0d;
+  background: var(--kb-preview-panel-bg);
 }
 .sheet-view table {
   border-collapse: collapse;
 }
 .sheet-view td, .sheet-view th {
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--kb-preview-white-08);
   padding: 6px 8px;
   white-space: nowrap;
 }

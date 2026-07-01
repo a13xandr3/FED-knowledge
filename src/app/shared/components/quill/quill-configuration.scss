@@ -34,11 +34,11 @@
     --mat-typography-subtitle1-font-family: "Poppins";
     --mat-typography-subtitle2-font-family: "Poppins";
     font-size: 1rem;
-    background-color: lawngreen;
+    background-color: var(--kb-quill-debug-bg);
 }
 html,
 body {height: 100%;line-height: 1.5;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;scroll-behavior: smooth;}
-body {background-color: #000;color: #000;font-family: "Poppins";}
+body {background-color: var(--kb-page-bg);color: var(--kb-page-bg);font-family: "Poppins";}
 img,
 picture,
 video,

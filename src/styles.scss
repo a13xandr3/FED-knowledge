@@ -1,3 +1,194 @@
+$kb-bg-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
+$kb-card-bg: rgba(255, 255, 255, 0.1);
+$kb-border-glow: rgba(255, 255, 255, 0.25);
+$kb-text-color: #eaeaea;
+$kb-accent-color: #00bcd4;
+$kb-shadow-color: rgba(0, 0, 0, 0.6);
+
+$kb-surface-control: rgba(255, 255, 255, 0.08);
+$kb-surface-control-soft: rgba(255, 255, 255, 0.07);
+$kb-surface-row: rgba(255, 255, 255, 0.04);
+$kb-surface-chip: rgba(255, 255, 255, 0.12);
+$kb-text-strong: #fff;
+$kb-text-soft: rgba(234, 234, 234, 0.84);
+$kb-text-status: rgba(234, 234, 234, 0.82);
+$kb-text-muted: rgba(234, 234, 234, 0.78);
+$kb-text-meta: rgba(234, 234, 234, 0.76);
+$kb-text-label: rgba(234, 234, 234, 0.74);
+$kb-text-subtle: rgba(234, 234, 234, 0.72);
+$kb-text-placeholder: rgba(234, 234, 234, 0.62);
+$kb-text-disabled: rgba(234, 234, 234, 0.48);
+$kb-text-option: #212626;
+$kb-danger-color: #ff8a80;
+$kb-border-subtle: rgba(255, 255, 255, 0.14);
+$kb-border-field: rgba(255, 255, 255, 0.42);
+$kb-border-input: rgba(255, 255, 255, 0.32);
+$kb-border-result: rgba(255, 255, 255, 0.28);
+
+$kb-accent-hover: #10cfe8;
+$kb-accent-border: rgba(0, 188, 212, 0.72);
+$kb-accent-border-strong: rgba(0, 188, 212, 0.84);
+$kb-accent-border-soft: rgba(0, 188, 212, 0.36);
+$kb-accent-surface: rgba(0, 188, 212, 0.16);
+$kb-accent-surface-soft: rgba(0, 188, 212, 0.12);
+$kb-accent-surface-muted: rgba(0, 188, 212, 0.1);
+$kb-accent-focus: rgba(0, 188, 212, 0.18);
+$kb-accent-focus-strong: rgba(0, 188, 212, 0.28);
+$kb-accent-shadow: rgba(0, 188, 212, 0.32);
+$kb-accent-shadow-button: rgba(0, 188, 212, 0.4);
+$kb-accent-rgb: 0, 188, 212;
+
+$kb-shadow-hover: rgba(0, 0, 0, 0.7);
+$kb-shadow-drop: rgba(0, 0, 0, 0.35);
+$kb-shadow-panel: rgba(0, 0, 0, 0.18);
+$kb-glow-purple: #4a148c55;
+$kb-glow-purple-soft: #4a148c33;
+$kb-glow-accent: #00bcd455;
+$kb-glow-accent-soft: #00bcd433;
+$kb-title-shadow: 0 0 1px #14302e, 2px 2px 3px #1c4a48, -1px -1px 1px rgba(255, 255, 255, 0.28);
+
+$kb-light-border: #999;
+$kb-light-border-soft: #ccc;
+$kb-light-border-strong: #444;
+$kb-light-border-medium: #777;
+$kb-light-surface: rgba(0, 0, 0, 0.02);
+$kb-light-surface-active: rgba(63, 81, 181, 0.06);
+$kb-light-primary: #3f51b5;
+$kb-light-bg: #fff;
+$kb-light-bg-muted: #f5f5f5;
+$kb-light-bg-card: #f9f9f9;
+$kb-light-text: #444;
+$kb-light-text-muted: #555;
+$kb-light-shadow: #ddd;
+$kb-file-alt-bg: #611111;
+$kb-file-video-bg: #b56526;
+$kb-scrollbar-thumb: rgba(0, 0, 0, 0.35);
+$kb-scrollbar-thumb-strong: rgba(0, 0, 0, 0.4);
+$kb-scrollbar-track: red;
+$kb-scrollbar-bg: aqua;
+
+$kb-preview-bg: #0f0f12;
+$kb-preview-panel-bg: #0b0b0d;
+$kb-preview-text: #e9eaee;
+$kb-preview-header-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+$kb-preview-button-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
+$kb-preview-white-02: rgba(255, 255, 255, 0.02);
+$kb-preview-white-06: rgba(255, 255, 255, 0.06);
+$kb-preview-white-08: rgba(255, 255, 255, 0.08);
+$kb-preview-white-12: rgba(255, 255, 255, 0.12);
+$kb-preview-white-14: rgba(255, 255, 255, 0.14);
+$kb-preview-white-16: rgba(255, 255, 255, 0.16);
+$kb-preview-white-18: rgba(255, 255, 255, 0.18);
+$kb-preview-white-28: rgba(255, 255, 255, 0.28);
+$kb-preview-loading-bg: rgba(7, 7, 10, 0.65);
+
+$kb-editor-overlay-bg: rgba(28, 32, 38, 0.88);
+$kb-editor-overlay-hover-bg: #111827;
+$kb-editor-overlay-blocked-bg: rgba(248, 250, 252, 0.96);
+$kb-editor-overlay-blocked-border: rgba(148, 163, 184, 0.7);
+$kb-editor-overlay-blocked-text: #1f2937;
+$kb-quill-debug-bg: lawngreen;
+$kb-page-bg: #000;
+
+:root {
+  /* Tema escuro principal */
+  --kb-bg-gradient: #{$kb-bg-gradient};
+  --kb-card-bg: #{$kb-card-bg};
+  --kb-border-glow: #{$kb-border-glow};
+  --kb-text-color: #{$kb-text-color};
+  --kb-accent-color: #{$kb-accent-color};
+  --kb-shadow-color: #{$kb-shadow-color};
+
+  /* Superficies e textos */
+  --kb-surface-control: #{$kb-surface-control};
+  --kb-surface-control-soft: #{$kb-surface-control-soft};
+  --kb-surface-row: #{$kb-surface-row};
+  --kb-surface-chip: #{$kb-surface-chip};
+  --kb-text-strong: #{$kb-text-strong};
+  --kb-text-soft: #{$kb-text-soft};
+  --kb-text-status: #{$kb-text-status};
+  --kb-text-muted: #{$kb-text-muted};
+  --kb-text-meta: #{$kb-text-meta};
+  --kb-text-label: #{$kb-text-label};
+  --kb-text-subtle: #{$kb-text-subtle};
+  --kb-text-placeholder: #{$kb-text-placeholder};
+  --kb-text-disabled: #{$kb-text-disabled};
+  --kb-text-option: #{$kb-text-option};
+  --kb-danger-color: #{$kb-danger-color};
+  --kb-border-subtle: #{$kb-border-subtle};
+  --kb-border-field: #{$kb-border-field};
+  --kb-border-input: #{$kb-border-input};
+  --kb-border-result: #{$kb-border-result};
+
+  /* Acentos, foco e sombras */
+  --kb-accent-hover: #{$kb-accent-hover};
+  --kb-accent-border: #{$kb-accent-border};
+  --kb-accent-border-strong: #{$kb-accent-border-strong};
+  --kb-accent-border-soft: #{$kb-accent-border-soft};
+  --kb-accent-surface: #{$kb-accent-surface};
+  --kb-accent-surface-soft: #{$kb-accent-surface-soft};
+  --kb-accent-surface-muted: #{$kb-accent-surface-muted};
+  --kb-accent-focus: #{$kb-accent-focus};
+  --kb-accent-focus-strong: #{$kb-accent-focus-strong};
+  --kb-accent-shadow: #{$kb-accent-shadow};
+  --kb-accent-shadow-button: #{$kb-accent-shadow-button};
+  --kb-accent-rgb: #{$kb-accent-rgb};
+  --kb-shadow-hover: #{$kb-shadow-hover};
+  --kb-shadow-drop: #{$kb-shadow-drop};
+  --kb-shadow-panel: #{$kb-shadow-panel};
+  --kb-glow-purple: #{$kb-glow-purple};
+  --kb-glow-purple-soft: #{$kb-glow-purple-soft};
+  --kb-glow-accent: #{$kb-glow-accent};
+  --kb-glow-accent-soft: #{$kb-glow-accent-soft};
+  --kb-title-shadow: #{$kb-title-shadow};
+
+  /* Upload, chips e editor claro */
+  --kb-light-border: #{$kb-light-border};
+  --kb-light-border-soft: #{$kb-light-border-soft};
+  --kb-light-border-strong: #{$kb-light-border-strong};
+  --kb-light-border-medium: #{$kb-light-border-medium};
+  --kb-light-surface: #{$kb-light-surface};
+  --kb-light-surface-active: #{$kb-light-surface-active};
+  --kb-light-primary: #{$kb-light-primary};
+  --kb-light-bg: #{$kb-light-bg};
+  --kb-light-bg-muted: #{$kb-light-bg-muted};
+  --kb-light-bg-card: #{$kb-light-bg-card};
+  --kb-light-text: #{$kb-light-text};
+  --kb-light-text-muted: #{$kb-light-text-muted};
+  --kb-light-shadow: #{$kb-light-shadow};
+  --kb-file-alt-bg: #{$kb-file-alt-bg};
+  --kb-file-video-bg: #{$kb-file-video-bg};
+  --kb-scrollbar-thumb: #{$kb-scrollbar-thumb};
+  --kb-scrollbar-thumb-strong: #{$kb-scrollbar-thumb-strong};
+  --kb-scrollbar-track: #{$kb-scrollbar-track};
+  --kb-scrollbar-bg: #{$kb-scrollbar-bg};
+
+  /* Visualizador de arquivos */
+  --kb-preview-bg: #{$kb-preview-bg};
+  --kb-preview-panel-bg: #{$kb-preview-panel-bg};
+  --kb-preview-text: #{$kb-preview-text};
+  --kb-preview-header-bg: #{$kb-preview-header-bg};
+  --kb-preview-button-bg: #{$kb-preview-button-bg};
+  --kb-preview-white-02: #{$kb-preview-white-02};
+  --kb-preview-white-06: #{$kb-preview-white-06};
+  --kb-preview-white-08: #{$kb-preview-white-08};
+  --kb-preview-white-12: #{$kb-preview-white-12};
+  --kb-preview-white-14: #{$kb-preview-white-14};
+  --kb-preview-white-16: #{$kb-preview-white-16};
+  --kb-preview-white-18: #{$kb-preview-white-18};
+  --kb-preview-white-28: #{$kb-preview-white-28};
+  --kb-preview-loading-bg: #{$kb-preview-loading-bg};
+
+  /* Quill e pagina */
+  --kb-editor-overlay-bg: #{$kb-editor-overlay-bg};
+  --kb-editor-overlay-hover-bg: #{$kb-editor-overlay-hover-bg};
+  --kb-editor-overlay-blocked-bg: #{$kb-editor-overlay-blocked-bg};
+  --kb-editor-overlay-blocked-border: #{$kb-editor-overlay-blocked-border};
+  --kb-editor-overlay-blocked-text: #{$kb-editor-overlay-blocked-text};
+  --kb-quill-debug-bg: #{$kb-quill-debug-bg};
+  --kb-page-bg: #{$kb-page-bg};
+}
+
 html, body {
   height: 100%;
   margin: 0;

@@ -1,10 +1,3 @@
-$bg: linear-gradient(135deg, #232526 0%, #414345 100%);
-$card: rgba(255, 255, 255, 0.1);
-$border: rgba(255, 255, 255, 0.25);
-$text: #eaeaea;
-$accent: #00bcd4;
-$shadow: rgba(0, 0, 0, 0.6);
-
 :host {
   display: block;
   height: 91%;
@@ -26,8 +19,8 @@ $shadow: rgba(0, 0, 0, 0.6);
   flex-direction: column;
   max-height: 91dvh;
   overflow: hidden;
-  color: $text;
-  background: $bg;
+  color: var(--kb-text-color);
+  background: var(--kb-bg-gradient);
 }
 
 .page-shell::before {
@@ -35,8 +28,8 @@ $shadow: rgba(0, 0, 0, 0.6);
   inset: 0;
   content: "";
   background:
-    radial-gradient(circle at 18% 20%, #4a148c33, transparent 36%),
-    radial-gradient(circle at 82% 70%, #00bcd433, transparent 40%);
+    radial-gradient(circle at 18% 20%, var(--kb-glow-purple-soft), transparent 36%),
+    radial-gradient(circle at 82% 70%, var(--kb-glow-accent-soft), transparent 40%);
   filter: blur(76px);
 }
 
@@ -55,10 +48,10 @@ $shadow: rgba(0, 0, 0, 0.6);
   height: 67dvh !important;
   overflow: auto;
   scrollbar-width: none;
-  border: 1px solid $border;
+  border: 1px solid var(--kb-border-glow);
   border-radius: 1rem;
-  background: $card;
-  box-shadow: 0 8px 25px $shadow;
+  background: var(--kb-card-bg);
+  box-shadow: 0 8px 25px var(--kb-shadow-color);
 }
 
 .table-responsive::-webkit-scrollbar {
@@ -67,31 +60,31 @@ $shadow: rgba(0, 0, 0, 0.6);
 
 :host ::ng-deep {
   .mat-mdc-table {
-    color: $text;
+    color: var(--kb-text-color);
     background: transparent;
   }
 
   .mat-mdc-table .mdc-data-table__header-row {
     height: 2rem !important;
-    color: $accent;
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--kb-accent-color);
+    background: var(--kb-surface-control);
   }
 
   tr.mat-mdc-row {
     height: var(--row-h) !important;
-    color: $text;
-    background: rgba(255, 255, 255, 0.04);
+    color: var(--kb-text-color);
+    background: var(--kb-surface-row);
   }
 
   tr.mat-mdc-row:hover {
-    background: rgba(0, 188, 212, 0.12);
+    background: var(--kb-accent-surface-soft);
   }
 
   th.mat-mdc-header-cell,
   td.mat-mdc-cell {
     vertical-align: middle;
     color: inherit;
-    border-bottom-color: $border;
+    border-bottom-color: var(--kb-border-glow);
     padding-top: calc(var(--cell-vpad) / 2);
     padding-bottom: calc(var(--cell-vpad) / 2);
   }
@@ -129,10 +122,10 @@ $shadow: rgba(0, 0, 0, 0.6);
   }
 
   .mat-mdc-standard-chip {
-    --mdc-chip-elevated-container-color: rgba(255, 255, 255, 0.12);
-    --mdc-chip-label-text-color: #eaeaea;
+    --mdc-chip-elevated-container-color: var(--kb-surface-chip);
+    --mdc-chip-label-text-color: var(--kb-text-color);
     padding: 0.3rem !important;
-    border: 1px solid $border;
+    border: 1px solid var(--kb-border-glow);
   }
 
   .mat-mdc-standard-chip .mdc-evolution-chip__action--primary {
@@ -153,25 +146,25 @@ $shadow: rgba(0, 0, 0, 0.6);
   flex-wrap: wrap;
   gap: 0.4rem;
   padding: 0.5rem;
-  border: 1px solid $border;
+  border: 1px solid var(--kb-border-glow);
   border-radius: 0.875rem;
-  background: $card;
+  background: var(--kb-card-bg);
 }
 
 .kb-page-btn {
   min-width: 2rem;
   height: 2rem;
-  color: $text;
-  border: 1px solid $border;
+  color: var(--kb-text-color);
+  border: 1px solid var(--kb-border-glow);
   border-radius: 0.6rem;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--kb-surface-control);
 }
 
 .kb-page-btn:hover:not(:disabled),
 .kb-page-btn--active {
-  color: #fff;
-  border-color: rgba(0, 188, 212, 0.72);
-  background: rgba(0, 188, 212, 0.16);
+  color: var(--kb-text-strong);
+  border-color: var(--kb-accent-border);
+  background: var(--kb-accent-surface);
 }
 
 .kb-page-btn:disabled {
@@ -180,19 +173,19 @@ $shadow: rgba(0, 0, 0, 0.6);
 }
 
 .tags {
-  color: $text;
+  color: var(--kb-text-color);
   cursor: pointer;
 }
 
 .tags:hover {
-  color: $accent;
+  color: var(--kb-accent-color);
 }
 
 a,
 .edit,
 .delete {
   cursor: pointer;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 2px 4px var(--kb-shadow-drop));
 }
 
 a.disabled {

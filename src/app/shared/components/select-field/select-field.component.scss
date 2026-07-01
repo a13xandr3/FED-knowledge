@@ -13,7 +13,7 @@
         display: none !important;
     }
     .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-        background: rgba(0, 0, 0, 0.02) !important;
+        background: var(--kb-light-surface) !important;
         border-top: 1px solid !important;
         border-left: 1px solid !important;
         border-right: 1px solid !important;

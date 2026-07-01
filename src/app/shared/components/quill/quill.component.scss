@@ -1,24 +1,24 @@
 ::ng-deep quill-editor {
     width: 100% !important;
-    border: 1px solid #999 !important;
+    border: 1px solid var(--kb-light-border) !important;
     border-radius: 10px !important;
 }
 ::ng-deep .ql-snow .ql-tooltip {
-    background: rgba(0, 0, 0, 0.02) !important;
-    border: 1px solid #ccc;
-    box-shadow: 0 0 5px #ddd;
-    color: #444;
+    background: var(--kb-light-surface) !important;
+    border: 1px solid var(--kb-light-border-soft);
+    box-shadow: 0 0 5px var(--kb-light-shadow);
+    color: var(--kb-light-text);
     padding: 5px 12px;
     white-space: nowrap;
     left: 0 !important;
 }
 ::ng-deep .ql-toolbar.ql-snow {
-    border: 1px solid #999 !important;
+    border: 1px solid var(--kb-light-border) !important;
     box-sizing: border-box !important;
     //font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
     padding: 8px !important;
     border-radius: 10px !important;
-    background: rgba(0, 0, 0, 0.02) !important;
+    background: var(--kb-light-surface) !important;
 }
 ::ng-deep .ql-editor {
     box-sizing: border-box;
@@ -31,7 +31,7 @@
     text-align: left;
     white-space: pre-wrap;
     word-wrap: break-word;
-    background: rgba(0, 0, 0, 0.02) !important;
+    background: var(--kb-light-surface) !important;
     iframe {
         width: 100%;
         height: -webkit-fill-available;
@@ -53,9 +53,9 @@
     display: none;
 }
 ::ng-deep .kb-iframe-fallback-overlay__link {
-    background: rgba(28, 32, 38, 0.88);
+    background: var(--kb-editor-overlay-bg);
     border-radius: 4px;
-    color: #fff;
+    color: var(--kb-text-strong);
     font-size: 12px;
     line-height: 1.2;
     margin: 8px;
@@ -69,15 +69,15 @@
 }
 ::ng-deep .kb-iframe-fallback-overlay__link:hover,
 ::ng-deep .kb-iframe-fallback-overlay__link:focus-visible {
-    background: #111827;
-    color: #fff;
-    outline: 2px solid #3f51b5;
+    background: var(--kb-editor-overlay-hover-bg);
+    color: var(--kb-text-strong);
+    outline: 2px solid var(--kb-light-primary);
     outline-offset: 2px;
 }
 ::ng-deep .kb-iframe-fallback-overlay--blocked {
     align-items: center;
-    background: rgba(248, 250, 252, 0.96);
-    border: 1px solid rgba(148, 163, 184, 0.7);
+    background: var(--kb-editor-overlay-blocked-bg);
+    border: 1px solid var(--kb-editor-overlay-blocked-border);
     border-radius: 4px;
     flex-direction: column;
     gap: 10px;
@@ -86,7 +86,7 @@
     text-align: center;
 }
 ::ng-deep .kb-iframe-fallback-overlay--blocked .kb-iframe-fallback-overlay__message {
-    color: #1f2937;
+    color: var(--kb-editor-overlay-blocked-text);
     display: block;
     font-size: 13px;
     line-height: 1.35;
@@ -98,7 +98,7 @@
     border-top: 0px !important;
     border-left: 0px !important;
     border-right: 0px !important;
-    border-bottom: 1px solid #999 !important;
+    border-bottom: 1px solid var(--kb-light-border) !important;
     box-sizing: border-box;
     font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
     padding: 8px;

@@ -1,9 +1,3 @@
-$bg: linear-gradient(135deg, #232526 0%, #414345 100%);
-$border: rgba(255, 255, 255, 0.25);
-$text: #eaeaea;
-$accent: #00bcd4;
-$shadow: rgba(0, 0, 0, 0.6);
-
 :host {
   display: block;
 }
@@ -15,10 +9,10 @@ $shadow: rgba(0, 0, 0, 0.6);
   flex: 0 0 auto;
   min-height: clamp(56px, 9dvh, 88px);
   overflow: hidden;
-  color: $text;
-  background: $bg;
-  border-top: 1px solid $border;
-  box-shadow: 0 -8px 25px $shadow;
+  color: var(--kb-text-color);
+  background: var(--kb-bg-gradient);
+  border-top: 1px solid var(--kb-border-glow);
+  box-shadow: 0 -8px 25px var(--kb-shadow-color);
   box-sizing: border-box;
 }
 
@@ -27,8 +21,8 @@ $shadow: rgba(0, 0, 0, 0.6);
   inset: -120%;
   content: "";
   background:
-    radial-gradient(circle at 20% 20%, #4a148c55, transparent 34%),
-    radial-gradient(circle at 80% 20%, #00bcd455, transparent 34%);
+    radial-gradient(circle at 20% 20%, var(--kb-glow-purple), transparent 34%),
+    radial-gradient(circle at 80% 20%, var(--kb-glow-accent), transparent 34%);
   filter: blur(72px);
 }
 
@@ -50,7 +44,7 @@ $shadow: rgba(0, 0, 0, 0.6);
 
 .app-footer__copyright {
   margin: 0;
-  color: rgba(234, 234, 234, 0.84);
+  color: var(--kb-text-soft);
   font-size: 0.8rem;
 }
 
@@ -62,7 +56,7 @@ $shadow: rgba(0, 0, 0, 0.6);
 }
 
 .app-footer__link {
-  color: rgba(234, 234, 234, 0.72);
+  color: var(--kb-text-subtle);
   font-size: 0.8rem;
   line-height: 1.2;
   text-decoration: none;
@@ -70,6 +64,6 @@ $shadow: rgba(0, 0, 0, 0.6);
 
 .app-footer__link:hover,
 .app-footer__link:focus-visible {
-  color: $accent;
+  color: var(--kb-accent-color);
   text-decoration: underline;
 }
