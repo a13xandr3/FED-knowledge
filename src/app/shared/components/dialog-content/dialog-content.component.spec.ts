@@ -12,6 +12,7 @@ import { LinkStateService } from 'src/app/shared/state/link-state-service';
 import { LinkMapperService } from 'src/app/shared/services/link-mapper.service';
 import { SnackService } from 'src/app/shared/services/snack.service';
 import { FileApiService } from 'src/app/shared/services/file-api.service';
+import { AiExplainService } from 'src/app/shared/services/ai-explain.service';
 import { FilesPayload } from 'src/app/shared/utils/file-selection.util';
 import { PreviewItem } from 'src/app/types/Files';
 
@@ -51,6 +52,13 @@ const filesApiServiceMock = {
   buildPreviewsFromFileIds: jest.fn(),
   delete: jest.fn(),
   uploadOne: jest.fn(),
+  download: jest.fn(),
+  getSnapshot: jest.fn(),
+  payloadToFile: jest.fn(),
+};
+
+const aiExplainServiceMock = {
+  explain: jest.fn(),
 };
 
 const matDialogRefMock = {
@@ -93,6 +101,10 @@ describe('DialogContentComponent (standalone + Jest)', () => {
     (filesApiServiceMock.buildPreviewsFromFileIds as jest.Mock).mockResolvedValue(previewsMock);
     (filesApiServiceMock.delete as jest.Mock).mockReturnValue(of(null));
     (filesApiServiceMock.uploadOne as jest.Mock).mockImplementation((_p: any) => of({ id: 999 }));
+    (filesApiServiceMock.download as jest.Mock).mockReturnValue(of(new Blob(['abc'], { type: 'text/plain' })));
+    (filesApiServiceMock.getSnapshot as jest.Mock).mockReturnValue(of({ filename: 'a.txt', mimeType: 'text/plain' }));
+    (filesApiServiceMock.payloadToFile as jest.Mock).mockResolvedValue(new File(['abc'], 'a.txt', { type: 'text/plain' }));
+    (aiExplainServiceMock.explain as jest.Mock).mockReturnValue(of({ explanation: 'Explicacao IA', model: 'gpt-test' }));
 
     await TestBed.configureTestingModule({
       imports: [
@@ -107,6 +119,7 @@ describe('DialogContentComponent (standalone + Jest)', () => {
         { provide: LinkMapperService, useValue: linkMapperServiceMock },
         { provide: SnackService, useValue: snackServiceMock },
         { provide: FileApiService, useValue: filesApiServiceMock },
+        { provide: AiExplainService, useValue: aiExplainServiceMock },
         { provide: MatDialogRef, useValue: matDialogRefMock },
         { provide: MAT_DIALOG_DATA, useFactory: createDialogDataMock },
         // ngx-mask config para a NgxMaskDirective usada pelo componente
@@ -216,6 +229,7 @@ describe('DialogContentComponent (standalone + Jest)', () => {
         { provide: LinkMapperService, useValue: linkMapperServiceMock },
         { provide: SnackService, useValue: snackServiceMock },
         { provide: FileApiService, useValue: filesApiServiceMock },
+        { provide: AiExplainService, useValue: aiExplainServiceMock },
         { provide: MatDialogRef, useValue: matDialogRefMock },
         {
           provide: MAT_DIALOG_DATA,
@@ -308,6 +322,72 @@ describe('DialogContentComponent (standalone + Jest)', () => {
     component.onError(err);
 
     expect(errorSpy).toHaveBeenCalledWith(err);
+  });
+
+  it('explainTopic deve chamar servico de IA com contexto do card', () => {
+    component.aiPrompt = 'Explique como tutorial';
+
+    component.explainTopic();
+
+    expect(aiExplainServiceMock.explain).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'topic',
+        prompt: 'Explique como tutorial',
+        context: expect.objectContaining({
+          name: dialogDataMock.name,
+          categoria: dialogDataMock.categoria,
+          subCategoria: dialogDataMock.subCategoria,
+          descricao: dialogDataMock.descricao,
+        }),
+      }),
+      undefined,
+    );
+    expect(component.aiResult).toBe('Explicacao IA');
+    expect(component.aiResultModel).toBe('gpt-test');
+    expect(component.aiLoading).toBe(false);
+  });
+
+  it('explainAttachment deve restaurar arquivo da fila e chamar servico de IA', async () => {
+    const queuedFile = {
+      filename: 'a.txt',
+      mimeType: 'text/plain',
+      sizeBytes: 3,
+      payloadBytes: new Uint8Array([1]),
+      contentEncoding: 'identity',
+      hashSha256Hex: 'hash',
+      hashMode: 'binary',
+    };
+    (component as any).fileQueue = [queuedFile];
+
+    await component.explainAttachment({
+      index: 0,
+      filename: 'a.txt',
+      mimeType: 'text/plain',
+      sizeBytes: 3,
+    });
+
+    expect(filesApiServiceMock.payloadToFile).toHaveBeenCalledWith(queuedFile);
+    expect(aiExplainServiceMock.explain).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'file',
+        attachment: expect.objectContaining({
+          filename: 'a.txt',
+          mimeType: 'text/plain',
+        }),
+      }),
+      expect.any(File),
+    );
+  });
+
+  it('insertAiResult deve inserir HTML escapado no campo descricao', () => {
+    component.fr.get('descricao')?.setValue('<p>Antes</p>');
+    component.aiResult = 'Linha <script>\ncontinua\n\nOutro';
+
+    component.insertAiResult();
+
+    expect(component.fr.get('descricao')?.value).toBe(
+      '<p>Antes</p><p><br></p><p>Linha &lt;script&gt;<br>continua</p><p>Outro</p>'
+    );
   });
 
   it('salvar com form inválido não deve chamar serviços', () => {

@@ -92,6 +92,20 @@
 .fnt {
   font-size: 0.71rem !important;
 }
+
+.file-actions {
+  display: flex;
+  gap: .35rem;
+}
+
+.file-actions button {
+  min-height: 1.8rem;
+  padding: .2rem .45rem;
+  border: 1px solid #777;
+  border-radius: .35rem;
+  cursor: pointer;
+  background: #fff;
+}
 /*
  * Thumbnail de arquivos não‑imagem.
  * Usa layout semelhante às thumbnails de imagem para manter consistência visual.

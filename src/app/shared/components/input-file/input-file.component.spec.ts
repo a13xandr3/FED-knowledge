@@ -406,6 +406,23 @@ describe('InputFileComponent', () => {
     expect(component.previews).toEqual([]);
   });
 
+  it('onExplain deve emitir referencia do preview', () => {
+    const explainSpy = jest.spyOn(component.explainRef, 'emit');
+    component.previews = [{ id: 1, url: 'blob:1', filename: 'a.txt', mimeType: 'text/plain', sizeBytes: 1 }];
+
+    component.onExplain(component.previews[0], 0);
+    component.onExplain({ filename: 'x', url: '', sizeBytes: 0 } as any, 99);
+
+    expect(explainSpy).toHaveBeenCalledTimes(1);
+    expect(explainSpy).toHaveBeenCalledWith({
+      id: 1,
+      index: 0,
+      filename: 'a.txt',
+      mimeType: 'text/plain',
+      sizeBytes: 1,
+    });
+  });
+
   it('getIconClasses e trackById devem retornar valores esperados', () => {
     expect(component.getIconClasses({ mimeType: 'application/pdf' } as any)).toEqual(['fa-file-pdf', 'text-red-500']);
     expect(component.getIconClasses({ mimeType: 'text/plain' } as any)).toEqual(['fa-file-txt', 'text-red-500']);

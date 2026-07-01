@@ -56,7 +56,10 @@
         <div class="text-xs mt-1 truncate fnt" [title]="transformFileName(p.filename)">
           {{ transformFileName(p.filename) }}
         </div>
-        <button type="button" class="fnt" (click)="onRemove(p, i)">Remover</button>
+        <div class="file-actions">
+          <button type="button" class="fnt" (click)="onExplain(p, i)">IA</button>
+          <button type="button" class="fnt" (click)="onRemove(p, i)">Remover</button>
+        </div>
       </div>
     }
   </div>

@@ -23,6 +23,7 @@ export class UploaderComponent {
   readonly error = output<unknown>();
   readonly cleared = output<void>();
   readonly removedRef = output<{ id?: number; index: number; filename: string }>();
+  readonly explainRef = output<{ id?: number; index: number; filename: string; mimeType?: string; sizeBytes: number }>();
 
   private readonly inner = viewChild.required(InputFileComponent);
 

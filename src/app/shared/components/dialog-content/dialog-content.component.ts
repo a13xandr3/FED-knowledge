@@ -15,6 +15,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { 
   catchError, 
   concatMap, 
+  firstValueFrom,
   forkJoin, 
   map, 
   Observable, 
@@ -42,6 +43,20 @@ import { UploaderComponent } from 'src/app/shared/components/uploader/uploader.c
 import { TokenTimeLeftPipe } from 'src/app/shared/pipes/token-time-left.pipe';
 import { TokenExpiringSoonPipe } from 'src/app/shared/pipes/token-expiring-soon.pipe';
 import { PreviewItem } from 'src/app/types/Files';
+import {
+  AiExplainContext,
+  AiExplainRequest,
+  AiExplainService
+} from 'src/app/shared/services/ai-explain.service';
+
+type AttachmentExplainRef = {
+  id?: number;
+  index: number;
+  filename: string;
+  mimeType?: string;
+  sizeBytes: number;
+};
+
 @Component({
   selector: 'app-dialog-content',
   templateUrl: './dialog-content.component.html',
@@ -73,6 +88,11 @@ export class DialogContentComponent implements OnInit {
   currentContent = '';
   totalHorasDia!: string;
   public previewsFromIds: PreviewItem[] = [];
+  aiPrompt = '';
+  aiResult = '';
+  aiResultModel = '';
+  aiTargetLabel = '';
+  aiLoading = false;
   /** Fila de arquivos processados pelo input-file (payloadBytes etc.) */
   private initialIds: number[] = [];  
   private fileQueue: ProcessedFile[] = [];
@@ -86,6 +106,7 @@ export class DialogContentComponent implements OnInit {
   private readonly linkMapperService = inject(LinkMapperService);
   private readonly snackService = inject(SnackService);
   private readonly filesApiService = inject(FileApiService);
+  private readonly aiExplainService = inject(AiExplainService);
 
   private toDateBrOrEmpty(value: string | null | undefined): string {
     return this.linkMapperService.toDateBr(value ?? null) ?? '';
@@ -182,6 +203,67 @@ export class DialogContentComponent implements OnInit {
   onError(err: unknown): void {
     console.error(err);
   }
+
+  onAiPromptInput(event: Event): void {
+    this.aiPrompt = (event.target as HTMLTextAreaElement | null)?.value ?? '';
+  }
+
+  explainTopic(): void {
+    const prompt = this.aiPrompt.trim() || 'Explique o tema deste card de forma clara, objetiva e em portugues do Brasil.';
+    this.requestAiExplanation({
+      mode: 'topic',
+      prompt,
+      context: this.buildAiContext()
+    }, undefined, 'Tema do card');
+  }
+
+  async explainAttachment(ref: AttachmentExplainRef): Promise<void> {
+    try {
+      const file = await this.resolveAttachmentFile(ref);
+      if (!file) {
+        this.snackService.mostrarMensagem('Arquivo ainda nao esta disponivel para analise.', 'Fechar');
+        return;
+      }
+
+      const isImage = (file.type || ref.mimeType || '').toLowerCase().startsWith('image/');
+      const prompt = this.aiPrompt.trim() || (
+        isImage
+          ? 'Explique a imagem anexada de forma clara e destaque os pontos mais importantes.'
+          : 'Explique o arquivo anexado de forma clara e destaque os pontos mais importantes.'
+      );
+
+      this.requestAiExplanation({
+        mode: isImage ? 'image' : 'file',
+        prompt,
+        context: this.buildAiContext(),
+        attachment: {
+          filename: file.name,
+          mimeType: file.type || ref.mimeType,
+          sizeBytes: file.size
+        }
+      }, file, file.name);
+    } catch (err) {
+      this.snackService.mostrarMensagem(this.getAiErrorMessage(err), 'Fechar');
+    }
+  }
+
+  insertAiResult(): void {
+    const content = this.aiResult.trim();
+    if (!content) return;
+
+    const ctrl = this.fr.get('descricao');
+    const current = String(ctrl?.value ?? '').trim();
+    const html = this.textToHtml(content);
+    ctrl?.setValue(current ? `${current}<p><br></p>${html}` : html);
+    ctrl?.markAsDirty();
+  }
+
+  clearAiResult(): void {
+    this.aiResult = '';
+    this.aiResultModel = '';
+    this.aiTargetLabel = '';
+  }
+
   onPreviewRemoved(idx: number): void {
     const removedId = this.previewsFromIds[idx]?.id;
     this.removePreviewIdFromForm(removedId);
@@ -196,6 +278,100 @@ export class DialogContentComponent implements OnInit {
     const curr: number[] = (ctrl?.value ?? []).filter((v: any) => v !== id);
     ctrl?.setValue(curr);
   }
+
+  private requestAiExplanation(request: AiExplainRequest, file: File | undefined, targetLabel: string): void {
+    if (this.aiLoading) return;
+
+    this.aiLoading = true;
+    this.aiResult = '';
+    this.aiResultModel = '';
+    this.aiTargetLabel = targetLabel;
+
+    this.aiExplainService.explain(request, file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: response => {
+          this.aiResult = response.explanation ?? '';
+          this.aiResultModel = response.model ?? '';
+        },
+        error: err => {
+          this.aiLoading = false;
+          this.snackService.mostrarMensagem(this.getAiErrorMessage(err), 'Fechar');
+        },
+        complete: () => {
+          this.aiLoading = false;
+        }
+      });
+  }
+
+  private buildAiContext(): AiExplainContext {
+    const dados = this.fr.getRawValue();
+    const id = Number(dados.id);
+
+    return {
+      id: Number.isFinite(id) ? id : undefined,
+      name: String(dados.name ?? ''),
+      categoria: String(dados.categoria ?? ''),
+      subCategoria: String(dados.subCategoria ?? ''),
+      tags: this.toStringArray(dados.tag),
+      uris: this.toStringArray(dados.uri),
+      descricao: String(dados.descricao ?? '')
+    };
+  }
+
+  private async resolveAttachmentFile(ref: AttachmentExplainRef): Promise<File | null> {
+    const id = Number(ref.id);
+
+    if (Number.isFinite(id) && id > 0) {
+      const [snapshot, blob] = await Promise.all([
+        firstValueFrom(this.filesApiService.getSnapshot(id, false)),
+        firstValueFrom(this.filesApiService.download(id))
+      ]);
+      const filename = snapshot?.filename || ref.filename || `file-${id}`;
+      const mimeType = snapshot?.mimeType || blob.type || ref.mimeType || 'application/octet-stream';
+      return new File([blob], filename, { type: mimeType, lastModified: Date.now() });
+    }
+
+    const queued = this.findQueuedFile(ref);
+    return queued ? this.filesApiService.payloadToFile(queued) : null;
+  }
+
+  private findQueuedFile(ref: AttachmentExplainRef): ProcessedFile | undefined {
+    return this.fileQueue.find(file =>
+      file.filename === ref.filename &&
+      (!ref.sizeBytes || file.sizeBytes === ref.sizeBytes)
+    ) ?? this.fileQueue.find(file => file.filename === ref.filename);
+  }
+
+  private toStringArray(value: unknown): string[] {
+    return Array.isArray(value)
+      ? value.map(item => String(item ?? '').trim()).filter(Boolean)
+      : [];
+  }
+
+  private textToHtml(value: string): string {
+    return value
+      .split(/\n{2,}/)
+      .map(paragraph => paragraph.trim())
+      .filter(Boolean)
+      .map(paragraph => `<p>${this.escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`)
+      .join('');
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  private getAiErrorMessage(err: unknown): string {
+    const record = err as { error?: { message?: string }; message?: string } | null;
+    return record?.error?.message ?? record?.message ?? 'Falha ao gerar explicacao com IA';
+  }
+
   private deleteMany(ids: number[]): Observable<unknown> {
     return ids.length ? forkJoin(ids.map(id => this.filesApiService.delete(id))) : of(null);
   } 

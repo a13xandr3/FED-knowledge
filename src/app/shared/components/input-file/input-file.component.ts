@@ -42,6 +42,7 @@ export class InputFileComponent implements OnInit {
   readonly error = output<unknown>();
   readonly cleared = output<void>();
   readonly removedRef = output<{ id?: number; index: number; filename: string }>();
+  readonly explainRef = output<{ id?: number; index: number; filename: string; mimeType?: string; sizeBytes: number }>();
 
   // --------- estado UI ---------
   dragActive = false;
@@ -383,6 +384,16 @@ export class InputFileComponent implements OnInit {
     this.filesSvc.revokeObjectUrl(this.previews[index].url);
     this.previews.splice(index, 1);
     this.removedAt.emit(index); // pai atualiza o form/fileIDs
+  }
+  onExplain(p: PreviewItem, index: number): void {
+    if (!this.previews[index]) return;
+    this.explainRef.emit({
+      id: p.id,
+      index,
+      filename: p.filename,
+      mimeType: p.mimeType,
+      sizeBytes: p.sizeBytes
+    });
   }
   getIconClasses(p: PreviewItem): string[] {
     const mt = (p?.mimeType ?? '').toLowerCase();

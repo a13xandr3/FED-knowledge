@@ -159,13 +159,74 @@
                   (error)="onError($event)"
                   (cleared)="onClearedFiles()"
                   (removedRef)="onPreviewRemovedRef($event)"
+                  (explainRef)="explainAttachment($event)"
                   [allowMultiple]="true"
                   [previews]="previewsFromIds">
                 </app-uploader>
+                @if (aiLoading || aiResult) {
+                  <div class="ai-panel ai-panel--inline">
+                    @if (aiLoading) {
+                      <div class="ai-status">Gerando explicação para {{ aiTargetLabel }}...</div>
+                    }
+                    @if (aiResult) {
+                      <div class="ai-result">
+                        <div class="ai-result__meta">
+                          <span>{{ aiTargetLabel }}</span>
+                          @if (aiResultModel) {
+                            <span>{{ aiResultModel }}</span>
+                          }
+                        </div>
+                        <pre>{{ aiResult }}</pre>
+                        <div class="ai-result__actions">
+                          <button mat-button type="button" (click)="insertAiResult()">Inserir no comentário</button>
+                          <button mat-button type="button" (click)="clearAiResult()">Limpar</button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
               </div>
             </mat-tab>
             <mat-tab label="Comentários">
               <div class="tab-panel tab-panel--comments">
+                <div class="ai-panel">
+                  <div class="ai-toolbar">
+                    <textarea
+                      class="ai-prompt"
+                      rows="2"
+                      [value]="aiPrompt"
+                      [disabled]="aiLoading"
+                      placeholder="Opcional: oriente a explicação da IA"
+                      (input)="onAiPromptInput($event)">
+                    </textarea>
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      type="button"
+                      [disabled]="aiLoading"
+                      (click)="explainTopic()">
+                      Explicar tema
+                    </button>
+                  </div>
+                  @if (aiLoading) {
+                    <div class="ai-status">Gerando explicação para {{ aiTargetLabel }}...</div>
+                  }
+                  @if (aiResult) {
+                    <div class="ai-result">
+                      <div class="ai-result__meta">
+                        <span>{{ aiTargetLabel }}</span>
+                        @if (aiResultModel) {
+                          <span>{{ aiResultModel }}</span>
+                        }
+                      </div>
+                      <pre>{{ aiResult }}</pre>
+                      <div class="ai-result__actions">
+                        <button mat-button type="button" (click)="insertAiResult()">Inserir no comentário</button>
+                        <button mat-button type="button" (click)="clearAiResult()">Limpar</button>
+                      </div>
+                    </div>
+                  }
+                </div>
                 <app-quill formControlName="descricao"></app-quill>
               </div>
             </mat-tab>
